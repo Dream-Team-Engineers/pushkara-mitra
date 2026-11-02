@@ -43,7 +43,12 @@ function main() {
   for (const [key, info] of Object.entries(packages)) {
     const licence = String(info.licenses);
     if (isAllowed(licence)) continue;
-    const match = exceptions.find((e) => e.name === nameOf(key) && e.licence === licence);
+    const name = nameOf(key);
+    const match = exceptions.find(
+      (e) =>
+        e.licence === licence &&
+        (e.name.endsWith('*') ? name.startsWith(e.name.slice(0, -1)) : e.name === name),
+    );
     if (match) used.add(match.name);
     else failures.push(`${key}: ${licence}`);
   }

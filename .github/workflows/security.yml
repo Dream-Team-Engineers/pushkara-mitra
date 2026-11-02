@@ -77,7 +77,13 @@ jobs:
           node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('prod-deps/package.json',JSON.stringify(p))"
           cp .npmrc prod-deps/
           (cd prod-deps && npm install --package-lock-only --ignore-scripts)
-          ./osv-scanner scan source --lockfile=prod-deps/package-lock.json
+          # osv-scanner exits 128 on a lockfile with no packages, which is today's state (zero runtime dependencies).
+          count="$(node -p "Object.keys(require('./prod-deps/package-lock.json').packages).filter(Boolean).length")"
+          if [ "$count" -eq 0 ]; then
+            echo "::notice::No production dependencies to scan."
+          else
+            ./osv-scanner scan source --lockfile=prod-deps/package-lock.json
+          fi
       - name: npm audit (all dependencies, informational)
         run: npm audit --audit-level=high || echo "::warning::Dev-tool advisories present, see docs/security/vulnerability-management.md"
 
