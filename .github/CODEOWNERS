@@ -1,0 +1,19 @@
+# Two owners are intended on every critical path (Kickoff Prompt V1, section 6.6).
+# TODO(OQ-001): DEV2 and DEV3 are not yet named. Until they are, @amruthamudunuru39 (LEAD) is the
+# only owner, which means a LEAD-authored PR cannot be approved by a code owner. Replace the
+# placeholders below as soon as the usernames are known.
+# LEAD = @amruthamudunuru39, DEV2 = <TBD>, DEV3 = <TBD>
+
+*                                 @amruthamudunuru39
+/src/payments*                    @amruthamudunuru39
+/src/donations*                   @amruthamudunuru39
+/src/durable-objects/             @amruthamudunuru39
+/src/security/                    @amruthamudunuru39
+/migrations/                      @amruthamudunuru39
+/docs/compliance/                 @amruthamudunuru39
+/docs/legal/                      @amruthamudunuru39
+/docs/security/                   @amruthamudunuru39
+/.github/                         @amruthamudunuru39
+/scripts/                         @amruthamudunuru39
+/wrangler.toml                    @amruthamudunuru39
+/docs/ENGINEERING_STANDARDS.md    @amruthamudunuru39

@@ -1,0 +1,3 @@
+-- Intentionally empty: no tables yet.
+-- Rule: no personal-data columns without a data-inventory entry (docs/compliance/data-inventory.md),
+-- a retention period and counsel-reviewed notice. Location data must never be stored (ADR 0004).

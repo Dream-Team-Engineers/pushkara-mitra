@@ -1,0 +1,8 @@
+# Placeholders only. Never commit real values. Real values live in GitHub environment secrets.
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_API_TOKEN=
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+JWT_SIGNING_KEY=
+SENTRY_DSN=

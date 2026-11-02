@@ -1,0 +1,29 @@
+# Data inventory
+
+One row per data element. Nothing below is implemented yet; this is the design baseline that every feature PR must update ("Data inventory and notices updated if personal data changed").
+
+> Retention values marked "Proposed" are engineering proposals for counsel and the owners. They are not legal conclusions and every row is `NEEDS REVIEW`.
+
+## Data elements
+
+| ID    | Data element                                                     | Purpose                     | Stored?                                                 | Where                                   | Retention (Proposed)                                                       | Processor                | Consent ref          | Status       |
+| ----- | ---------------------------------------------------------------- | --------------------------- | ------------------------------------------------------- | --------------------------------------- | -------------------------------------------------------------------------- | ------------------------ | -------------------- | ------------ |
+| DI-01 | Account identifier (phone number or similar)                     | Sign-in, abuse control      | TBD                                                     | D1                                      | Until account deletion, and deletion after the event window. Needs counsel | Cloudflare, SMS provider | CON-01               | NEEDS REVIEW |
+| DI-02 | Display name                                                     | Group identification        | TBD                                                     | D1                                      | Same as DI-01                                                              | Cloudflare               | CON-01               | NEEDS REVIEW |
+| DI-03 | Group membership                                                 | Group features              | TBD                                                     | D1                                      | Deleted when the group ends, and at the latest post-event                  | Cloudflare               | CON-02               | NEEDS REVIEW |
+| DI-04 | Live location                                                    | Show group members on a map | **Never stored.** Durable Object memory only (ADR 0004) | Memory                                  | 0 (evicted on hibernation or disconnect)                                   | Cloudflare               | CON-02               | NEEDS REVIEW |
+| DI-05 | Missing-person report (subject details, photo, reporter contact) | Reunite families            | TBD: blocked pending counsel (ADR 0006)                 | TBD                                     | TBD                                                                        | Cloudflare               | CON-03               | NEEDS REVIEW |
+| DI-06 | Vendor directory data (business name, contact, category)         | Directory                   | Yes                                                     | D1, R2                                  | Life of listing plus review                                                | Cloudflare               | none (business data) | NEEDS REVIEW |
+| DI-07 | Payment references (order ID, payment ID, amount, status)        | Reconciliation, refunds     | Yes. **No card, PIN or OTP data**                       | D1                                      | Per accounting law. Needs counsel                                          | Razorpay, Cloudflare     | CON-04               | NEEDS REVIEW |
+| DI-08 | Consent records (purpose, version, timestamp, withdrawal)        | Prove and honour consent    | Yes                                                     | D1                                      | Needs counsel                                                              | Cloudflare               | all                  | NEEDS REVIEW |
+| DI-09 | Operational and security logs (no location, no content)          | Security, CERT-In           | Yes                                                     | Workers logs / sink in India (ADR 0005) | 180 days if CERT-In applies. Unverified                                    | Cloudflare               | none                 | NEEDS REVIEW |
+| DI-10 | Error telemetry                                                  | Debugging                   | Yes, scrubbed                                           | Sentry                                  | Short, to be set                                                           | Sentry                   | CON-06               | NEEDS REVIEW |
+
+## Processors and data processing agreements
+
+| Processor    | Role                                      | DPA in place? | Data location   | Status       |
+| ------------ | ----------------------------------------- | ------------- | --------------- | ------------ |
+| Cloudflare   | Hosting, Workers, D1, R2, Durable Objects | Not reviewed  | To be confirmed | NEEDS REVIEW |
+| Razorpay     | Payments                                  | Not reviewed  | To be confirmed | NEEDS REVIEW |
+| Sentry       | Error telemetry                           | Not reviewed  | To be confirmed | NEEDS REVIEW |
+| SMS provider | OTP and notices                           | Not selected  | To be confirmed | NEEDS REVIEW |

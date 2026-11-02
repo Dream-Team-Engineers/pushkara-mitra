@@ -1,0 +1,58 @@
+# No secrets here. Secrets are set per environment with `wrangler secret put` or GitHub environment secrets.
+name = "pushkara-mitra"
+main = "src/index.ts"
+compatibility_date = "2026-08-22"
+workers_dev = false
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Durable Objects: new_classes (NOT new_sqlite_classes) so no SQLite-backed storage exists.
+# See docs/decisions/0004-ephemeral-location.md.
+[[durable_objects.bindings]]
+name = "GROUP_LOCATION"
+class_name = "GroupLocation"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["GroupLocation"]
+
+[env.preview]
+name = "pushkara-mitra-preview"
+workers_dev = true
+[env.preview.assets]
+directory = "./public"
+binding = "ASSETS"
+[[env.preview.durable_objects.bindings]]
+name = "GROUP_LOCATION"
+class_name = "GroupLocation"
+[[env.preview.migrations]]
+tag = "v1"
+new_classes = ["GroupLocation"]
+
+[env.staging]
+name = "pushkara-mitra-staging"
+workers_dev = true
+[env.staging.assets]
+directory = "./public"
+binding = "ASSETS"
+[[env.staging.durable_objects.bindings]]
+name = "GROUP_LOCATION"
+class_name = "GroupLocation"
+[[env.staging.migrations]]
+tag = "v1"
+new_classes = ["GroupLocation"]
+
+[env.production]
+name = "pushkara-mitra-production"
+workers_dev = false
+[env.production.assets]
+directory = "./public"
+binding = "ASSETS"
+[[env.production.durable_objects.bindings]]
+name = "GROUP_LOCATION"
+class_name = "GroupLocation"
+[[env.production.migrations]]
+tag = "v1"
+new_classes = ["GroupLocation"]

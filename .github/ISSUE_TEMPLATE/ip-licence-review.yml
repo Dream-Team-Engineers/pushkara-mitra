@@ -1,0 +1,37 @@
+name: IP and licence review
+description: Review a dependency, asset, font, image, translation or trademark question
+labels: [ip-licence, legal]
+body:
+  - type: input
+    id: item
+    attributes:
+      label: Item (package, asset, font, text or mark)
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence or permission as stated by the owner
+  - type: input
+    id: source
+    attributes:
+      label: Source URL and date retrieved
+  - type: textarea
+    id: use
+    attributes:
+      label: How it would be used (shipped to users, build-time only, reference only)
+    validations:
+      required: true
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance impact (tick all that apply)
+      options:
+        - label: DPDP (personal data, consent, retention, deletion)
+        - label: CERT-In (incident reporting, logging)
+        - label: Payments
+        - label: E-commerce
+        - label: Children or dependents
+        - label: IP / licence
+        - label: Accessibility
+        - label: Public safety

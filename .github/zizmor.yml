@@ -1,0 +1,7 @@
+rules:
+  # Justified in docs/security/security-test-evidence.md (ZF-001): the './' form of a local
+  # reusable workflow call is the long-established syntax. We do not adopt the newer '$/' syntax
+  # until it is verified against GitHub documentation and actionlint.
+  self-repository:
+    ignore:
+      - release.yml

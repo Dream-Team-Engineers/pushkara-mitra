@@ -1,0 +1,30 @@
+name: Security review
+description: Request a design or code security review (not for live vulnerabilities)
+labels: [security]
+body:
+  - type: markdown
+    attributes:
+      value: For a real vulnerability, use private vulnerability reporting instead. Do not describe exploit details here.
+  - type: textarea
+    id: scope
+    attributes:
+      label: What needs review, and which trust boundary does it touch?
+    validations:
+      required: true
+  - type: textarea
+    id: threats
+    attributes:
+      label: Threats you already considered
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance impact (tick all that apply)
+      options:
+        - label: DPDP (personal data, consent, retention, deletion)
+        - label: CERT-In (incident reporting, logging)
+        - label: Payments
+        - label: E-commerce
+        - label: Children or dependents
+        - label: IP / licence
+        - label: Accessibility
+        - label: Public safety

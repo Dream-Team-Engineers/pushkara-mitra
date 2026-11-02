@@ -1,0 +1,75 @@
+{
+  "_comment": "Reviewed licence exceptions. Every entry is DEV/BUILD-TIME ONLY: the Worker has zero runtime dependencies (npm ls --omit=dev is empty). Status of every entry is NEEDS REVIEW until counsel or the owners sign it off. Matching is by package name and exact licence string.",
+  "exceptions": [
+    {
+      "name": "argparse",
+      "licence": "Python-2.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Permissive PSF-style licence, transitive dev tooling dependency, not distributed."
+    },
+    {
+      "name": "caniuse-lite",
+      "licence": "CC-BY-4.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Browser-support data used by build tooling. Attribution licence, not distributed."
+    },
+    {
+      "name": "lightningcss",
+      "licence": "MPL-2.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Transitive dependency of vite (test tooling). File-level copyleft, unmodified, not distributed."
+    },
+    {
+      "name": "lightningcss-win32-x64-msvc",
+      "licence": "MPL-2.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Platform binary of lightningcss. Same reasoning."
+    },
+    {
+      "name": "lightningcss-linux-x64-gnu",
+      "licence": "MPL-2.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Platform binary of lightningcss (CI runner). Same reasoning."
+    },
+    {
+      "name": "spdx-exceptions",
+      "licence": "CC-BY-3.0",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Data package pulled in by licence tooling. Not distributed."
+    },
+    {
+      "name": "spdx-ranges",
+      "licence": "(MIT AND CC-BY-3.0)",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Data package pulled in by licence tooling. Not distributed."
+    },
+    {
+      "name": "@img/sharp-wasm32",
+      "licence": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Optional image library pulled in by Wrangler/Miniflare local dev. LGPL libvips. Dynamically linked, unmodified, never deployed to the Worker."
+    },
+    {
+      "name": "@img/sharp-win32-x64",
+      "licence": "Apache-2.0 AND LGPL-3.0-or-later",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Platform binary of sharp for developer machines. Same reasoning."
+    },
+    {
+      "name": "@img/sharp-linux-x64",
+      "licence": "Apache-2.0 AND LGPL-3.0-or-later",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Platform binary of sharp for CI runners. Same reasoning."
+    }
+  ]
+}

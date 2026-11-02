@@ -1,0 +1,118 @@
+name: Security
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # CodeQL where code scanning is available (public repos, or GitHub Code Security).
+  # Otherwise Semgrep CE. Licence and rule-set terms: docs/legal/licence-register.md (NEEDS REVIEW).
+  sast:
+    name: sast
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write # upload CodeQL results (public repos only)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Initialize CodeQL
+        if: ${{ !github.event.repository.private }}
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: javascript-typescript
+      - name: Analyze with CodeQL
+        if: ${{ !github.event.repository.private }}
+        uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: ${{ github.event.repository.private }}
+        with:
+          python-version: '3.13'
+      - name: Semgrep CE (fails on high severity)
+        if: ${{ github.event.repository.private }}
+        run: |
+          pip install --disable-pip-version-check semgrep==1.183.0
+          semgrep scan --metrics=off --error --severity ERROR \
+            --config p/typescript --config p/security-audit .
+
+  sca:
+    name: sca
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: npm audit (production dependencies)
+        run: npm audit --audit-level=high --omit=dev
+      - name: Install osv-scanner (pinned version and checksum)
+        run: |
+          curl -fsSL -o osv-scanner \
+            https://github.com/google/osv-scanner/releases/download/v2.7.0/osv-scanner_linux_amd64
+          echo "160c6253e2922e9e0a6a9771c5c4c40a4b3c6090b34a3cdd5e80c96cc2e4218b  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+      - name: osv-scanner (production dependency set)
+        run: |
+          # Build a production-only lockfile so that dev-tool advisories do not block shipping code.
+          mkdir prod-deps
+          node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('prod-deps/package.json',JSON.stringify(p))"
+          cp .npmrc prod-deps/
+          (cd prod-deps && npm install --package-lock-only --ignore-scripts)
+          ./osv-scanner scan source --lockfile=prod-deps/package-lock.json
+      - name: npm audit (all dependencies, informational)
+        run: npm audit --audit-level=high || echo "::warning::Dev-tool advisories present, see docs/security/vulnerability-management.md"
+
+  secrets-scan:
+    name: secrets-scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install gitleaks CLI (pinned version and checksum)
+        run: |
+          curl -fsSL -o gitleaks.tar.gz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+      - name: Scan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          MQ_BASE: ${{ github.event.merge_group.base_sha }}
+          MQ_HEAD: ${{ github.event.merge_group.head_sha }}
+        run: |
+          case "$EVENT_NAME" in
+            pull_request) range="${PR_BASE}..${PR_HEAD}" ;;
+            merge_group) range="${MQ_BASE}..${MQ_HEAD}" ;;
+            *) range="" ;;
+          esac
+          if [ -n "$range" ]; then
+            ./gitleaks git --no-banner --redact --log-opts="$range" .
+          else
+            ./gitleaks git --no-banner --redact .
+          fi

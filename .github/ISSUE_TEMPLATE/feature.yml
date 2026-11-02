@@ -1,0 +1,37 @@
+name: Feature
+description: Propose or track a feature or task
+labels: []
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary and user value
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Testable statements. Include offline behaviour and Telugu text where relevant.
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options: [M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10]
+    validations:
+      required: true
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance impact (tick all that apply)
+      options:
+        - label: DPDP (personal data, consent, retention, deletion)
+        - label: CERT-In (incident reporting, logging)
+        - label: Payments
+        - label: E-commerce
+        - label: Children or dependents
+        - label: IP / licence
+        - label: Accessibility
+        - label: Public safety

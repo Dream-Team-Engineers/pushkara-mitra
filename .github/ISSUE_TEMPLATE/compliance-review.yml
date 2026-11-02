@@ -1,0 +1,36 @@
+name: Compliance review
+description: Track a legal or compliance obligation that needs a decision or evidence
+labels: [compliance, legal]
+body:
+  - type: input
+    id: obligation
+    attributes:
+      label: Obligation
+      description: The register ID (docs/compliance/legal-register.md) if one exists.
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question or evidence needed
+      description: Engineering is not legal advice. State what counsel or the owner must decide.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Authoritative source (URL) and date retrieved
+      description: Prefer egazette.gov.in, meity.gov.in, cert-in.org.in, rbi.org.in, indiacode.nic.in. Write "unverified" if you could not retrieve it.
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance impact (tick all that apply)
+      options:
+        - label: DPDP (personal data, consent, retention, deletion)
+        - label: CERT-In (incident reporting, logging)
+        - label: Payments
+        - label: E-commerce
+        - label: Children or dependents
+        - label: IP / licence
+        - label: Accessibility
+        - label: Public safety
