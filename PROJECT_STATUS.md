@@ -8,19 +8,20 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 
 ## 1. Summary
 
-| Area | State |
-| --- | --- |
-| Phase 0: read-only preflight | Done |
-| Phase 1: local scaffold and first push | Done, merged to `main` |
-| First CI run fixes (PR 6) | Merged. All 12 PR checks passed |
-| Phase 2: GitHub settings via `scripts/setup-github.sh` | **Not done** |
-| Phase 3: project board linking and M0 issues | **Not done** |
-| Product features (location, directory, login, payments) | Not started. They belong to M1 to M4 |
-| Legal and compliance sign-off | Not started. Every item is `NEEDS REVIEW` |
+| Area                                                    | State                                     |
+| ------------------------------------------------------- | ----------------------------------------- |
+| Phase 0: read-only preflight                            | Done                                      |
+| Phase 1: local scaffold and first push                  | Done, merged to `main`                    |
+| First CI run fixes (PR 6)                               | Merged. All 12 PR checks passed           |
+| Phase 2: GitHub settings via `scripts/setup-github.sh`  | **Not done**                              |
+| Phase 3: project board linking and M0 issues            | **Not done**                              |
+| Product features (location, directory, login, payments) | Not started. They belong to M1 to M4      |
+| Legal and compliance sign-off                           | Not started. Every item is `NEEDS REVIEW` |
 
 ## 2. What was built
 
 ### Worker (runs locally, tested)
+
 - `src/index.ts`: Cloudflare Worker. `GET /healthz` returns `{"status":"ok"}` with `Cache-Control: no-store`. Non-GET/HEAD returns 405 with `Allow: GET, HEAD`. Unknown paths return 404. Static files are served from `public/`.
 - `src/security/headers.ts`: security headers on every response (CSP with `default-src 'none'` and `frame-ancestors 'none'`, HSTS, `nosniff`, `Referrer-Policy: no-referrer`, a Permissions-Policy that disables geolocation, camera, microphone and payment, COOP and CORP).
 - `src/durable-objects/GroupLocation.ts`: stub only. It stores nothing.
@@ -28,12 +29,14 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 - `public/`: placeholder page (title and one disclaimer line, unstyled), web manifest, service worker. The manifest and service worker have not been tested in a browser.
 
 ### Tests and local gates
+
 - 15 tests in 4 files: worker smoke and headers tests (run in workerd), and repo guards on Node.
 - Privacy guard `tests/guards/no-location-persistence.test.ts`: a coarse static scan of `src/` for storage calls and coordinate fields in log calls. It is a safety net, not a proof.
 - Lint (ESLint 10, strict type-checked), typecheck (TypeScript 6, strict), Prettier, licence check (336 packages) and SBOM all passed locally.
 - The dev server was run (`npm run dev`) and these live results were observed: `/` renders the placeholder page, `/healthz` returns 200, POST returns 405, an unknown path returns 404, and the headers above are present.
 
 ### CI/CD (`.github/workflows/`, nine workflows)
+
 `ci.yml`, `security.yml`, `supply-chain.yml`, `pr-hygiene.yml`, `preview.yml`, `deploy-staging.yml`, `release.yml`, `deploy-production.yml`, `scorecard.yml`.
 
 - All use `permissions: {}` at top level, actions pinned to full commit SHAs, and `merge_group` triggers. None use `pull_request_target`.
@@ -43,11 +46,13 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 - Latest runs on `main`: CI, Security, Supply chain and Deploy staging succeeded. Scorecard was skipped. **Release failed** (see section 4).
 
 ### Governance and repo files
+
 - `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `LICENSE` (an "All rights reserved" placeholder).
 - `.github/`: `CODEOWNERS` (one owner), PR template, issue templates (feature, bug, compliance, security, IP and licence review), Dependabot config, zizmor config.
 - `scripts/setup-github.sh` (the user-supplied file, copied unchanged), `scripts/check-pr-checklist.mjs`, `scripts/licence-check.mjs`.
 
 ### Documentation
+
 - `docs/architecture.md`, `docs/i18n.md`, `docs/performance-budget.md`.
 - `docs/security/` (5 files), `docs/operations/` (5 files).
 - `docs/decisions/`: ADRs 0001 to 0007 and `OPEN_QUESTIONS.md` (OQ-001 to OQ-019).
