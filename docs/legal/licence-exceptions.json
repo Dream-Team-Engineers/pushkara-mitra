@@ -1,5 +1,5 @@
 {
-  "_comment": "Reviewed licence exceptions. Every entry is DEV/BUILD-TIME ONLY: the Worker has zero runtime dependencies (npm ls --omit=dev is empty). Status of every entry is NEEDS REVIEW until counsel or the owners sign it off. Matching is by package name and exact licence string.",
+  "_comment": "Reviewed licence exceptions. Every entry is DEV/BUILD-TIME ONLY: the Worker has zero runtime dependencies (npm ls --omit=dev is empty). Status of every entry is NEEDS REVIEW until counsel or the owners sign it off. Matching is by package name and exact licence string. A name ending in * matches any package with that prefix (platform-specific binaries differ per OS); the licence string must still match exactly.",
   "exceptions": [
     {
       "name": "argparse",
@@ -23,20 +23,6 @@
       "reason": "Transitive dependency of vite (test tooling). File-level copyleft, unmodified, not distributed."
     },
     {
-      "name": "lightningcss-win32-x64-msvc",
-      "licence": "MPL-2.0",
-      "scope": "dev",
-      "status": "NEEDS REVIEW",
-      "reason": "Platform binary of lightningcss. Same reasoning."
-    },
-    {
-      "name": "lightningcss-linux-x64-gnu",
-      "licence": "MPL-2.0",
-      "scope": "dev",
-      "status": "NEEDS REVIEW",
-      "reason": "Platform binary of lightningcss (CI runner). Same reasoning."
-    },
-    {
       "name": "spdx-exceptions",
       "licence": "CC-BY-3.0",
       "scope": "dev",
@@ -58,18 +44,25 @@
       "reason": "Optional image library pulled in by Wrangler/Miniflare local dev. LGPL libvips. Dynamically linked, unmodified, never deployed to the Worker."
     },
     {
-      "name": "@img/sharp-win32-x64",
-      "licence": "Apache-2.0 AND LGPL-3.0-or-later",
+      "name": "lightningcss-*",
+      "licence": "MPL-2.0",
       "scope": "dev",
       "status": "NEEDS REVIEW",
-      "reason": "Platform binary of sharp for developer machines. Same reasoning."
+      "reason": "Platform binaries of lightningcss (vite test tooling), one per OS and libc. Same reasoning as lightningcss."
     },
     {
-      "name": "@img/sharp-linux-x64",
+      "name": "@img/sharp-*",
       "licence": "Apache-2.0 AND LGPL-3.0-or-later",
       "scope": "dev",
       "status": "NEEDS REVIEW",
-      "reason": "Platform binary of sharp for CI runners. Same reasoning."
+      "reason": "Platform binaries of sharp for developer machines and CI runners. Dynamically linked, unmodified, never deployed to the Worker."
+    },
+    {
+      "name": "@img/sharp-libvips-*",
+      "licence": "LGPL-3.0-or-later",
+      "scope": "dev",
+      "status": "NEEDS REVIEW",
+      "reason": "Platform builds of the LGPL libvips library used by sharp. Dev tooling only, unmodified, never deployed to the Worker."
     }
   ]
 }
