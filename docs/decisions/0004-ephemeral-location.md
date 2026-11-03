@@ -1,6 +1,6 @@
 # 0004. Ephemeral location
 
-Status: Proposed (acceptance is an M0 exit criterion)
+Status: Proposed (base ADR; Amendment 1 approved for staging only on 2026-11-03)
 Date: 2026-11-02
 
 ## Context
@@ -26,7 +26,7 @@ A hibernating Durable Object can be evicted, which loses in-memory state. That i
 
 ## Amendment 1: SQLite-backed class on Workers Free (2026-11-03)
 
-Status: **Proposed. Awaiting explicit owner approval in the pull request review.** The migration change in the same pull request must not merge without that approval.
+Status: **Approved for staging only** through merge of [PR #12](https://github.com/Dream-Team-Engineers/pushkara-mitra/pull/12) on 2026-11-03 (merge commit `2bca94161311715ecf7d6a8c9b322d2e40339de8`). This approval does not authorize preview or production changes, nor approval of the base ADR's other pending M0 criteria.
 
 ### Context
 
