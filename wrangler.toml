@@ -8,8 +8,12 @@ workers_dev = false
 directory = "./public"
 binding = "ASSETS"
 
-# Durable Objects: new_classes (NOT new_sqlite_classes) so no SQLite-backed storage exists.
-# See docs/decisions/0004-ephemeral-location.md.
+# Durable Objects: GroupLocation keeps location in memory only (ADR 0004).
+# Staging runs on Workers Free, which only offers the SQLite backend, so staging uses
+# new_sqlite_classes (ADR 0004 Amendment 1). The SQLite store is provisioned but must never
+# be used: no storage API, SQL, alarms or WebSocket attachment serialisation.
+# Preview and production keep new_classes until their Cloudflare plan is decided (OQ-020).
+# Guard: tests/guards/wrangler-config.test.ts.
 [[durable_objects.bindings]]
 name = "GROUP_LOCATION"
 class_name = "GroupLocation"
@@ -42,7 +46,7 @@ name = "GROUP_LOCATION"
 class_name = "GroupLocation"
 [[env.staging.migrations]]
 tag = "v1"
-new_classes = ["GroupLocation"]
+new_sqlite_classes = ["GroupLocation"]
 
 [env.production]
 name = "pushkara-mitra-production"
