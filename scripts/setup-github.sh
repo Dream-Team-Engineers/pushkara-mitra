@@ -12,13 +12,13 @@
 set -euo pipefail
 
 GH_OWNER="${GH_OWNER:-Dream-Team-Engineers}"
-GH_REPO="${GH_REPO:?Set GH_REPO to the repository name (not the project board)}"
+GH_REPO="${GH_REPO:-pushkara-mitra}"
 PROJECT_NUMBER="${PROJECT_NUMBER:-2}"
-LEAD="${LEAD:?Set LEAD to the lead GitHub username}"
-DEV2="${DEV2:?Set DEV2 to a GitHub username}"
-DEV3="${DEV3:?Set DEV3 to a GitHub username}"
+LEAD="${LEAD:-amruthamudunuru39}"
+DEV2="${DEV2:-siddhu949}"
+DEV3="${DEV3:-gkmraju}"
 REQUIRE_SIGNED_COMMITS="${REQUIRE_SIGNED_COMMITS:-1}"
-DRY_RUN="${DRY_RUN:-0}"
+DRY_RUN="${DRY_RUN:-1}"
 
 REPO="$GH_OWNER/$GH_REPO"
 # Must match job names in .github/workflows exactly (Kickoff Prompt V1, section 6.3).
