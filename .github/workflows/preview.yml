@@ -54,3 +54,11 @@ jobs:
         run: |
           url="$(grep -oE 'https://[^ ]+workers\.dev[^ ]*' upload.log | head -n 1 || true)"
           gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Preview: ${url:-URL not found, see the workflow log}"
+      - name: Comment that nothing was deployed
+        if: steps.upload.outputs.deployed == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO"             --body "Preview NOT deployed: Cloudflare secrets are not set for the preview environment. A green preview check does not mean a preview exists."
