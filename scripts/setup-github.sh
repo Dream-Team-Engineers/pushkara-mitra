@@ -82,6 +82,16 @@ repo_settings() {
   ok "squash-only, auto-delete branches, auto-merge"
 }
 
+# release-please opens the release pull request with GITHUB_TOKEN, which GitHub
+# blocks unless this is on. The default token stays read-only; each workflow
+# declares the permissions it needs.
+actions_permissions() {
+  log "GitHub Actions workflow permissions"
+  jq -n '{default_workflow_permissions: "read", can_approve_pull_request_reviews: true}' \
+    | api PUT "repos/$REPO/actions/permissions/workflow"
+  ok "read-only default token, Actions may create pull requests"
+}
+
 security_features() {
   log "Security features"
   api_nobody PUT "repos/$REPO/vulnerability-alerts" && ok "Dependabot alerts"
@@ -311,6 +321,7 @@ EOF
 main() {
   preflight
   repo_settings
+  actions_permissions
   security_features
   rulesets
   environments
