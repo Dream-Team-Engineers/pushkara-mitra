@@ -99,6 +99,7 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 ## Daily progress — 2026-11-03 (IST)
 
 **Completed / verified**
+
 - Cloudflare Free staging configured; staging Worker deployed; homepage and `/healthz` (`{"status":"ok"}`) verified live. No production deployment.
 - Staging deployment fixes merged in PR #12: SQLite-backed Durable Object namespace for **staging only** (no storage API use permitted), privacy/config guards, reliable Wrangler failure propagation and URL smoke test. CI checks reported passing.
 - ADR 0004 staging-only amendment approval recorded via merged PR #13; base ADR's other acceptance criteria remain pending.
@@ -109,6 +110,7 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 - Security and Supply chain workflows green on `main` (user-verified screenshots).
 
 **Open / risks**
+
 - Private GitHub Free: branch ruleset enforcement and native secret scanning/push protection unavailable; CODEOWNERS/CI are not enforced PR gates. Keep manual independent review and CI secret scans.
 - GitHub security configuration **partially complete**; live setup script, project board/milestones, and remaining access/2FA checks pending.
 - Engineering Standards v3.0 still placeholder; owner approval required before V2 implementation. Legal/DPDP reviews remain `NEEDS REVIEW`.
