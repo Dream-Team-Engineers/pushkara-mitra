@@ -51,7 +51,17 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::notice::Staging deploy skipped: Cloudflare secrets are not set for the staging environment."
-            exit 0
+            echo "::error::Staging was NOT deployed: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are not set for the staging environment."
+            exit 1
           fi
-          npx wrangler deploy --env staging
+          npx wrangler deploy --env staging | tee deploy.log
+      - name: Smoke test /healthz on the deployed URL
+        run: |
+          url="$(grep -oE 'https://[^ ]+workers\.dev' deploy.log | head -n 1 || true)"
+          if [ -z "$url" ]; then
+            echo "::error::Could not find the staging URL in the deploy output."
+            exit 1
+          fi
+          body="$(curl -fsS --retry 5 --retry-delay 3 --retry-all-errors "$url/healthz")"
+          echo "$url/healthz -> $body"
+          [ "$body" = '{"status":"ok"}' ]
