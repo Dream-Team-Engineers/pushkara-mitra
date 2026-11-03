@@ -99,6 +99,7 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 ## Daily progress — 2026-11-03 (IST)
 
 **Completed / verified**
+
 - Cloudflare Free staging configured; staging Worker deployed; homepage and `/healthz` (`{"status":"ok"}`) verified live. No production deployment.
 - Staging deployment fixes merged in PR #12: SQLite-backed Durable Object namespace for **staging only** (no storage API use permitted), privacy/config guards, reliable Wrangler failure propagation and URL smoke test. CI checks reported passing.
 - ADR 0004 staging-only amendment approval recorded via merged PR #13; base ADR's other acceptance criteria remain pending.
@@ -109,6 +110,7 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 - Security and Supply chain workflows green on `main` (user-verified screenshots).
 
 **Open / risks**
+
 - Private GitHub Free: branch ruleset enforcement and native secret scanning/push protection unavailable; CODEOWNERS/CI are not enforced PR gates. Keep manual independent review and CI secret scans.
 - GitHub security configuration **partially complete**; live setup script, project board/milestones, and remaining access/2FA checks pending.
 - Engineering Standards v3.0 still placeholder; owner approval required before V2 implementation. Legal/DPDP reviews remain `NEEDS REVIEW`.
@@ -117,3 +119,28 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 **Next:** Approve engineering standards; reconcile GitHub Free governance risks; complete M0/Phase 2-3 setup safely; begin V2 secure foundation only after prerequisites.
 
 **Daily update rule:** Append a dated IST entry with verified changes, PR links, checks, blockers and next action. Preserve earlier entries; use a reviewed PR rather than direct edits to `main`.
+
+## Audit and fix — 2026-11-03 (IST, later entry)
+
+**Verified (commands run 2026-11-03)**
+
+- `main` at `052bc50`: `CI` and `Deploy staging` runs concluded `failure`; `Security`, `Supply chain` and `Release` concluded `success`. Two Dependabot update runs (`glob`, `minimatch`) also concluded `failure`; cause not yet investigated.
+- `prettier --check .` failed on `.release-please-manifest.json` and `PROJECT_STATUS.md` (whitespace only). Fixed in PR #18; `npm run check` passed locally (lint, typecheck, 23 tests, format) and all 12 PR checks passed.
+- GitHub release `v1.0.0` exists (published 2026-11-03T17:14:17Z), created by merging release PR #15. Whether it started a production deploy is **not** verified here.
+- The `production` environment has no protection rules (no required reviewers).
+- PR #17 (Engineering Standards v3.0 proposal) is open and unreviewed.
+
+**Reported by the audit, not independently verified**
+
+- The `v1.0.0` release started a production deploy that stopped only because `npm run check` failed. Check the production Worker and workflow runs before relying on this.
+- All recent PRs (#9 to #16) merged without approvals.
+- Dependabot alerts and code scanning are not viewable; `license-checker` needs Node 24 or later while the repo pins Node 22.
+
+**Open / risks**
+
+- Releases are not gated: a release can reach the production deploy job with no approval. Reset to 0.x and decouple release from production deploy (owner: LEAD).
+- Staging deploy and Dependabot runs failing on `main` need investigation.
+- No branch protection on private GitHub Free; independent review is manual.
+- Legal/DPDP rows remain `NEEDS REVIEW`; engineering readiness and legal sign-off are reported separately. No production-readiness claim.
+
+**Next:** merge PR #18 after independent review; stop releases deploying production; decide ADR 0007; review PR #17; run `setup-github.sh` dry run first.
