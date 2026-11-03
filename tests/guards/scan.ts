@@ -2,8 +2,12 @@
 
 const PERSISTENCE_PATTERNS: readonly [string, RegExp][] = [
   ['Durable Object storage', /\b(?:state|ctx|this\.ctx|this\.state)\.storage\b/],
-  ['WebSocket attachment serialisation', /\bserializeAttachment\b/],
+  ['WebSocket attachment serialisation', /\b(?:serialize|deserialize)Attachment\b/],
   ['KV/R2 put', /\.put\s*\(/],
+  // ADR 0004 Amendment 1: a SQLite-backed class may exist, but its store must never be used.
+  ['SQLite storage access', /\.sql\s*\.\s*exec\b|\bstorage\s*\.\s*sql\b/],
+  ['Durable Object KV storage API', /\bstorage\s*\.\s*kv\b/],
+  ['Durable Object alarm', /\b(?:set|get|delete)Alarm\s*\(/],
 ];
 
 const LOG_CALL = /\b(?:console|logger|log)\s*\.\s*(?:log|info|warn|error|debug|trace)\s*\(/g;

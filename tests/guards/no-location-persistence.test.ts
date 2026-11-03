@@ -27,6 +27,18 @@ describe('scanner self-tests', () => {
     expect(findPersistenceCalls('await env.BUCKET.put(key, body)')).not.toEqual([]);
   });
 
+  it('flags the SQLite backend, KV storage API, alarms and attachment deserialisation', () => {
+    expect(findPersistenceCalls('const sql = storage.sql; sql.exec("INSERT")')).not.toEqual([]);
+    expect(findPersistenceCalls('db.sql.exec("SELECT 1")')).not.toEqual([]);
+    expect(findPersistenceCalls('storage.kv.put("k", 1)')).not.toEqual([]);
+    expect(findPersistenceCalls('await ctx.setAlarm(Date.now())')).not.toEqual([]);
+    expect(findPersistenceCalls('const s = ws.deserializeAttachment()')).not.toEqual([]);
+  });
+
+  it('does not flag ordinary code', () => {
+    expect(findPersistenceCalls('const m = /a/.exec(text); const sqlish = "x";')).toEqual([]);
+  });
+
   it('ignores comments', () => {
     expect(findPersistenceCalls('// never call ctx.storage.put()\nconst a = 1;')).toEqual([]);
   });
