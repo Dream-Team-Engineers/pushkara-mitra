@@ -1,6 +1,6 @@
 # Pushkara Mitra — Project status
 
-**Ordering:** newest update first; older entries follow below. All displayed times are IST (UTC+05:30). Historical entry timestamps are their recorded Git commit times, not invented execution times. Where exact execution time or individual attribution is unavailable, say so explicitly.
+**Ordering:** newest update first; older entries follow below. All entry-heading times are IST (UTC+05:30). Historical entry timestamps are their recorded Git commit times, not invented execution times. Where exact execution time or individual attribution is unavailable, say so explicitly.
 
 **Standing update convention:** on every completed task, prepend a new timestamped entry immediately below this reporting guide. Use `YYYY-MM-DD HH:mm:ss IST`. Preserve earlier entries below it; do not append new progress at the bottom. Update through a reviewed PR, never directly on main. Historical instructions to append entries are superseded by this convention.
 
@@ -10,7 +10,7 @@
 
 - **Task / outcome:** status entries reordered newest first; verified recorded timestamps added; older reports retained below. This is a documentation layout change, not approval of the historical claims.
 - **Implemented by:** DEV3 coordinator (Codex), at the user's explicit request. Existing source-review/upload work remains in draft PR #29; this reporting update is included in that PR to avoid conflicting status edits.
-- **Accountable human owner:** LEAD `amruthamudunuru39`. **Independent human reviewer:** DEV2 `siddhu949`, requested; approval not recorded. Independent agent review is recorded separately when completed.
+- **Accountable human owner:** LEAD `amruthamudunuru39`. **Independent human reviewer:** DEV2 `siddhu949`, requested; approval not recorded. **Independent agent reviewer:** `qa_governance`, completed; no blocking issues found. This is not human approval.
 - **Evidence / checks:** five dated updates plus the V1 baseline reordered; historical Git commit metadata used for times and attribution; Markdown formatting and structural checks run. No application code, version, workflow or release history changed.
 - **Blockers:** standards adoption and G0/G1 decisions remain open in issue #24. The source upload and current reporting change are not authoritative standards approval.
 - **Next action / owner:** LEAD and DEV2 review PR #29 and the standards findings; designated human reviewers record the required decisions in issue #24.
