@@ -37,13 +37,29 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          set -euo pipefail
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::notice::Preview skipped: Cloudflare secrets are not set for the preview environment."
+            echo "::error::Preview NOT deployed: Cloudflare secrets are not set for the preview environment."
             echo "deployed=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            exit 1
           fi
           npx wrangler versions upload --env preview --tag "pr-${PR_NUMBER}" \
             --message "Preview for PR ${PR_NUMBER}" | tee upload.log
+          url="$(grep -oE 'https://[^ ]+workers\.dev[^ ]*' upload.log | head -n 1 || true)"
+          if [ -z "$url" ]; then
+            echo "::error::Preview upload returned no workers.dev URL."
+            exit 1
+          fi
+          if ! node --input-type=module -e '
+            try {
+              const url = new URL(process.argv[1]);
+              if (url.protocol !== "https:" || !url.hostname.endsWith(".workers.dev") || url.username || url.password || url.port) process.exit(1);
+            } catch { process.exit(1); }
+          ' "$url"; then
+            echo "::error::Invalid preview workers.dev URL."
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "deployed=true" >> "$GITHUB_OUTPUT"
       - name: Comment preview URL
         if: steps.upload.outputs.deployed == 'true'
@@ -51,14 +67,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
+          PREVIEW_URL: ${{ steps.upload.outputs.url }}
         run: |
-          url="$(grep -oE 'https://[^ ]+workers\.dev[^ ]*' upload.log | head -n 1 || true)"
-          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Preview: ${url:-URL not found, see the workflow log}"
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Preview: ${PREVIEW_URL}"
       - name: Comment that nothing was deployed
-        if: steps.upload.outputs.deployed == 'false'
+        if: failure() && steps.upload.outputs.deployed == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
-          gh pr comment "$PR_NUMBER" --repo "$REPO"             --body "Preview NOT deployed: Cloudflare secrets are not set for the preview environment. A green preview check does not mean a preview exists."
+          gh pr comment "$PR_NUMBER" --repo "$REPO"             --body "Preview NOT deployed: Cloudflare secrets are not set for the preview environment. The preview check failed because no deployment was performed."
