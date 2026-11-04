@@ -1,0 +1,88 @@
+name: Bootstrap preview (manual, one time)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type BOOTSTRAP_PREVIEW to authorize the reviewed preview-only bootstrap
+        required: true
+        type: string
+      preflight_confirmed:
+        description: Confirm intended Free account, no existing preview namespace and an exclusive deployment window
+        required: true
+        default: false
+        type: boolean
+      reviewed_pr:
+        description: Merged PR number whose merge commit is the selected main SHA, with independent bootstrap approval
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: bootstrap-preview
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    name: bootstrap-preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: read # verify actual independent approval; never approve or merge
+    steps:
+      - name: Validate manual preview intent
+        env:
+          BOOTSTRAP_EVENT: ${{ github.event_name }}
+          BOOTSTRAP_REF: ${{ github.ref }}
+          BOOTSTRAP_CONFIRMATION: ${{ inputs.confirmation }}
+          BOOTSTRAP_PR: ${{ inputs.reviewed_pr }}
+          BOOTSTRAP_PREFLIGHT: ${{ inputs.preflight_confirmed }}
+        run: |
+          set -euo pipefail
+          if [ "$BOOTSTRAP_EVENT" != workflow_dispatch ] || [ "$BOOTSTRAP_REF" != refs/heads/main ] || [ "$BOOTSTRAP_CONFIRMATION" != BOOTSTRAP_PREVIEW ] || [ "$BOOTSTRAP_PREFLIGHT" != true ] || ! [[ "$BOOTSTRAP_PR" =~ ^[0-9]{1,10}$ ]]; then
+            echo "::error::Bootstrap requires manual confirmation, confirmed human preflight, main and a numeric reviewed PR."
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Verify independent human approval on the final reviewed PR head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BOOTSTRAP_PR: ${{ inputs.reviewed_pr }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          current_main="$(gh api "repos/$REPO/git/ref/heads/main" --jq '.object.sha')"
+          test "$RUN_SHA" = "$current_main" || { echo "::error::Main changed; obtain review on the current revision."; exit 1; }
+          gh api "repos/$REPO/pulls/$BOOTSTRAP_PR" > "$RUNNER_TEMP/preview-pr.json"
+          gh api --paginate --slurp "repos/$REPO/pulls/$BOOTSTRAP_PR/reviews?per_page=100" > "$RUNNER_TEMP/preview-reviews.json"
+          node scripts/verify-preview-bootstrap-review.mjs "$RUNNER_TEMP/preview-pr.json" "$RUNNER_TEMP/preview-reviews.json" "$RUN_SHA" "$REPO" "$BOOTSTRAP_PR"
+      - run: npm ci
+      - run: npm run check
+      - name: Recheck main before deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          current_main="$(gh api "repos/$REPO/git/ref/heads/main" --jq '.object.sha')"
+          test "$RUN_SHA" = "$current_main" || { echo "::error::Main changed; stop and review the new revision."; exit 1; }
+      - name: Bootstrap only the missing preview Worker and verify health
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap-preview.mjs

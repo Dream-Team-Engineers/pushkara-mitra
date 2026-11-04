@@ -52,3 +52,25 @@ The staging deploy failed with Cloudflare error 10097: "In order to use Durable 
 - The staging backend cannot be switched back without deleting the namespace. Staging holds no data, so this is acceptable.
 - At M10, the class is removed with a `deleted_classes` migration (docs/operations/post-event-deletion.md).
 - If production also moves to the Free plan, or to SQLite on Paid, that needs a further amendment with owner approval before its first deploy.
+
+## Amendment 2: Initial preview namespace on confirmed Workers Free (2026-11-04)
+
+Status: **PROPOSED — PENDING HUMAN REVIEW.** This candidate changes preview configuration only. It is not approval of the base ADR, a production change, a paid-plan action or authorization to deploy. Amendment 1's staging approval and configuration remain unchanged.
+
+### Evidence and scope
+
+The owner supplied a Workers Free plan screenshot. The coordinator's preview inspection reported that `pushkara-mitra-preview` has not been created (Wrangler attempt 3). These observations establish the reason for this candidate; they do not grant deployment permission, prove access to a particular account on a later run, or establish production readiness. Recheck the selected account and absence of an existing preview namespace before first bootstrap. OQ-020 continues to track the remaining decisions.
+
+Workers Free requires SQLite-backed Durable Objects, as documented in Amendment 1's authoritative references. Preview's current `new_classes` declaration cannot bootstrap `GroupLocation` on that plan. The proposed initial preview declaration is therefore `new_sqlite_classes = ["GroupLocation"]` while retaining the existing initial tag `v1`. This is an initial namespace proposal, not a conversion or reset of an existing namespace.
+
+### Proposed decision
+
+1. Only preview changes from `new_classes` to `new_sqlite_classes`. Staging retains its already approved declaration; production and top-level migration declarations remain unchanged.
+2. The SQLite namespace may be provisioned but must remain unused. No `ctx.storage`, SQL, KV, alarm, WebSocket attachment serialization/deserialization, hibernation state, location logging or history is permitted. The class remains a 501 stub and the persistence allow-list stays empty.
+3. No app feature, location handling, migration tag rewrite, namespace deletion/recreation, production deployment, paid setting or API permission change is authorized by this amendment.
+4. If a preview namespace already exists or the account/plan differs at bootstrap, stop and investigate. Do not delete, recreate, convert or reset it to force this initial migration through. Any new migration strategy needs a separate reviewed decision.
+5. Human review must record the exact configuration revision, scope and decision before use. A separate manually authorized bootstrap workflow must enforce its own preconditions; this proposal does not grant that authorization.
+
+### Verification and rollback boundaries
+
+The configuration guard checks preview/staging SQLite declarations, unchanged production/top-level declarations, only `GroupLocation`, and the original `v1` tags. Privacy guards remain mandatory and unchanged. Local tests do not provision Cloudflare resources or prove live preview availability. A rollback before first deployment can revert this preview-only candidate; after provisioning, do not assume a backend switch is reversible or remove a namespace without a separately approved migration/retention plan.

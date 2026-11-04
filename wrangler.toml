@@ -12,7 +12,9 @@ binding = "ASSETS"
 # Staging runs on Workers Free, which only offers the SQLite backend, so staging uses
 # new_sqlite_classes (ADR 0004 Amendment 1). The SQLite store is provisioned but must never
 # be used: no storage API, SQL, alarms or WebSocket attachment serialisation.
-# Preview and production keep new_classes until their Cloudflare plan is decided (OQ-020).
+# Preview proposes the same unused SQLite provisioning for Workers Free (ADR 0004 Amendment 2).
+# Amendment 2 is pending human review; this config is not deployment authorization.
+# Production and the top-level migration keep new_classes; no existing namespace is reset.
 # Guard: tests/guards/wrangler-config.test.ts.
 [[durable_objects.bindings]]
 name = "GROUP_LOCATION"
@@ -33,7 +35,7 @@ name = "GROUP_LOCATION"
 class_name = "GroupLocation"
 [[env.preview.migrations]]
 tag = "v1"
-new_classes = ["GroupLocation"]
+new_sqlite_classes = ["GroupLocation"]
 
 [env.staging]
 name = "pushkara-mitra-staging"
