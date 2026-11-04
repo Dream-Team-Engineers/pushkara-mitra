@@ -1,151 +1,46 @@
-# Pushkara Mitra: Status of V1 (as of 2026-11-02)
+# Pushkara Mitra — Project status
 
-Repository: `Dream-Team-Engineers/pushkara-mitra` (private, Free org plan). Default branch: `main`.
+**Ordering:** newest update first; older entries follow below. All entry-heading times are IST (UTC+05:30). Historical entry timestamps are their recorded Git commit times, not invented execution times. Where exact execution time or individual attribution is unavailable, say so explicitly.
 
-V1, as defined by the Kickoff Prompt V1, is the repository scaffold only. No product features were in scope.
+**Standing update convention:** on every completed task, prepend a new timestamped entry immediately below this reporting guide. Use `YYYY-MM-DD HH:mm:ss IST`. Preserve earlier entries below it; do not append new progress at the bottom. Update through a reviewed PR, never directly on main. Historical instructions to append entries are superseded by this convention.
 
-Engineering readiness and legal sign-off are reported separately. Nothing here is legal advice, and nothing is certified as compliant.
+**Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
-## 1. Summary
+## Reporting layout and accountability — 2026-11-04 20:00:05 IST
 
-| Area                                                    | State                                     |
-| ------------------------------------------------------- | ----------------------------------------- |
-| Phase 0: read-only preflight                            | Done                                      |
-| Phase 1: local scaffold and first push                  | Done, merged to `main`                    |
-| First CI run fixes (PR 6)                               | Merged. All 12 PR checks passed           |
-| Phase 2: GitHub settings via `scripts/setup-github.sh`  | **Not done**                              |
-| Phase 3: project board linking and M0 issues            | **Not done**                              |
-| Product features (location, directory, login, payments) | Not started. They belong to M1 to M4      |
-| Legal and compliance sign-off                           | Not started. Every item is `NEEDS REVIEW` |
+- **Task / outcome:** status entries reordered newest first; verified recorded timestamps added; older reports retained below. This is a documentation layout change, not approval of the historical claims.
+- **Implemented by:** DEV3 coordinator (Codex), at the user's explicit request. Existing source-review/upload work remains in draft PR #29; this reporting update is included in that PR to avoid conflicting status edits.
+- **Accountable human owner:** LEAD `amruthamudunuru39`. **Independent human reviewer:** DEV2 `siddhu949`, requested; approval not recorded. **Independent agent reviewer:** `qa_governance`, completed; no blocking issues found. This is not human approval.
+- **Evidence / checks:** five dated updates plus the V1 baseline reordered; historical Git commit metadata used for times and attribution; Markdown formatting and structural checks run. No application code, version, workflow or release history changed.
+- **Blockers:** standards adoption and G0/G1 decisions remain open in issue #24. The source upload and current reporting change are not authoritative standards approval.
+- **Next action / owner:** LEAD and DEV2 review PR #29 and the standards findings; designated human reviewers record the required decisions in issue #24.
 
-## 2. What was built
+## Standards source review — 2026-11-04 19:19:14 IST
 
-### Worker (runs locally, tested)
+**Accountability:** DEV3 coordinator inspected/uploaded; release_review independently scrutinized adoption blockers. Human standards approval remains pending.  
+**Recorded at:** commit `1f2f035` (timestamp above; task execution times were not separately recorded).
 
-- `src/index.ts`: Cloudflare Worker. `GET /healthz` returns `{"status":"ok"}` with `Cache-Control: no-store`. Non-GET/HEAD returns 405 with `Allow: GET, HEAD`. Unknown paths return 404. Static files are served from `public/`.
-- `src/security/headers.ts`: security headers on every response (CSP with `default-src 'none'` and `frame-ancestors 'none'`, HSTS, `nosniff`, `Referrer-Policy: no-referrer`, a Permissions-Policy that disables geolocation, camera, microphone and payment, COOP and CORP).
-- `src/durable-objects/GroupLocation.ts`: stub only. It stores nothing.
-- `src/flags.ts`: kill-switch stub that fails closed.
-- `public/`: placeholder page (title and one disclaimer line, unstyled), web manifest, service worker. The manifest and service worker have not been tested in a browser.
+- **Coordinator / completed:** inspected the user-uploaded Engineering Standards v3 DRAFT DOCX as reference data; all 17 substantive section bodies match the existing Markdown draft. Preserved the original binary unchanged under `docs/proposals/sources/` with SHA-256 provenance in the updated standards audit.
+- **Independent Security reviewer / completed:** confirmed suitability for draft/source archival only. Adoption blockers: missing authoritative-replacement decision and approval metadata, absent section-18 mapping, conditional signing language, stale `v0.2.0` target versus released `v1.0.1`, ADR 0004 staging exception, and effective governance/deployment-status reconciliation. No approval or legal sign-off asserted.
+- **Checks:** ZIP/OOXML parsed without executing content; no macro/embedded-object/ActiveX entries, external relationships or tracked insertions/deletions detected. Exact copied-file SHA-256 verified. This is not an antivirus certification. Markdown formatting checked; application behavior is unchanged.
+- **Next:** review the source-upload PR and audit findings, then produce a corrected approval candidate and record actual G0/G1 decisions in issue #24. `docs/ENGINEERING_STANDARDS.md` remains unchanged; uploading this draft does not unblock implementation or authorize production, version resets or release-history rewrites.
 
-### Tests and local gates
+## Post-merge verification — 2026-11-04 18:41:52 IST
 
-- 15 tests in 4 files: worker smoke and headers tests (run in workerd), and repo guards on Node.
-- Privacy guard `tests/guards/no-location-persistence.test.ts`: a coarse static scan of `src/` for storage calls and coordinate fields in log calls. It is a safety net, not a proof.
-- Lint (ESLint 10, strict type-checked), typecheck (TypeScript 6, strict), Prettier, licence check (336 packages) and SBOM all passed locally.
-- The dev server was run (`npm run dev`) and these live results were observed: `/` renders the placeholder page, `/healthz` returns 200, POST returns 405, an unknown path returns 404, and the headers above are present.
+**Accountability:** DEV3 coordinator verified and reported; qa_governance independently corroborated workflow/review evidence. No merge or deployment was performed by the reporting agent.  
+**Recorded at:** commit `4f673c6` (timestamp above; task execution times were not separately recorded).
 
-### CI/CD (`.github/workflows/`, nine workflows)
+- **Coordinator / task completed:** verified main `bc8325cdc53de906cd6aabcf62c7d07cc1aa60c4`. PR #22 (production safety), #25 (decision draft), #26 (agent checkpoint) and #27 (release metadata) are merged. No merge was performed by this agent session. The earlier checkpoint's pending-merge statements describe its earlier snapshot.
+- **Release safety:** the stop gate is now active on main. [Release run 41835536191](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835536191) succeeded with exactly one job, `release-please`; there is no production deployment job. GitHub release `v1.0.1` was published by release automation. This is release metadata, not evidence of production deployment. The callable production workflow remains an unconditional failure without secrets or deployment commands.
+- **Checks:** latest main [CI](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535769), [Security](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535827) and [Supply chain](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535778) succeeded. Scorecard skipped. [Staging run](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835536169) completed successfully, including deployment and deployed-URL `/healthz`; this remains health evidence rather than full UAT. Independent QA corroborated these results.
+- **Review evidence:** PR #22 and #25 returned no formal reviews. PR #26 returned a COMMENTED review rather than an APPROVED review. Merge state alone does not establish independent review or approval of G0/G1; the authoring session did not mark the manual review gates complete.
+- **Remaining blocker:** `docs/ENGINEERING_STANDARDS.md` is still a placeholder; issue #24 contains no new standards revision, ADR 0007/scope decision or identity/roles/retention/consent approval record. Merging a decision draft is not resolution of its pending decisions. Backend/frontend implementation remains blocked; no high-risk feature is enabled.
+- **Next action:** LEAD and the appropriate human reviewers record the authoritative standards source/revision and the G0/G1 decisions in [issue #24](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/24). Dependency risk remains tracked in issue #23. No version reset, release-history rewrite, paid setting change, production deployment, location persistence or approval bypass is authorized.
 
-`ci.yml`, `security.yml`, `supply-chain.yml`, `pr-hygiene.yml`, `preview.yml`, `deploy-staging.yml`, `release.yml`, `deploy-production.yml`, `scorecard.yml`.
+## Agent delivery checkpoint — 2026-11-04 18:31:16 IST
 
-- All use `permissions: {}` at top level, actions pinned to full commit SHAs, and `merge_group` triggers. None use `pull_request_target`.
-- Required checks (eleven): `ci-lint`, `ci-typecheck`, `ci-test`, `sast`, `sca`, `secrets-scan`, `licence-check`, `sbom`, `workflow-security`, `pr-checklist`, `pr-title`. Names were diffed against `REQUIRED_CHECKS` in `scripts/setup-github.sh` with no mismatch.
-- SAST: CodeQL on public repos, Semgrep CE on private ones.
-- Secrets scan: gitleaks 8.30.1 with a pinned checksum. Dependency scan: `npm audit` and osv-scanner 2.7.0 with a pinned checksum, run on a production-only lockfile.
-- Latest runs on `main`: CI, Security, Supply chain and Deploy staging succeeded. Scorecard was skipped. **Release failed** (see section 4).
-
-### Governance and repo files
-
-- `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `LICENSE` (an "All rights reserved" placeholder).
-- `.github/`: `CODEOWNERS` (one owner), PR template, issue templates (feature, bug, compliance, security, IP and licence review), Dependabot config, zizmor config.
-- `scripts/setup-github.sh` (the user-supplied file, copied unchanged), `scripts/check-pr-checklist.mjs`, `scripts/licence-check.mjs`.
-
-### Documentation
-
-- `docs/architecture.md`, `docs/i18n.md`, `docs/performance-budget.md`.
-- `docs/security/` (5 files), `docs/operations/` (5 files).
-- `docs/decisions/`: ADRs 0001 to 0007 and `OPEN_QUESTIONS.md` (OQ-001 to OQ-019).
-- `docs/legal/`: licence register, licence exceptions, copyright policy, trademark review, asset permissions, third-party attributions, government disclaimer.
-- `docs/compliance/` (13 files): legal register, DPDP checklist, DPIA, data inventory, consent register, CERT-In checklist, payments, donations, e-commerce, children's data safety, accessibility and evidence index. All use the 11-column record schema, and **every status is `NEEDS REVIEW`**.
-
-## 3. Key decisions already recorded
-
-- **Location is never persisted or logged** (ADR 0004): memory only, no Durable Object storage, no WebSocket attachments.
-- **No dependents or children features** until counsel answers the questions in `docs/compliance/children-data-safety.md` (ADR 0006).
-- **Repo visibility** (ADR 0007): the repo is private on the Free plan, so rulesets, environments and CodeQL are unavailable. Recommendation recorded: make it public. **Not yet decided.**
-- Reviewed licence exceptions (dev tooling only, none are runtime dependencies) are in `docs/legal/licence-exceptions.json`, all `NEEDS REVIEW`.
-
-## 4. Open issues
-
-1. **Release workflow fails on `main`.** release-please reports "GitHub Actions is not permitted to create or approve pull requests". A repo setting needs to be turned on. Per `CLAUDE.md` rule 2, GitHub settings change only through `scripts/setup-github.sh`, so this needs a decision on how to apply it. A release-please branch was also created on the remote by that run.
-2. **Release PRs and required checks (OQ-009).** PRs opened with the default `GITHUB_TOKEN` do not trigger checks, so release PRs need a separate token.
-3. **Phase 2 not run.** Needs `GH_REPO=pushkara-mitra`, `LEAD=amruthamudunuru39`, and the usernames `DEV2` and `DEV3`. Branch protection and environments cannot be enforced on a private Free repo until ADR 0007 is decided.
-4. **Phase 3 not run.** M0 issues, milestone, labels and board fields.
-5. **Not verified:** osv-scanner and gitleaks were never run locally (they ran in GitHub Actions only). The osv-scanner step skips the scan today because there are zero production dependencies.
-
-## 5. Inputs needed from the owners
-
-- `DEV2` and `DEV3` GitHub usernames.
-- `SECURITY_EMAIL` and `GRIEVANCE_EMAIL`.
-- The real `docs/ENGINEERING_STANDARDS.md` (v3.0). The current file is a placeholder, and Standards sections 5, 9, 14 and 18 need reconciling against it (OQ-002).
-- Decision on ADR 0007 (repo visibility).
-- Git identity: the global git identity is `Amrutha-MIG`, while the repo-local one is `amruthamudunuru39` with a noreply email. Choose which to use.
-- The V2 kickoff prompt (or Master Prompt v2). It is not in the repo or Downloads. It is only referred to in ADRs 0004 and 0006.
-
-## 6. Engineering readiness vs legal sign-off
-
-- **Engineering readiness:** the V1 scaffold is built, tested locally and green on `main` for CI, Security and Supply chain. Release is red, and Phases 2 and 3 are open.
-- **Legal sign-off:** none. No legal citation, effective date or compliance status has been verified by counsel. All items stay `NEEDS REVIEW` until reviewed.
-
-## 7. Next steps
-
-1. Receive the V2 file.
-2. Decide how to fix the Release workflow, and the visibility question (ADR 0007).
-3. Run Phase 3 (M0 issues). Run Phase 2 after ADR 0007 and the DEV2 and DEV3 usernames are settled.
-
----
-
-## Daily progress — 2026-11-03 (IST)
-
-**Completed / verified**
-
-- Cloudflare Free staging configured; staging Worker deployed; homepage and `/healthz` (`{"status":"ok"}`) verified live. No production deployment.
-- Staging deployment fixes merged in PR #12: SQLite-backed Durable Object namespace for **staging only** (no storage API use permitted), privacy/config guards, reliable Wrangler failure propagation and URL smoke test. CI checks reported passing.
-- ADR 0004 staging-only amendment approval recorded via merged PR #13; base ADR's other acceptance criteria remain pending.
-- CODEOWNERS updated with LEAD `amruthamudunuru39`, DEV2 `siddhu949`, DEV3 `gkmraju` via merged PR #14.
-- GitHub setup script completed a **dry run only**; live Phase 2 setup not executed.
-- Dependabot dependency graph, alerts and security updates enabled (user-confirmed); Actions default token read-only with PR creation permission enabled.
-- `release-please` rerun succeeded after permission correction; production deploy correctly skipped. Release PR #15 opened **but must not be merged** until release readiness.
-- Security and Supply chain workflows green on `main` (user-verified screenshots).
-
-**Open / risks**
-
-- Private GitHub Free: branch ruleset enforcement and native secret scanning/push protection unavailable; CODEOWNERS/CI are not enforced PR gates. Keep manual independent review and CI secret scans.
-- GitHub security configuration **partially complete**; live setup script, project board/milestones, and remaining access/2FA checks pending.
-- Engineering Standards v3.0 still placeholder; owner approval required before V2 implementation. Legal/DPDP reviews remain `NEEDS REVIEW`.
-- Staging SQLite Durable Object migration is effectively irreversible without namespace replacement; preview/production unchanged. No claim of production readiness.
-
-**Next:** Approve engineering standards; reconcile GitHub Free governance risks; complete M0/Phase 2-3 setup safely; begin V2 secure foundation only after prerequisites.
-
-**Daily update rule:** Append a dated IST entry with verified changes, PR links, checks, blockers and next action. Preserve earlier entries; use a reviewed PR rather than direct edits to `main`.
-
-## Audit and fix — 2026-11-03 (IST, later entry)
-
-**Verified (commands run 2026-11-03)**
-
-- `main` at `052bc50`: `CI` and `Deploy staging` runs concluded `failure`; `Security`, `Supply chain` and `Release` concluded `success`. Two Dependabot update runs (`glob`, `minimatch`) also concluded `failure`; cause not yet investigated.
-- `prettier --check .` failed on `.release-please-manifest.json` and `PROJECT_STATUS.md` (whitespace only). Fixed in PR #18; `npm run check` passed locally (lint, typecheck, 23 tests, format) and all 12 PR checks passed.
-- GitHub release `v1.0.0` exists (published 2026-11-03T17:14:17Z), created by merging release PR #15. Whether it started a production deploy is **not** verified here.
-- The `production` environment has no protection rules (no required reviewers).
-- PR #17 (Engineering Standards v3.0 proposal) is open and unreviewed.
-
-**Reported by the audit, not independently verified**
-
-- The `v1.0.0` release started a production deploy that stopped only because `npm run check` failed. Check the production Worker and workflow runs before relying on this.
-- All recent PRs (#9 to #16) merged without approvals.
-- Dependabot alerts and code scanning are not viewable; `license-checker` needs Node 24 or later while the repo pins Node 22.
-
-**Open / risks**
-
-- Releases are not gated: a release can reach the production deploy job with no approval. Reset to 0.x and decouple release from production deploy (owner: LEAD).
-- Staging deploy and Dependabot runs failing on `main` need investigation.
-- No branch protection on private GitHub Free; independent review is manual.
-- Legal/DPDP rows remain `NEEDS REVIEW`; engineering readiness and legal sign-off are reported separately. No production-readiness claim.
-
-**Next:** merge PR #18 after independent review; stop releases deploying production; decide ADR 0007; review PR #17; run `setup-github.sh` dry run first.
-
-## Agent delivery checkpoint — 2026-11-04 (IST)
+**Accountability:** DEV3 coordinator implemented/reported; dependency_review, delivery_plan, release_review and qa_governance agents supplied the named evidence. Human decisions remain with LEAD and designated reviewers.  
+**Recorded at:** commit `81accfd` (timestamp above; task execution times were not separately recorded).
 
 This entry supersedes older statements about current CI, team identities and release failures; earlier entries remain historical evidence. Verified base: `4e076c7595dd0b6a789ce50fbbebb1b4cce8ba80`. PR #20 was merged by `gkmraju` at 2026-11-04T12:48:54Z (18:18:54 IST); the GitHub account record does not establish how the action was initiated. No merge or production deployment was performed by this agent session. No project version reset or release-history rewrite is authorized; the older suggestion to reset to 0.x must not be executed without owner approval.
 
@@ -201,11 +96,158 @@ Authorized stabilization and planning continue through independent PRs; this che
 
 **Next action:** humans review the production stop gate and record G0/G1 decisions in issue #24; engineering can prepare decision-only contracts and compatible dependency investigations meanwhile. No agent may merge, deploy production, change paid settings, persist location or bypass human approvals. Legal/DPDP items remain `NEEDS REVIEW`.
 
-## Post-merge verification — 2026-11-04 (IST)
+## Audit and fix — 2026-11-03 23:41:11 IST
 
-- **Coordinator / task completed:** verified main `bc8325cdc53de906cd6aabcf62c7d07cc1aa60c4`. PR #22 (production safety), #25 (decision draft), #26 (agent checkpoint) and #27 (release metadata) are merged. No merge was performed by this agent session. The earlier checkpoint's pending-merge statements describe its earlier snapshot.
-- **Release safety:** the stop gate is now active on main. [Release run 41835536191](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835536191) succeeded with exactly one job, `release-please`; there is no production deployment job. GitHub release `v1.0.1` was published by release automation. This is release metadata, not evidence of production deployment. The callable production workflow remains an unconditional failure without secrets or deployment commands.
-- **Checks:** latest main [CI](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535769), [Security](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535827) and [Supply chain](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835535778) succeeded. Scorecard skipped. [Staging run](https://github.com/Dream-Team-Engineers/pushkara-mitra/actions/runs/41835536169) completed successfully, including deployment and deployed-URL `/healthz`; this remains health evidence rather than full UAT. Independent QA corroborated these results.
-- **Review evidence:** PR #22 and #25 returned no formal reviews. PR #26 returned a COMMENTED review rather than an APPROVED review. Merge state alone does not establish independent review or approval of G0/G1; the authoring session did not mark the manual review gates complete.
-- **Remaining blocker:** `docs/ENGINEERING_STANDARDS.md` is still a placeholder; issue #24 contains no new standards revision, ADR 0007/scope decision or identity/roles/retention/consent approval record. Merging a decision draft is not resolution of its pending decisions. Backend/frontend implementation remains blocked; no high-risk feature is enabled.
-- **Next action:** LEAD and the appropriate human reviewers record the authoritative standards source/revision and the G0/G1 decisions in [issue #24](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/24). Dependency risk remains tracked in issue #23. No version reset, release-history rewrite, paid setting change, production deployment, location persistence or approval bypass is authorized.
+**Accountability:** GitHub commit author `Aditya-MG`; commit records Claude Sonnet 5.5 co-authorship. Underlying audit actions are not independently assigned beyond that evidence.  
+**Recorded at:** commit `954009b` (timestamp above; task execution times were not separately recorded).
+
+**Verified (commands run 2026-11-03)**
+
+- `main` at `052bc50`: `CI` and `Deploy staging` runs concluded `failure`; `Security`, `Supply chain` and `Release` concluded `success`. Two Dependabot update runs (`glob`, `minimatch`) also concluded `failure`; cause not yet investigated.
+- `prettier --check .` failed on `.release-please-manifest.json` and `PROJECT_STATUS.md` (whitespace only). Fixed in PR #18; `npm run check` passed locally (lint, typecheck, 23 tests, format) and all 12 PR checks passed.
+- GitHub release `v1.0.0` exists (published 2026-11-03T17:14:17Z), created by merging release PR #15. Whether it started a production deploy is **not** verified here.
+- The `production` environment has no protection rules (no required reviewers).
+- PR #17 (Engineering Standards v3.0 proposal) is open and unreviewed.
+
+**Reported by the audit, not independently verified**
+
+- The `v1.0.0` release started a production deploy that stopped only because `npm run check` failed. Check the production Worker and workflow runs before relying on this.
+- All recent PRs (#9 to #16) merged without approvals.
+- Dependabot alerts and code scanning are not viewable; `license-checker` needs Node 24 or later while the repo pins Node 22.
+
+**Open / risks**
+
+- Releases are not gated: a release can reach the production deploy job with no approval. Reset to 0.x and decouple release from production deploy (owner: LEAD).
+- Staging deploy and Dependabot runs failing on `main` need investigation.
+- No branch protection on private GitHub Free; independent review is manual.
+- Legal/DPDP rows remain `NEEDS REVIEW`; engineering readiness and legal sign-off are reported separately. No production-readiness claim.
+
+**Next:** merge PR #18 after independent review; stop releases deploying production; decide ADR 0007; review PR #17; run `setup-github.sh` dry run first.
+
+## Daily progress — 2026-11-03 22:42:06 IST
+
+**Accountability:** GitHub commit author `gkmraju`; underlying work is attributed only where recorded in the entry. Independent approval is not implied.  
+**Recorded at:** commit `bb6ad94` (timestamp above; task execution times were not separately recorded).
+
+**Completed / verified**
+
+- Cloudflare Free staging configured; staging Worker deployed; homepage and `/healthz` (`{"status":"ok"}`) verified live. No production deployment.
+- Staging deployment fixes merged in PR #12: SQLite-backed Durable Object namespace for **staging only** (no storage API use permitted), privacy/config guards, reliable Wrangler failure propagation and URL smoke test. CI checks reported passing.
+- ADR 0004 staging-only amendment approval recorded via merged PR #13; base ADR's other acceptance criteria remain pending.
+- CODEOWNERS updated with LEAD `amruthamudunuru39`, DEV2 `siddhu949`, DEV3 `gkmraju` via merged PR #14.
+- GitHub setup script completed a **dry run only**; live Phase 2 setup not executed.
+- Dependabot dependency graph, alerts and security updates enabled (user-confirmed); Actions default token read-only with PR creation permission enabled.
+- `release-please` rerun succeeded after permission correction; production deploy correctly skipped. Release PR #15 opened **but must not be merged** until release readiness.
+- Security and Supply chain workflows green on `main` (user-verified screenshots).
+
+**Open / risks**
+
+- Private GitHub Free: branch ruleset enforcement and native secret scanning/push protection unavailable; CODEOWNERS/CI are not enforced PR gates. Keep manual independent review and CI secret scans.
+- GitHub security configuration **partially complete**; live setup script, project board/milestones, and remaining access/2FA checks pending.
+- Engineering Standards v3.0 still placeholder; owner approval required before V2 implementation. Legal/DPDP reviews remain `NEEDS REVIEW`.
+- Staging SQLite Durable Object migration is effectively irreversible without namespace replacement; preview/production unchanged. No claim of production readiness.
+
+**Next:** Approve engineering standards; reconcile GitHub Free governance risks; complete M0/Phase 2-3 setup safely; begin V2 secure foundation only after prerequisites.
+
+**Historical daily update rule (superseded by the current convention above):** Append a dated IST entry with verified changes, PR links, checks, blockers and next action. Preserve earlier entries; use a reviewed PR rather than direct edits to `main`.
+
+## V1 baseline — 2026-11-02 20:16:40 IST
+
+**Accountability:** GitHub commit author `amruthamudunuru39`; commit records Claude Sonnet 5.5 co-authorship. Attribution is to the recorded report, not proof of every underlying action.  
+**Recorded at:** initial status commit `b23df4c` (timestamp above; individual task times were not recorded).
+
+Repository: `Dream-Team-Engineers/pushkara-mitra` (private, Free org plan). Default branch: `main`.
+
+V1, as defined by the Kickoff Prompt V1, is the repository scaffold only. No product features were in scope.
+
+Engineering readiness and legal sign-off are reported separately. Nothing here is legal advice, and nothing is certified as compliant.
+
+### 1. Summary
+
+| Area                                                    | State                                     |
+| ------------------------------------------------------- | ----------------------------------------- |
+| Phase 0: read-only preflight                            | Done                                      |
+| Phase 1: local scaffold and first push                  | Done, merged to `main`                    |
+| First CI run fixes (PR 6)                               | Merged. All 12 PR checks passed           |
+| Phase 2: GitHub settings via `scripts/setup-github.sh`  | **Not done**                              |
+| Phase 3: project board linking and M0 issues            | **Not done**                              |
+| Product features (location, directory, login, payments) | Not started. They belong to M1 to M4      |
+| Legal and compliance sign-off                           | Not started. Every item is `NEEDS REVIEW` |
+
+### 2. What was built
+
+#### Worker (runs locally, tested)
+
+- `src/index.ts`: Cloudflare Worker. `GET /healthz` returns `{"status":"ok"}` with `Cache-Control: no-store`. Non-GET/HEAD returns 405 with `Allow: GET, HEAD`. Unknown paths return 404. Static files are served from `public/`.
+- `src/security/headers.ts`: security headers on every response (CSP with `default-src 'none'` and `frame-ancestors 'none'`, HSTS, `nosniff`, `Referrer-Policy: no-referrer`, a Permissions-Policy that disables geolocation, camera, microphone and payment, COOP and CORP).
+- `src/durable-objects/GroupLocation.ts`: stub only. It stores nothing.
+- `src/flags.ts`: kill-switch stub that fails closed.
+- `public/`: placeholder page (title and one disclaimer line, unstyled), web manifest, service worker. The manifest and service worker have not been tested in a browser.
+
+#### Tests and local gates
+
+- 15 tests in 4 files: worker smoke and headers tests (run in workerd), and repo guards on Node.
+- Privacy guard `tests/guards/no-location-persistence.test.ts`: a coarse static scan of `src/` for storage calls and coordinate fields in log calls. It is a safety net, not a proof.
+- Lint (ESLint 10, strict type-checked), typecheck (TypeScript 6, strict), Prettier, licence check (336 packages) and SBOM all passed locally.
+- The dev server was run (`npm run dev`) and these live results were observed: `/` renders the placeholder page, `/healthz` returns 200, POST returns 405, an unknown path returns 404, and the headers above are present.
+
+#### CI/CD (`.github/workflows/`, nine workflows)
+
+`ci.yml`, `security.yml`, `supply-chain.yml`, `pr-hygiene.yml`, `preview.yml`, `deploy-staging.yml`, `release.yml`, `deploy-production.yml`, `scorecard.yml`.
+
+- All use `permissions: {}` at top level, actions pinned to full commit SHAs, and `merge_group` triggers. None use `pull_request_target`.
+- Required checks (eleven): `ci-lint`, `ci-typecheck`, `ci-test`, `sast`, `sca`, `secrets-scan`, `licence-check`, `sbom`, `workflow-security`, `pr-checklist`, `pr-title`. Names were diffed against `REQUIRED_CHECKS` in `scripts/setup-github.sh` with no mismatch.
+- SAST: CodeQL on public repos, Semgrep CE on private ones.
+- Secrets scan: gitleaks 8.30.1 with a pinned checksum. Dependency scan: `npm audit` and osv-scanner 2.7.0 with a pinned checksum, run on a production-only lockfile.
+- Latest runs on `main`: CI, Security, Supply chain and Deploy staging succeeded. Scorecard was skipped. **Release failed** (see section 4).
+
+#### Governance and repo files
+
+- `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `LICENSE` (an "All rights reserved" placeholder).
+- `.github/`: `CODEOWNERS` (one owner), PR template, issue templates (feature, bug, compliance, security, IP and licence review), Dependabot config, zizmor config.
+- `scripts/setup-github.sh` (the user-supplied file, copied unchanged), `scripts/check-pr-checklist.mjs`, `scripts/licence-check.mjs`.
+
+#### Documentation
+
+- `docs/architecture.md`, `docs/i18n.md`, `docs/performance-budget.md`.
+- `docs/security/` (5 files), `docs/operations/` (5 files).
+- `docs/decisions/`: ADRs 0001 to 0007 and `OPEN_QUESTIONS.md` (OQ-001 to OQ-019).
+- `docs/legal/`: licence register, licence exceptions, copyright policy, trademark review, asset permissions, third-party attributions, government disclaimer.
+- `docs/compliance/` (13 files): legal register, DPDP checklist, DPIA, data inventory, consent register, CERT-In checklist, payments, donations, e-commerce, children's data safety, accessibility and evidence index. All use the 11-column record schema, and **every status is `NEEDS REVIEW`**.
+
+### 3. Key decisions already recorded
+
+- **Location is never persisted or logged** (ADR 0004): memory only, no Durable Object storage, no WebSocket attachments.
+- **No dependents or children features** until counsel answers the questions in `docs/compliance/children-data-safety.md` (ADR 0006).
+- **Repo visibility** (ADR 0007): the repo is private on the Free plan, so rulesets, environments and CodeQL are unavailable. Recommendation recorded: make it public. **Not yet decided.**
+- Reviewed licence exceptions (dev tooling only, none are runtime dependencies) are in `docs/legal/licence-exceptions.json`, all `NEEDS REVIEW`.
+
+### 4. Open issues
+
+1. **Release workflow fails on `main`.** release-please reports "GitHub Actions is not permitted to create or approve pull requests". A repo setting needs to be turned on. Per `CLAUDE.md` rule 2, GitHub settings change only through `scripts/setup-github.sh`, so this needs a decision on how to apply it. A release-please branch was also created on the remote by that run.
+2. **Release PRs and required checks (OQ-009).** PRs opened with the default `GITHUB_TOKEN` do not trigger checks, so release PRs need a separate token.
+3. **Phase 2 not run.** Needs `GH_REPO=pushkara-mitra`, `LEAD=amruthamudunuru39`, and the usernames `DEV2` and `DEV3`. Branch protection and environments cannot be enforced on a private Free repo until ADR 0007 is decided.
+4. **Phase 3 not run.** M0 issues, milestone, labels and board fields.
+5. **Not verified:** osv-scanner and gitleaks were never run locally (they ran in GitHub Actions only). The osv-scanner step skips the scan today because there are zero production dependencies.
+
+### 5. Inputs needed from the owners
+
+- `DEV2` and `DEV3` GitHub usernames.
+- `SECURITY_EMAIL` and `GRIEVANCE_EMAIL`.
+- The real `docs/ENGINEERING_STANDARDS.md` (v3.0). The current file is a placeholder, and Standards sections 5, 9, 14 and 18 need reconciling against it (OQ-002).
+- Decision on ADR 0007 (repo visibility).
+- Git identity: the global git identity is `Amrutha-MIG`, while the repo-local one is `amruthamudunuru39` with a noreply email. Choose which to use.
+- The V2 kickoff prompt (or Master Prompt v2). It is not in the repo or Downloads. It is only referred to in ADRs 0004 and 0006.
+
+### 6. Engineering readiness vs legal sign-off
+
+- **Engineering readiness:** the V1 scaffold is built, tested locally and green on `main` for CI, Security and Supply chain. Release is red, and Phases 2 and 3 are open.
+- **Legal sign-off:** none. No legal citation, effective date or compliance status has been verified by counsel. All items stay `NEEDS REVIEW` until reviewed.
+
+### 7. Next steps
+
+1. Receive the V2 file.
+2. Decide how to fix the Release workflow, and the visibility question (ADR 0007).
+3. Run Phase 3 (M0 issues). Run Phase 2 after ADR 0007 and the DEV2 and DEV3 usernames are settled.
+
+---
