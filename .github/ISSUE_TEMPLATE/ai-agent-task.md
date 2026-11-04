@@ -4,7 +4,7 @@ about: Small, reviewable AI-assisted implementation task
 title: "[AI] "
 labels: []
 assignees: []
----
+--- 
 
 ## Scope / owner / agent role
 ## Acceptance criteria and dependencies
