@@ -3,7 +3,7 @@
 <!-- One or two sentences. Link the issue. -->
 
 ## Checklist
- 
+
 Tick every item. For a conditional item that does not apply, tick it and write "N/A".
 
 - [ ] Tested on this PR's preview
