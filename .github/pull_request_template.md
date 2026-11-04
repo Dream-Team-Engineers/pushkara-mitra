@@ -16,3 +16,11 @@ Tick every item. For a conditional item that does not apply, tick it and write "
 - [ ] Strings externalised; works at 200% text size and with a screen reader
 - [ ] `needs-owner-review` label added if payments, donations, location, children or audit code is touched
 - [ ] No secrets
+
+
+## AI-assisted delivery safety gates
+- [ ] Human owner and independent reviewer identified
+- [ ] Privacy/security/child-safety impact and required approvals recorded
+- [ ] No unapproved production deployment, live payments, location persistence or public missing-person feature
+- [ ] CI and staging functional tests reviewed; rollback documented
+- [ ] GitHub private Free manual review verified (CODEOWNERS alone is not enforcement)
