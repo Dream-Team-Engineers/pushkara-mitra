@@ -2,7 +2,7 @@
 
 **Status:** proposed; not an authorization to launch production or enable high-risk features. Target: staging prototype by 2026-11-10; completion is not guaranteed.
 
-## Six isolated roles
+## Six isolated roles.
 1. **Orchestrator/architect (LEAD):** maintain issue dependency graph, scope, interfaces and daily integration; never self-approve.
 2. **Frontend agent (DEV2):** Telugu-first accessible PWA, multilingual UI, offline static assets; no API/personal-data caching.
 3. **Backend agent (DEV3):** Workers APIs, D1, sessions/RBAC, input validation; never store or log location.
