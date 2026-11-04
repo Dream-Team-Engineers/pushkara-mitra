@@ -1,5 +1,9 @@
 # Pushkara Mitra: Version Roadmap and Readiness
 
+**Current product direction — 2026-11-04 (IST):** the user explicitly requested the full Kumbh-Sathi feature and user-flow target, adapted for Pushkara Mitra, without silently reducing it to a foundation shell. [Reference parity acceptance](proposals/REFERENCE_PARITY_ACCEPTANCE.md) records 26 acceptance items and the verified/unknown reference behavior. The historical V1/V2 material below is sequencing context, not a restriction on planning the now-requested full product. Foundation remains the first dependency tranche. Existing no-production, no-location-persistence, no-paid-settings and high-risk human-approval boundaries remain; G0/G1 adoption and contracts still require explicit disposition. The old `v0.2.0` target is historical and does not authorize a reset from current `v1.0.1` or any tag/history rewrite. Full implementation uses the next owner-approved prospective versions.
+
+## Historical roadmap baseline — 2026-11-02
+
 Status as of 2026-11-02. Source documents: Kickoff Prompt V1, Kickoff Prompt V2, `PROJECT_STATUS.md`, the ADRs and `docs/decisions/OPEN_QUESTIONS.md`.
 
 Only **V1** and **V2** are defined by a prompt. Anything after V2 is a hint taken from the docs, not a plan, and needs its own prompt and counsel sign-off.
