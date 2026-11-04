@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { findCoordinateLogging, findPersistenceCalls } from './scan';
+import { findCoordinateLogging, findPersistenceCalls, stripComments } from './scan';
 
 const SRC = join(import.meta.dirname, '..', '..', 'src');
 
@@ -41,6 +41,44 @@ describe('scanner self-tests', () => {
 
   it('ignores comments', () => {
     expect(findPersistenceCalls('// never call ctx.storage.put()\nconst a = 1;')).toEqual([]);
+  });
+
+  it('does not hide executable persistence after comment markers in strings', () => {
+    expect(findPersistenceCalls('const note = "//"; ctx.storage.put("k", 1);')).not.toEqual([]);
+    expect(
+      findPersistenceCalls('const note = "/*"; ctx.storage.put("k", 1); const end = "*/";'),
+    ).not.toEqual([]);
+  });
+
+  it('preserves string, regex and template literal text while removing real comments', () => {
+    const literals = 'const a = "//"; const b = /[/*]/; const c = `/* text */`;';
+    expect(stripComments(`${literals} // actual comment`)).toBe(`${literals} `);
+    expect(stripComments('const text = "/*"; /* actual */ const end = "*/";')).toBe(
+      'const text = "/*";  const end = "*/";',
+    );
+  });
+
+  it('detects executable persistence inside template substitutions', () => {
+    expect(
+      findPersistenceCalls('const text = `// ${ctx.storage.put("k", 1)} /* text */`;'),
+    ).not.toEqual([]);
+    expect(
+      findPersistenceCalls('const text = `/* ${`nested ${ctx.storage.put("k", 1)}`} */`;'),
+    ).not.toEqual([]);
+  });
+
+  it('ignores actual comments inside template substitutions', () => {
+    expect(
+      findPersistenceCalls('const text = `// ${1 /* ctx.storage.put("k", 1) */} /* text */`;'),
+    ).toEqual([]);
+    expect(findPersistenceCalls('const text = `${1 // ctx.storage.put("k", 1)\n}`;')).toEqual([]);
+  });
+
+  it('does not hide coordinate logging after literal comment markers', () => {
+    expect(findCoordinateLogging('const note = "//"; console.log({ lat: 1 });')).not.toEqual([]);
+    expect(
+      findCoordinateLogging('const note = "/*"; console.log({ coords }); const end = "*/";'),
+    ).not.toEqual([]);
   });
 
   it('flags coordinates in log calls only', () => {
