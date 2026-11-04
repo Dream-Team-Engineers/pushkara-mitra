@@ -1,53 +1,24 @@
 name: Deploy production
 
-# Called only from release.yml. It is never triggered directly.
+# Retain the callable interface for existing references, but fail closed.
+# No credentials, environment or deployment commands are available to this job.
 on:
   workflow_call:
     inputs:
       ref:
-        description: Release tag to deploy
+        description: Release tag (deployment is blocked pending human approval)
         required: true
         type: string
 
 permissions: {}
 
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
-
 jobs:
-  deploy:
-    name: deploy-production
+  blocked:
+    name: production-release-blocked
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    environment: production
-    permissions:
-      contents: read
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ inputs.ref }}
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - name: Deploy to production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy --env production
-      - name: Smoke test /healthz
-        env:
-          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+      - name: Require a reviewed production release process
         run: |
-          test -n "$PRODUCTION_URL" || { echo "Set the PRODUCTION_URL environment variable"; exit 1; }
-          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors \
-            "${PRODUCTION_URL%/}/healthz"
-      - name: Print rollback command
-        if: failure()
-        run: |
-          echo "Production deploy or smoke test failed. Roll back with:"
-          echo "  npx wrangler rollback --env production"
+          echo "::error::Production deployment is disabled pending an explicit human release decision and verified independent approval controls."
+          exit 1

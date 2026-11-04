@@ -29,14 +29,6 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Tags created with GITHUB_TOKEN do not trigger other workflows, so production is
-  # deployed from this same run when a release is created.
-  deploy-production:
-    name: release-deploy-production
-    needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
-    permissions:
-      contents: read
-    uses: ./.github/workflows/deploy-production.yml
-    with:
-      ref: ${{ needs.release-please.outputs.tag_name }}
+  # Production deployment is intentionally disconnected from release creation.
+  # Re-enable only in a separately reviewed change after an explicit human
+  # release decision and verification of enforceable independent approvals.
