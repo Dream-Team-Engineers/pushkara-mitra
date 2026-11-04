@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.0...v1.0.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* block automatic production deployment ([ab97849](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/ab9784998a35f5ee3173d497e9dbed2249c3a25b))
+* block automatic production deployment ([c289852](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/c289852a3d4cf8500c158daef12fad2bd87481f0))
+
 ## 1.0.0 (2026-11-03)
 
 
