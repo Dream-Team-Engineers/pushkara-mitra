@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Truthful GitHub protection setup — 2026-11-05 05:46:01 IST
+
+- **Task / outcome:** setup now verifies exact main-only policy in preview/staging/production, stops on permission/plan/query failures, rejects extra wildcard/duplicate policies, and verifies actual production reviewers/self-review/admin-bypass and disabled auto-merge before reporting success. Dry run remains the default and does not call GitHub.
+- **Implemented by:** qa_governance; DEV3 coordinator independently reviewed/integrated. **Accountable owner:** LEAD amruthamudunuru39. **Independent human reviewer:** DEV2 siddhu949, actual approval pending.
+- **Evidence:** 24 mocked regressions plus full integrated check; Bash syntax and full-script mocked dry run passed. All fixture API writes are temporary local JSON. Exact final totals are recorded in PR.
+- **Live status / next owner:** no GitHub settings were changed. Main/environment H-01/H-02 remain live unresolved; merging this script does not apply protections. LEAD must decide ADR0007/credential isolation and approve supported controls after reviewing dry run; unsupported plan/read-back must fail, never trigger purchases/public visibility or automatic downgrades. Do not run the whole setup blindly; it also configures project metadata.
+
 ## Fail-closed dependency security evidence — 2026-11-05 05:45:07 IST
 
 - **Task / outcome:** informational dependency audit now distinguishes valid advisories from outages/invalid evidence; OSV inventory derives exact production versions/integrities from the committed lock without resolving/installing another graph. Unsupported sources/inconsistent graphs fail closed.
