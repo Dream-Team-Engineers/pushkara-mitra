@@ -1,9 +1,20 @@
 {
-  "name": "Pushkara Mitra",
+  "id": "/",
+  "name": "Pushkara Mitra — public prototype",
   "short_name": "Pushkara Mitra",
+  "description": "An independent original public prototype. No live event or personal services.",
   "lang": "te",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1d4ed8"
+  "background_color": "#f6f4ef",
+  "theme_color": "#302744",
+  "icons": [
+    {
+      "src": "/assets/mitra-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

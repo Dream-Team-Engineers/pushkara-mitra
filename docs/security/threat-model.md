@@ -47,3 +47,11 @@ Mitigations that exist today: strict CSP and security headers (tested), pinned t
 ## Open items
 
 Risk ratings and the review sign-off are pending (M0 exit criterion: "threat model v1").
+
+## Original public prototype candidate — review boundary
+
+This unmerged candidate adds only original public static pages and a six-resource offline allow-list. The canonical root and those assets must remain unconditional public representations; no authenticated or personalized response may be served at these paths. API/admin/auth, query-bearing, cross-origin, non-GET and Authorization-bearing requests are outside the service-worker cache. The redirected index.html alias is not precached or promised offline.
+
+Readiness requires the current controlling worker to acknowledge the expected cache revision and complete static set. Failed new installation with an older active worker must never report the new revision ready. Old in-flight workers can finish public requests; perpetual disappearance of every legacy public cache is not a security guarantee. Cache/protocol/helper versions must change together when static content changes.
+
+Same-origin script or service-worker compromise remains a trust risk; CSP, safe text rendering, exact static source review and deployment credential isolation are required defenses, not proof against all attacks. No identity, D1, consent, location or private processing is activated here. Future authenticated routes must reassess static paths, logout/session boundaries and cache behavior before release. Hosting connection-data handling remains unverified and requires privacy review. Native-language, accessibility, legal/IP and independent human approval remain pending.

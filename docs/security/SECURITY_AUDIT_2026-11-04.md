@@ -2,6 +2,8 @@
 
 **Audited main:** `6ae4ba05ece4138bc5c74045273340a3739b298e`. **Scope:** tracked application/static files, all ten GitHub workflows, deployment/setup/bootstrap scripts, repository guards, locked dependency advisories, main-history secret scan and read-only branch/environment metadata. Open/prototype changes are identified separately and are not counted as live fixes. Author: DEV3 coordinator; independent CI/security reviewer: release_review; runtime/header verification: qa_governance.
 
+> **Remediation follow-up, 5 November 2026:** this is the historical baseline audit. See [the current closure tracker](REMEDIATION_TRACKER.md) for separate tested PR candidates #41–#43 and the setup-hardening follow-up. None is merged or deployed; external H-01/H-02 and legal/approval gates remain open. The fully integrated local candidate passed135 tests plus80 real local routing cases. Human approval is pending.
+
 ## Precise conclusion
 
 No confirmed Critical exploit or exposed secret was found in the inspected artifacts. **The CI/deployment boundary is not secure enough to call resolved:** two conditional High risks below remain live. Main is still a small scaffold with no authenticated APIs or personal-data tables; absent future auth is a release prerequisite, not evidence of today's records leaking.

@@ -77,9 +77,24 @@ repo_settings() {
   jq -n '{
     allow_squash_merge: true, allow_merge_commit: false, allow_rebase_merge: false,
     squash_merge_commit_title: "PR_TITLE", squash_merge_commit_message: "PR_BODY",
-    delete_branch_on_merge: true, allow_auto_merge: true, allow_update_branch: true
+    delete_branch_on_merge: true, allow_auto_merge: false, allow_update_branch: true
   }' | api PATCH "repos/$REPO"
-  ok "squash-only, auto-delete branches, auto-merge"
+  if [[ "$DRY_RUN" == 1 ]]; then
+    ok "dry-run: squash-only, auto-delete and disabled auto-merge planned; not verified"
+    return
+  fi
+  local observed
+  observed="$(query "repos/$REPO")" || { warn "repository settings read-back failed"; return 1; }
+  if ! jq -e '
+      .allow_squash_merge == true and .allow_merge_commit == false and
+      .allow_rebase_merge == false and .allow_auto_merge == false and
+      .delete_branch_on_merge == true and .allow_update_branch == true and
+      .squash_merge_commit_title == "PR_TITLE" and .squash_merge_commit_message == "PR_BODY"
+    ' <<<"$observed" >/dev/null; then
+    warn "repository merge controls were not confirmed; setup stopped"
+    return 1
+  fi
+  ok "verified squash-only, auto-delete branches and disabled auto-merge"
 }
 
 # release-please opens the release pull request with GITHUB_TOKEN, which GitHub
@@ -162,34 +177,109 @@ rulesets() {
 }
 
 # ---------------------------------------------------------------- environments
+read_branch_policies() {
+  local env="$1" pages
+  pages="$(query "repos/$REPO/environments/$env/deployment-branch-policies?per_page=100" --paginate --slurp)" \
+    || { warn "cannot read branch policies on $env; no existing policy assumed"; return 1; }
+  if ! jq -e 'type == "array" and length > 0 and all(.[]; type == "object" and (.branch_policies | type == "array"))' \
+    <<<"$pages" >/dev/null; then
+    warn "invalid branch-policy response on $env; setup stopped"
+    return 1
+  fi
+  jq '[.[].branch_policies[]]' <<<"$pages"
+}
+
 add_branch_policy() {
-  local env="$1" pattern="$2" type="$3"
-  jq -n --arg n "$pattern" --arg t "$type" '{name: $n, type: $t}' \
-    | api POST "repos/$REPO/environments/$env/deployment-branch-policies" 2>/dev/null \
-    || ok "policy $pattern already present on $env"
+  local env="$1" pattern="$2" type="$3" policies
+  if [[ "$DRY_RUN" == 1 ]]; then
+    jq -n --arg n "$pattern" --arg t "$type" '{name: $n, type: $t}' \
+      | api POST "repos/$REPO/environments/$env/deployment-branch-policies"
+    ok "dry-run: $env policy planned; no live policy verified"
+    return
+  fi
+  policies="$(read_branch_policies "$env")" || return 1
+  if jq -e --arg n "$pattern" --arg t "$type" \
+    'length == 1 and .[0].name == $n and .[0].type == $t' <<<"$policies" >/dev/null; then
+    ok "verified existing $type policy $pattern on $env"
+    return
+  fi
+  if [[ "$(jq 'length' <<<"$policies")" != 0 ]]; then
+    warn "$env has unexpected or duplicate deployment policies; reconcile them through review, not automatic deletion"
+    return 1
+  fi
+  if ! jq -n --arg n "$pattern" --arg t "$type" '{name: $n, type: $t}' \
+    | api POST "repos/$REPO/environments/$env/deployment-branch-policies"; then
+    warn "could not create $type policy $pattern on $env; no policy claimed present"
+    return 1
+  fi
+  policies="$(read_branch_policies "$env")" || return 1
+  if ! jq -e --arg n "$pattern" --arg t "$type" \
+    'length == 1 and .[0].name == $n and .[0].type == $t' <<<"$policies" >/dev/null; then
+    warn "$env deployment policy was not confirmed after creation; setup stopped"
+    return 1
+  fi
+  ok "created and verified $type policy $pattern on $env"
+}
+
+verify_environment() {
+  local env="$1" reviewers="${2:-[]}" observed
+  if [[ "$DRY_RUN" == 1 ]]; then return; fi
+  observed="$(query "repos/$REPO/environments/$env")" \
+    || { warn "cannot verify returned $env environment controls"; return 1; }
+  if ! jq -e --arg env "$env" --argjson requested "$reviewers" '
+      .name == $env and
+      .deployment_branch_policy.protected_branches == false and
+      .deployment_branch_policy.custom_branch_policies == true and
+      (if $env == "production" then
+        .can_admins_bypass == false and
+        ([.protection_rules[]? | select(.type == "required_reviewers")] as $rules |
+          ($rules | length) == 1 and $rules[0].prevent_self_review == true and
+          ($rules[0].reviewers | type == "array") and
+          ($rules[0].reviewers | all(.type == "User" and (.reviewer.id | type == "number"))) and
+          ([$rules[0].reviewers[].reviewer.id] | sort) == ([$requested[].id] | sort))
+      else true end)
+    ' <<<"$observed" >/dev/null; then
+    warn "$env required controls are absent or differ from the request; setup stopped without a success claim"
+    return 1
+  fi
 }
 
 environments() {
   log "Environments"
-  jq -n '{deployment_branch_policy: null}' | api PUT "repos/$REPO/environments/preview"
-  ok "preview (any branch, test keys only)"
+  jq -n '{deployment_branch_policy: {protected_branches: false, custom_branch_policies: true}}' \
+    | api PUT "repos/$REPO/environments/preview"
+  verify_environment preview
+  add_branch_policy preview main branch
+  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: preview main-only planned; not applied"; else ok "verified preview (main only; secret scope not audited)"; fi
 
   jq -n '{deployment_branch_policy: {protected_branches: false, custom_branch_policies: true}}' \
     | api PUT "repos/$REPO/environments/staging"
+  verify_environment staging
   add_branch_policy staging main branch
-  ok "staging (main only)"
+  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: staging main-only planned; not applied"; else ok "verified staging (main only)"; fi
 
-  local reviewers
+  local reviewers lead_id dev2_id dev3_id
+  lead_id="$(user_id "$LEAD")" || return 1
+  dev2_id="$(user_id "$DEV2")" || return 1
+  dev3_id="$(user_id "$DEV3")" || return 1
   reviewers="$(jq -n \
-    --argjson a "$(user_id "$LEAD")" --argjson b "$(user_id "$DEV2")" --argjson c "$(user_id "$DEV3")" \
+    --argjson a "$lead_id" --argjson b "$dev2_id" --argjson c "$dev3_id" \
     '[{type:"User",id:$a},{type:"User",id:$b},{type:"User",id:$c}]')"
-  jq -n --argjson r "$reviewers" '{
-      wait_timer: 0, prevent_self_review: true, reviewers: $r,
+  if [[ "$DRY_RUN" != 1 ]] && ! jq -e 'length == 3 and (unique_by(.id) | length) == 3 and all(.[]; (.id | type == "number") and .id > 0)' \
+    <<<"$reviewers" >/dev/null; then
+    warn "production requires three distinct valid human reviewer IDs"
+    return 1
+  fi
+  if ! jq -n --argjson r "$reviewers" '{
+      wait_timer: 0, prevent_self_review: true, can_admins_bypass: false, reviewers: $r,
       deployment_branch_policy: {protected_branches: false, custom_branch_policies: true}}' \
-    | api PUT "repos/$REPO/environments/production" \
-    || warn "production reviewers rejected (private repos need a paid plan for this)"
+    | api PUT "repos/$REPO/environments/production"; then
+    warn "production reviewer configuration was rejected; setup stopped. Do not assume protection or upgrade/change visibility automatically."
+    return 1
+  fi
+  verify_environment production "$reviewers"
   add_branch_policy production main branch
-  ok "production (main only, 1 of 3 reviewers, no self-review)"
+  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: production reviewers/main-only planned; not verified"; else ok "verified production (main only, 1 of 3 reviewers, no self-review or admin bypass)"; fi
 }
 
 # ---------------------------------------------------------------- labels
@@ -332,4 +422,6 @@ main() {
   if [[ "$DRY_RUN" == 1 ]]; then log "Dry run complete. Re-run without DRY_RUN=1 to apply."; else log "Done"; fi
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
