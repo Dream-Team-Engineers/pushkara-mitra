@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.5](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.4...v1.0.5) (2026-11-05)
+
+
+### Bug Fixes
+
+* override minimatch and glob to patched versions ([8633605](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/8633605b1e3c2464c286806b9cfbc9b43a5b99e8))
+* override minimatch and glob to patched versions; track open decisions ([ab2722e](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/ab2722e3e67517e2b4456e36438664f84f94b9b7))
+
 ## [1.0.4](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.3...v1.0.4) (2026-11-05)
 
 
