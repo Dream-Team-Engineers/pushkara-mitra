@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.1...v1.0.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* prepare reviewed one-time Free preview bootstrap ([6ae4ba0](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/6ae4ba05ece4138bc5c74045273340a3739b298e))
+* prepare reviewed one-time Free preview bootstrap ([33695b0](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/33695b06043d2caf7f99d600123529bbd88709cf))
+
 ## [1.0.1](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.0...v1.0.1) (2026-11-04)
 
 
