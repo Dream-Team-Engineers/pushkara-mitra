@@ -240,7 +240,7 @@ No agent merges, deploys production, changes paid settings or replaces human app
 
 Recommended sequence:
 
-1. Worker-first/header boundary and real-routing integration tests (issue #38); independently review stabilization PRs #34–36.
+1. Worker-first/header boundary and real-routing integration tests (issue #38); independently review the stabilization work (#35 and #36 merged; #34 closed as superseded by #41).
 2. Approve the concrete standards/scope disposition and frontend build contract. Introduce `web`, browser/server TS boundaries, original shell/tokens/navigation, safe PWA registration/icons/offline fallback and one public content contract. Do not reorganize every folder before this slice works.
 3. In parallel, finish identity/roles/session/data/retention/provider decisions; then implement auth and ownership with negative tests, followed by minimal approved D1 consent/audit foundations.
 4. Add the complete original product journeys in dependency order using shared contracts and independent feature PRs. Sensitive activation waits for specific safety/privacy/operational approvals.
