@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.2...v1.0.3) (2026-11-05)
+
+
+### Bug Fixes
+
+* pause unreviewed preview credential execution ([64a4477](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/64a447789484764b55a38bb98c1b04ed486d18ba))
+
 ## [1.0.2](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.1...v1.0.2) (2026-11-04)
 
 
