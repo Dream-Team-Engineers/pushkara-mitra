@@ -7,6 +7,8 @@ workers_dev = false
 [assets]
 directory = "./public"
 binding = "ASSETS"
+# Security/method middleware must also wrap assets and asset redirects.
+run_worker_first = true
 
 # Durable Objects: GroupLocation keeps location in memory only (ADR 0004).
 # Staging runs on Workers Free, which only offers the SQLite backend, so staging uses
@@ -30,6 +32,8 @@ workers_dev = true
 [env.preview.assets]
 directory = "./public"
 binding = "ASSETS"
+# Security/method middleware must also wrap assets and asset redirects.
+run_worker_first = true
 [[env.preview.durable_objects.bindings]]
 name = "GROUP_LOCATION"
 class_name = "GroupLocation"
@@ -43,6 +47,8 @@ workers_dev = true
 [env.staging.assets]
 directory = "./public"
 binding = "ASSETS"
+# Security/method middleware must also wrap assets and asset redirects.
+run_worker_first = true
 [[env.staging.durable_objects.bindings]]
 name = "GROUP_LOCATION"
 class_name = "GroupLocation"
@@ -56,6 +62,8 @@ workers_dev = false
 [env.production.assets]
 directory = "./public"
 binding = "ASSETS"
+# Security/method middleware must also wrap assets and asset redirects.
+run_worker_first = true
 [[env.production.durable_objects.bindings]]
 name = "GROUP_LOCATION"
 class_name = "GroupLocation"
