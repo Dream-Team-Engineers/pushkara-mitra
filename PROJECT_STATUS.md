@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Worker-first security boundary — 2026-11-04 23:44:40 IST
+
+- **Task / outcome:** route all static assets through Worker security/method handling in all four configurations; runtime tests cover headers, methods, redirects, API/admin/auth and encoded paths. Local correction, not shipped staging.
+- **Implemented by:** qa_governance; DEV3 coordinator integrated and verified. **Accountable owner:** LEAD amruthamudunuru39. **Independent human reviewer:** DEV2 siddhu949, pending actual approval.
+- **Evidence:** 80 real local HTTP cases across four configurations; full check and workflow checks recorded in PR. No deployment, paid plan, migration/backend change, private APIs or location persistence.
+- **Blockers / next:** stacked on preview-credential pause PR #41; human review/merge and authorized staging verification required. Higher Worker invocation counts are a documented Free quota tradeoff. H-01/H-02 remain open until external enforcement is verified.
+
 ## Security audit and bounded mitigations — 2026-11-04 23:43:09 IST
 
 - **Task / outcome:** whole-main security audit at `6ae4ba05ece4138bc5c74045273340a3739b298e`; [precise findings report](docs/security/SECURITY_AUDIT_2026-11-04.md) distinguishes confirmed live exposure/control gaps, tested unmerged fixes, latent risks and unknown token/cloud impact. No Critical exploit or secret leak confirmed; no compromise clearance claimed.

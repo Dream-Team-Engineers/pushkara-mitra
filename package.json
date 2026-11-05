@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "licence-check": "node scripts/licence-check.mjs",
     "sbom": "npm sbom --sbom-format cyclonedx --sbom-type application > sbom.cdx.json",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run format:check"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run format:check",
+    "test:routing": "node scripts/test-routing.mjs"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.4.12",
