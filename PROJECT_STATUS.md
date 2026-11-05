@@ -100,6 +100,13 @@
 - **Parallel/backend evidence:** [PR #45](https://github.com/Dream-Team-Engineers/pushkara-mitra/pull/45) contains proposed public and gated foundation contracts only. It activates no endpoint, schema, persistence or approval.
 - **Blockers / next owner:** prototype stacks on unmerged security #44 (and #41–#43). DEV2 reviews final head; LEAD resolves G0/G1 and remaining BF/standards decisions before dependent backend implementation; human-reviewed assets/copy, enforceable external controls and authorized staging verification remain required. No merge, deployment, settings/billing change or original benchmark copying.
 
+## Backend contracts prepared for human decisions — 2026-11-05 06:04:28 IST
+
+- **Task / outcome:** proposed OpenAPI documents existing health and a small unimplemented public information endpoint; foundation acceptance table maps JWT/RBAC/session/D1/consent boundaries to pending BF/G0/G1 decisions and negative cases. No private route, binding, migration or processing activation.
+- **Implemented by:** dependency_review agent; DEV3 coordinator independently read/integrated. **Accountable owner:** LEAD; security/privacy and DEV2 human reviews pending. Proposed interfaces are not approved implementation contracts.
+- **Evidence:** OpenAPI3.1 validator0.7.2, formatting, valid synthetic schema plus5 rejected invalid fixtures, read-only/proposal/no-store invariants and relative links passed. These are documentation validations, not runtime API or security tests. No application dependency added.
+- **Blockers / next:** LEAD resolves authoritative standards/scope and linked BF identity/roles/session/retention/purpose decisions; approved operations then receive isolated implementation PRs. No agent infers approval, legal compliance or project completion. No remote/cloud/settings/persistence/production action.
+
 ## Truthful GitHub protection setup — 2026-11-05 05:46:01 IST
 
 - **Task / outcome:** setup now verifies exact main-only policy in preview/staging/production, stops on permission/plan/query failures, rejects extra wildcard/duplicate policies, and verifies actual production reviewers/self-review/admin-bypass and disabled auto-merge before reporting success. Dry run remains the default and does not call GitHub.
