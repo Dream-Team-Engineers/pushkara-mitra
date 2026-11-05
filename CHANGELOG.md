@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.4](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.3...v1.0.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* enforce Worker security policy on static assets ([d3c17ee](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d3c17ee3c35f5e3be4cd2270c574a7f8236bc040))
+* fail closed on invalid dependency scan evidence ([f801ae6](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/f801ae6f8b4d550a58a2fdee81ed116537c985a0))
+* verify GitHub protections before reporting success ([d39a85b](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d39a85b3b634d9548d3bb2cdf2626fad2c39b1a9))
+
 ## [1.0.3](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.2...v1.0.3) (2026-11-05)
 
 
