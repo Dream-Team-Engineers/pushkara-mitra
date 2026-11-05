@@ -1,0 +1,140 @@
+openapi: 3.1.0
+info:
+  title: Pushkara Mitra public information — proposed contract
+  version: 0.1.0-proposed
+  description: |
+    DESIGN ONLY. GET /healthz documents current scaffold behavior. The public
+    information endpoint is PROPOSED and is not implemented or approved.
+    G0 scope/standards approval and reviewed public copy are prerequisites.
+    This file creates no endpoint, resource, data collection or release authority.
+x-review-status: PROPOSED
+x-approval-evidence: null
+security: []
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      x-implementation-status: EXISTING_SCAFFOLD
+      summary: Return process liveness only
+      description: Not a readiness, dependency, authentication or compliance check.
+      responses:
+        '200':
+          description: Existing Worker response
+          headers:
+            Cache-Control:
+              schema:
+                const: no-store
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status]
+                properties:
+                  status:
+                    const: ok
+  /api/public/information:
+    get:
+      operationId: getPublicInformation
+      x-implementation-status: PROPOSED_NOT_IMPLEMENTED
+      summary: Read a reviewed, nonpersonal application information document
+      description: |
+        PROPOSED. Read only, with no account, analytics, database or geolocation.
+        Content comes from versioned, human-reviewed repository assets, not user
+        submissions. Only an independent-app description and basic usage help are
+        in scope. No live advisories, event-date claims, directory, payments,
+        missing-person content or other feature APIs are authorized.
+        Reject duplicate/unknown query parameters and unrecognized language values.
+        A locale without approved copy returns 404; do not silently substitute
+        another language or imply untranslated legal text was approved.
+        Do not read cookies or Authorization to personalize this response.
+        All responses use Cache-Control: no-store; service workers must not cache
+        /api responses. Existing security headers apply, including on errors.
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          description: Proposed Telugu default; each locale requires copy review.
+          schema:
+            type: string
+            enum: [te, en, hi]
+            default: te
+      responses:
+        '200':
+          description: Reviewed public information for the requested locale
+          headers:
+            Cache-Control:
+              schema:
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicInformation'
+        '400':
+          description: Invalid, repeated or unknown query parameter
+          headers:
+            Cache-Control:
+              schema:
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicError'
+        '404':
+          description: No approved information document exists for that locale
+          headers:
+            Cache-Control:
+              schema:
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicError'
+components:
+  schemas:
+    PublicInformation:
+      type: object
+      additionalProperties: false
+      required: [locale, revision, independentApplication, title, paragraphs]
+      properties:
+        locale:
+          type: string
+          enum: [te, en, hi]
+        revision:
+          type: string
+          description: Repository content revision; never a visitor identifier.
+          minLength: 1
+          maxLength: 64
+          pattern: '^[a-zA-Z0-9._-]+$'
+        independentApplication:
+          const: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        paragraphs:
+          type: array
+          minItems: 1
+          maxItems: 12
+          items:
+            type: string
+            minLength: 1
+            maxLength: 600
+    PublicError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [INVALID_QUERY, INFORMATION_UNAVAILABLE]
+            message:
+              type: string
+              minLength: 1
+              maxLength: 160
+              description: Fixed reviewed text; never echo request input or internals.
