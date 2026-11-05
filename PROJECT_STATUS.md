@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Fail-closed dependency security evidence — 2026-11-05 05:45:07 IST
+
+- **Task / outcome:** informational dependency audit now distinguishes valid advisories from outages/invalid evidence; OSV inventory derives exact production versions/integrities from the committed lock without resolving/installing another graph. Unsupported sources/inconsistent graphs fail closed.
+- **Implemented by:** DEV3 coordinator (audit-result validation) and release_review (offline lock inventory); coordinator independently reviewed/integrated. **Accountable owner:** LEAD. **Independent human reviewer:** DEV2 siddhu949, pending actual approval.
+- **Evidence:** full local check, malicious/invalid scanner fixtures, graph fixtures, actionlint/offline zizmor; actual production audit0, full audit27 moderate/0 high/0 critical, licence405 checked. PR records exact final counts.
+- **Blockers / next:** stacked after PR #42 and credential pause #41, all unmerged. Current advisory-compatible upstream fixes unavailable; dependency_review confirmed locked glob13/minimatch10 toolchain constraints. [Closure tracker](docs/security/REMEDIATION_TRACKER.md) records external protection, approval and legal gates; no zero-risk claim. Owner reviews final heads and chooses enforceable credential isolation. No cloud/settings/billing/production change.
+
 ## Worker-first security boundary — 2026-11-04 23:44:40 IST
 
 - **Task / outcome:** route all static assets through Worker security/method handling in all four configurations; runtime tests cover headers, methods, redirects, API/admin/auth and encoded paths. Local correction, not shipped staging.
