@@ -32,4 +32,20 @@ export default tseslint.config(
       parserOptions: { projectService: false, project: false },
     },
   },
+  {
+    files: ['public/assets/*.mjs'],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      parserOptions: { project: false, projectService: false },
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+        URL: 'readonly',
+        MessageChannel: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+      },
+    },
+  },
 );
