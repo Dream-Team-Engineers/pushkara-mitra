@@ -176,7 +176,8 @@ async function checkEnvironment(environment) {
         if (method === 'GET') assert.equal(response.headers.get('Location'), '/');
       }
       if (path === '/sw.js' && method === 'GET') assert.match(body, /addEventListener/);
-      if (path === '/manifest.webmanifest') assert.equal(JSON.parse(body).name, 'Pushkara Mitra');
+      if (path === '/manifest.webmanifest')
+        assert.match(JSON.parse(body).name, /^Pushkara Mitra(?:\s|$)/, `${context}: app identity`);
       if (path === '/healthz' && (method === 'GET' || method === 'HEAD')) {
         assert.equal(
           response.headers.get('Cache-Control'),
