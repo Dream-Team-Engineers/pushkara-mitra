@@ -1,14 +1,16 @@
 // Original public prototype. Only exact, own, static GET resources are cacheable.
 const CACHE_PREFIX = 'pushkara-static-prototype-';
 // Bump this AND offline-status.v1.mjs whenever any precached resource changes.
-const CACHE_NAME = `${CACHE_PREFIX}v22`;
-const STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V22';
+const CACHE_NAME = `${CACHE_PREFIX}v23`;
+const STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V23';
 // Cache canonical URLs only: /index.html is a redirect, not an offline resource.
 const STATIC_PATHS = [
   '/',
   '/assets/shell.v1.css',
   '/assets/shell.v1.mjs',
   '/assets/mobile-sections.v1.mjs',
+  '/assets/ghats-draft-view.v1.mjs',
+  '/assets/ghats-draft.v1.mjs',
   '/assets/icons.v1.mjs',
   '/assets/offline-status.v1.mjs',
   '/assets/mitra-mark.svg',

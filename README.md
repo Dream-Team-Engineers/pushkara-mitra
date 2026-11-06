@@ -6,7 +6,7 @@ An independent, Telugu-first, offline-capable pilgrim assistance PWA for the God
 
 > **Engineering readiness is not legal sign-off.** Passing CI means the code meets engineering gates. It says nothing about legal compliance. Legal status is tracked separately in [docs/compliance](docs/compliance/) and every item starts as `NEEDS REVIEW`.
 
-**Status on `feat/local-integration`:** local review build with an original mobile-first PWA, a review-pending Plan screen, public information layouts, offline static shell and disabled sensitive-service screens. The released `main` branch and approval state must be checked separately. This branch does not provide approved festival content, accounts, registration, emergency response, location, payments or production services.
+**Status on `review/local-integration-snapshot-20261106`:** local review build with an original mobile-first PWA, a review-pending Plan screen, a Ghats screen showing 159 user-submitted names and localities as an explicitly unverified draft, offline static shell and disabled sensitive-service screens. The released `main` branch and approval state must be checked separately. This branch does not provide approved festival content, accounts, registration, emergency response, device location, payments or production services.
 
 ## Architecture and delivery
 

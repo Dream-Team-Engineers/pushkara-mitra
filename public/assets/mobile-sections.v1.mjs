@@ -1,6 +1,12 @@
-// Original, synthetic interface content. No external facts, contacts or services.
+// Original review interface. Submitted ghat names are labelled as unverified drafts.
 import { icon } from './icons.v1.mjs';
+import { mountGhatsDraft } from './ghats-draft-view.v1.mjs';
 const copy = (te, en) => ({ te, en });
+const draftGhatsIntro = {
+  te: 'జట్టు సమీక్ష కోసం సమర్పించిన ఘాట్ పేర్లు మాత్రమే చూపుతున్నాము. ఇవి ధృవీకరించబడలేదు.',
+  en: 'Submitted ghat names are shown for team review only. They are not verified visitor guidance.',
+  hi: 'जमा किए गए घाटों के नाम केवल टीम समीक्षा के लिए दिखाए गए हैं। ये सत्यापित यात्री मार्गदर्शन नहीं हैं।',
+};
 
 export const sections = [
   {
@@ -30,7 +36,7 @@ export const sections = [
     title: copy('ఘాట్లు మరియు సౌకర్యాలు', 'Ghats and facilities'),
     intro: copy(
       'నిజమైన ఘాట్ పేర్లు, అందుబాటు మరియు భద్రతా వివరాలు ధృవీకరణ తర్వాత మాత్రమే చూపుతాము.',
-      'Real ghat names, access and safety details require source review before display.',
+      'Submitted names are shown as an unverified team-review draft. Access and safety remain unknown.',
     ),
     cards: [
       {
@@ -388,11 +394,13 @@ export function mountSections(main, language) {
     const intro = document.createElement('p');
     intro.className = 'page-summary';
     intro.textContent =
-      section.id === 'explore' && exploreIntro[language]
-        ? exploreIntro[language]
-        : (draftSectionDetails[language]?.[section.id]?.intro ??
-          section.intro[language] ??
-          section.intro.en);
+      section.id === 'ghats'
+        ? (draftGhatsIntro[language] ?? draftGhatsIntro.en)
+        : section.id === 'explore' && exploreIntro[language]
+          ? exploreIntro[language]
+          : (draftSectionDetails[language]?.[section.id]?.intro ??
+            section.intro[language] ??
+            section.intro.en);
     const grid = document.createElement('div');
     grid.className = 'section-card-grid';
     for (const [index, card] of section.cards.entries()) {
@@ -459,5 +467,6 @@ export function mountSections(main, language) {
       grid.append(pending);
     }
     panel.append(eyebrow, title, intro, grid);
+    if (section.id === 'ghats') mountGhatsDraft(panel, language);
   }
 }

@@ -52,7 +52,7 @@ function serviceWorker(options: { installFails?: boolean; missingPath?: string }
         Promise.resolve([
           'pushkara-static-prototype-v0',
           'pushkara-static-prototype-v1',
-          'pushkara-static-prototype-v22',
+          'pushkara-static-prototype-v23',
           'unrelated-app-cache',
         ]),
       delete: (name: string) => {
@@ -118,7 +118,7 @@ describe('public prototype cache boundary', () => {
     expect(pending).toBeDefined();
     const response = await pending;
     expect(await response?.text()).toBe('static:/assets/shell.v1.css');
-    expect(worker.opened).toEqual(['pushkara-static-prototype-v22']);
+    expect(worker.opened).toEqual(['pushkara-static-prototype-v23']);
     expect(worker.network).toEqual([]);
   });
 
@@ -208,7 +208,7 @@ describe('offline installation and current-controller acknowledgement', () => {
     expect(install).toBeDefined();
     expect(worker.skipped()).toBe(false);
     await install;
-    expect(worker.installedPaths()).toHaveLength(15);
+    expect(worker.installedPaths()).toHaveLength(17);
     expect(worker.installedPaths()).not.toContain('/index.html');
     expect(worker.installedPaths()).toContain('/assets/offline-status.v1.mjs');
     expect(worker.installedPaths()).toContain('/assets/icons.v1.mjs');

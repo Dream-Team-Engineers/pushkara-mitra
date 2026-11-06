@@ -14,12 +14,14 @@ Use Node 22 and npm 10, then run `npm ci` and `npm run check`. Start the app wit
 npx wrangler dev --local --ip 127.0.0.1
 ```
 
-Open `http://127.0.0.1:8787/#plan`. The page does not fetch or show the mock examples, including when the old `local-mock=1` query is present. Official date and place candidates are documented for human review in `docs/content/official-source-review.md`; they are not approved app content. No booking, identity, contact, location or payment is provided.
+Open `http://127.0.0.1:8787/#plan`. The page does not fetch or show the mock examples, including when the old `local-mock=1` query is present. Open `http://127.0.0.1:8787/#ghats` to review the 159 submitted names and localities. The Ghats screen labels every entry as an unverified draft and gives no opening, access, safety, facilities or directions guidance. These names are shown only in this draft review branch; they are not approved visitor information. Official date and place candidates are documented in `docs/content/official-source-review.md`. No booking, identity, contact, device location or payment is provided.
+
+Run `npm run review:ghats-draft` after changing `docs/content/user-ghats-candidate.json`; it regenerates the limited public draft module from the review source. The module includes only submitted names, district assignments, mandals and localities, without unverified history or source claims. The source JSON and richer offline review page stay in `docs/content`. Changing precached content also requires matching service-worker and offline-acknowledgement revisions.
 
 The test-only mock route remains in the local Worker for regression testing; the app no longer requests it. It responds only when the explicit variable is enabled and the request
 hostname is loopback. It has no binding in `wrangler.toml`, returns `404` by default,
 uses `Cache-Control: no-store`, and rejects writes. The service worker caches only
-fifteen canonical static resources. It does not cache the mock API or query URLs.
+seventeen canonical static resources, including the two draft-ghat modules. It does not cache the mock API or query URLs.
 
 `npm run test:routing` starts and stops local Wrangler for all four configurations
 and one opt-in mock run. It checks real HTTP routing, security headers and the

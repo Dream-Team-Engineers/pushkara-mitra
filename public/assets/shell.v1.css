@@ -481,6 +481,63 @@ main {
   font-weight: 700;
   text-underline-offset: 4px;
 }
+.ghats-draft {
+  margin: 30px 0 44px;
+}
+.ghats-draft-warning {
+  padding: 16px 18px;
+  border-left: 5px solid var(--accent);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+.ghats-draft label {
+  display: block;
+  margin-top: 22px;
+  font-weight: 700;
+}
+.ghats-draft input {
+  width: 100%;
+  min-height: 48px;
+  margin: 8px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+.ghats-draft-district {
+  margin-top: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+.ghats-draft-district summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.ghats-draft-district ul {
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+.ghats-draft-district li {
+  padding: 8px 0;
+  overflow-wrap: anywhere;
+}
+.ghats-draft-district li + li {
+  border-top: 1px solid var(--line);
+}
+.ghats-draft-district strong,
+.ghats-draft-district li span {
+  display: block;
+}
+.ghats-draft-district li span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 .offline-note {
   display: flex;
   gap: 20px;
