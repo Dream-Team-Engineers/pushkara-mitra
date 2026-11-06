@@ -25,6 +25,30 @@ export default tseslint.config(
   {
     files: ['**/*.mjs', '*.js'],
     ...tseslint.configs.disableTypeChecked,
-    languageOptions: { globals: nodeGlobals },
+    languageOptions: {
+      // These plain Node scripts already disable type-aware rules. Do not create
+      // default TypeScript projects for them; TypeScript source stays checked.
+      globals: nodeGlobals,
+      parserOptions: { projectService: false, project: false },
+    },
+  },
+  {
+    files: ['public/assets/*.mjs'],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      parserOptions: { project: false, projectService: false },
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
+        MessageChannel: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+      },
+    },
   },
 );
