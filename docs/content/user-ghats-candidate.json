@@ -1,0 +1,1597 @@
+{
+  "reviewStatus": "NEEDS_REVIEW",
+  "inputFile": "godavari_pushkaralu_2027_ghats.csv",
+  "sha256": "55ec41f7dad5cfee1349bb9ce4fd67b5e45bf01e5b159c437afff1e346b46a8e",
+  "rows": [
+    {
+      "S.No": "1",
+      "Ghat name": "Kotilingala Ghat (PMK Ghat)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "Bathing ghat beside the Kotilingeswara (Kotilingala) Shiva temple, traditionally said to enshrine a crore of lingas. Among the oldest and holiest spots in Rajamahendravaram and the main Shiva abhishekam ghat of the Pushkaram.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "2",
+      "Ghat name": "Pushkar Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "The principal Pushkaram ghat and the ceremonial centre of the festival, with the largest pilgrim facilities, pontoon bridges and VIP enclosure.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "3",
+      "Ghat name": "Markandeya Ghat (Padmavathi Ghat)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "Named for Sage Markandeya, who tradition says bathed here; also called Padmavathi Ghat.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "4",
+      "Ghat name": "Saraswati Ghat (VIP Ghat)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "The ghat used for Aksharabhyasam / Vidyarambham of children, invoking Goddess Saraswati; historically the VIP bathing ghat.",
+      "Ghat type": "Sukhakara (gentle) - verify",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "5",
+      "Ghat name": "Gowthami Ghat (Pushkaralapeta Ghat)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Pushkaralapeta, Rajahmundry",
+      "History & significance": "Named for Gowthami, another name of the Godavari. The main ghat for Pitru Tarpanam and ancestral rites, with hundreds of accredited priests.",
+      "Ghat type": "Sukhakara (gentle) - verify",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "6",
+      "Ghat name": "Subbayamma Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Alcot Garden, Rajahmundry",
+      "History & significance": "Local riverside ghat named after the Subbayamma temple in the Alcot Gardens area.",
+      "Ghat type": "Sukhakara (gentle) - verify",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "7",
+      "Ghat name": "Ramapadalarevu Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Ghat at the foot of the Dowleswaram barrage, named for the \"footsteps of Rama\" tradition attached to this bank.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "8",
+      "Ghat name": "CERP Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Ghat serving the CERP (Central Exercise... barrage) colony area beside the anicut.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "9",
+      "Ghat name": "Chintala Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Small barrage-side ghat used by local fishermen and residents.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "10",
+      "Ghat name": "Gayathri Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Ghat named for Goddess Gayathri, associated with daily sandhya vandana on the barrage bank.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "11",
+      "Ghat name": "Sunnambattila Ramp Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Ramp ghat built for access to the barrage apron and bathing steps.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "12",
+      "Ghat name": "VIP Bathing Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Rural",
+      "Village / Location": "Dowleswaram",
+      "History & significance": "Barrage-adjacent ghat reserved for officials and dignitaries during the festival.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "13",
+      "Ghat name": "Kotipalli Ghat 1",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Kotipalli",
+      "History & significance": "First of the four Kotipalli bathing ghats, beside the ancient Kotilingeswara / Suryanarayana temple known as Dakshina Kashi.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "14",
+      "Ghat name": "Kotipalli Ghat 2",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Kotipalli",
+      "History & significance": "Second bathing ghat of Kotipalli, on the Gautami channel near the Yanam border.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "15",
+      "Ghat name": "Kotipalli Ghat 3",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Kotipalli",
+      "History & significance": "Third bathing ghat of Kotipalli.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "16",
+      "Ghat name": "Kotipalli Ghat 4",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Kotipalli",
+      "History & significance": "Fourth bathing ghat of Kotipalli.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "17",
+      "Ghat name": "Munikudali Ghat 5",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Munikudali",
+      "History & significance": "Designated Pinda Pradanam ghat and pilot \"Model Pushkara Panchayat\" village; associated with sage Munikundala tradition.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "18",
+      "Ghat name": "Vadapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Atreyapuram",
+      "Village / Location": "Vadapalli",
+      "History & significance": "Village ghat on the Godavari; Vadapalli is a traditional Vedic learning village.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "19",
+      "Ghat name": "Vadapalli Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Atreyapuram",
+      "Village / Location": "Vadapalli",
+      "History & significance": "Second ghat recorded for the same village in the official list.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "20",
+      "Ghat name": "Kundaleswaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Katrenikona",
+      "Village / Location": "Kundaleswaram",
+      "History & significance": "Ghat named for Kuntaleswara; delta village bathing point.",
+      "Ghat type": "Key / major ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "21",
+      "Ghat name": "Muktheswaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Muktheswaram",
+      "History & significance": "Ghat beside the Muktheswaram temple village.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "22",
+      "Ghat name": "Tottaramudi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Tottaramudi",
+      "History & significance": "Delta village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "23",
+      "Ghat name": "Tottaramudi Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Tottaramudi",
+      "History & significance": "Second ghat recorded for the same village.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "24",
+      "Ghat name": "Bodasakurru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Allavaram",
+      "Village / Location": "Bodasakurru",
+      "History & significance": "Ghat at the Godavari-Vasista confluence area in the delta.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "25",
+      "Ghat name": "Muramalla Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Murammalla",
+      "History & significance": "Village ghat in the eastern delta.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "26",
+      "Ghat name": "Muramalla Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Muramalla",
+      "History & significance": "Second ghat recorded for the same village.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "27",
+      "Ghat name": "Appanapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mamidikuduru",
+      "Village / Location": "Appanapalli",
+      "History & significance": "Island-village ghat on the Gautami.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "28",
+      "Ghat name": "Sompalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Razole",
+      "Village / Location": "Sompalli",
+      "History & significance": "Village ghat near Razole.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "29",
+      "Ghat name": "Razole Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Razole",
+      "Village / Location": "Razole",
+      "History & significance": "Town ghat on the Vashista branch.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "30",
+      "Ghat name": "Antervedi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Antervedi",
+      "History & significance": "Ghat at the Godavari-Bay of Bengal confluence beside the Lakshmi Narasimha Swamy temple. \"Antarvedi\" means the end of the Veda; one of the most sacred delta bathing points.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "31",
+      "Ghat name": "Antervedi Pallipalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Antervedi",
+      "History & significance": "Companion ghat to the main Antarvedi snanam point.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "32",
+      "Ghat name": "Antervedi Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Antervedi",
+      "History & significance": "Additional ghat recorded at Antarvedi.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "33",
+      "Ghat name": "Bobbanilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mamidikuduru",
+      "Village / Location": "Bobbilanaka",
+      "History & significance": "Island ghat near Bodasakurru.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "34",
+      "Ghat name": "Mugalla Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Mugalla",
+      "History & significance": "Village ghat upstream of Rajamahendravaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "35",
+      "Ghat name": "Kothapeta Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kothapeta",
+      "Village / Location": "Kothapeta",
+      "History & significance": "Town ghat on the main Godavari channel.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "36",
+      "Ghat name": "Gedullanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Gedullanka",
+      "History & significance": "Island ghat in the central delta.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "37",
+      "Ghat name": "Tatapudi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Thatapudi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "38",
+      "Ghat name": "Kunavaram Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Kunavaram",
+      "Village / Location": "Kunavaram",
+      "History & significance": "Agency-area ghat on the upper Godavari, in the former Chintoor agency mandals.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "39",
+      "Ghat name": "Rajavaram Ghat (new)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Rajavaram",
+      "History & significance": "Newly built village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "40",
+      "Ghat name": "Vaddiparru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Vaddiparru",
+      "History & significance": "Village ghat on the Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "41",
+      "Ghat name": "Lolla Ghat (old)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Lolla",
+      "History & significance": "Older ghat at Lolla village.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "42",
+      "Ghat name": "Lolla Ghat (new)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Lolla",
+      "History & significance": "New ghat built alongside the older one.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "43",
+      "Ghat name": "Jithugapadu Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Jithugapadu",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "44",
+      "Ghat name": "Ravulapalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ravulapalem",
+      "Village / Location": "Ravulapalem",
+      "History & significance": "Town ghat at a major delta road and rail junction.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "45",
+      "Ghat name": "Komarajulanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ravulapalem",
+      "Village / Location": "Komarajulanka",
+      "History & significance": "Lanka (island) village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "46",
+      "Ghat name": "Kedarlanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Kedarlanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "47",
+      "Ghat name": "Addankivarilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Addankivarilanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "48",
+      "Ghat name": "Madupalli Ghat (new)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Madupalli",
+      "History & significance": "New ghat at Madupalli.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "49",
+      "Ghat name": "Peravaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Peravaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "50",
+      "Ghat name": "Velicheru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Velicheru",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "51",
+      "Ghat name": "Vaddiparru Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Vaddiparru",
+      "History & significance": "Second ghat recorded at Vaddiparru.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "52",
+      "Ghat name": "Athreyapuram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Athreyapuram",
+      "History & significance": "Ghat at the mandal headquarters, named for Sage Atri, after whom the village is named.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "53",
+      "Ghat name": "Vadapalli Ghat (3rd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Vadapalli",
+      "History & significance": "Further ghat recorded at Vadapalli.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "54",
+      "Ghat name": "Kothapeta Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kothapeta",
+      "Village / Location": "Kothapeta",
+      "History & significance": "Second ghat at Kothapeta town.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "55",
+      "Ghat name": "Vadapalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kothapeta",
+      "Village / Location": "Vadapalem",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "56",
+      "Ghat name": "Vanapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kothapeta",
+      "Village / Location": "Vanapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "57",
+      "Ghat name": "Veeravallipalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Veeravallipalem",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "58",
+      "Ghat name": "Sanapallilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Sanakipallilanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "59",
+      "Ghat name": "Yedurlanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Yedurlanka",
+      "History & significance": "Lanka village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "60",
+      "Ghat name": "Guthinadeevi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Guthinadeevi",
+      "History & significance": "Coastal-delta village ghat near the river mouth.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "61",
+      "Ghat name": "Guthinadeevi Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Guthinadeevi",
+      "History & significance": "Second ghat recorded at Guthinadeevi.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "62",
+      "Ghat name": "G. Mulapalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "G. Mulapalem",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "63",
+      "Ghat name": "T. Kothapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "T. Kothapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "64",
+      "Ghat name": "Tillakuppa Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Tillakuppa",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "65",
+      "Ghat name": "Kesanakurru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Kesanakurru",
+      "History & significance": "Village ghat on the Vasishta branch.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "66",
+      "Ghat name": "Kesanakurru Flood Bank Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "I. Polavaram",
+      "Village / Location": "Kesanakurru",
+      "History & significance": "Bathing point on the flood-protection bank at Kesanakurru.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "67",
+      "Ghat name": "Nadavapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Katrenikona",
+      "Village / Location": "Nadavapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "68",
+      "Ghat name": "Pallamkurru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Katrenikona",
+      "Village / Location": "Pallamkurru",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "69",
+      "Ghat name": "Inapuram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Inapuram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "70",
+      "Ghat name": "Kothalanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Kothalanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "71",
+      "Ghat name": "Pallivaripalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Pallivaripalem",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "72",
+      "Ghat name": "Tanelanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Tanelanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "73",
+      "Ghat name": "Kondakuduru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ayinavilli",
+      "Village / Location": "Kondukuduru",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "74",
+      "Ghat name": "Chintapallilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mummidivaram",
+      "Village / Location": "Chintapallilanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "75",
+      "Ghat name": "Vemagiri Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Kadiam",
+      "Village / Location": "Vemagiri",
+      "History & significance": "Ghat beside the Vemagiri reservoir and the Vemagiri Ashram, downstream of Rajamahendravaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "76",
+      "Ghat name": "Alamuru Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Alamuru",
+      "Village / Location": "Alamuru",
+      "History & significance": "Mandal-headquarters ghat on the Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "77",
+      "Ghat name": "Korumilli Ghat (old)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Korumilli",
+      "History & significance": "Older village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "78",
+      "Ghat name": "Korumilli Ghat (new)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Korumilli",
+      "History & significance": "New ghat built alongside the old one.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "79",
+      "Ghat name": "Kapileswarapuram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Kapileswarapuram",
+      "History & significance": "Ghat at the mandal headquarters, named for Sage Kapila.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "80",
+      "Ghat name": "Jonnada Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Alamuru",
+      "Village / Location": "Jonnada",
+      "History & significance": "Village ghat; Jonnada is known for its Vedic scholars.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "81",
+      "Ghat name": "Jonnada Ghat (2nd entry)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Alamuru",
+      "Village / Location": "Jonnada",
+      "History & significance": "Second ghat recorded at Jonnada.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "82",
+      "Ghat name": "Vakatippa Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kapileswarapuram",
+      "Village / Location": "Vakatippa",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "83",
+      "Ghat name": "Kulla Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Kulla",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "84",
+      "Ghat name": "Mallavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Mallavaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "85",
+      "Ghat name": "Sundarapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Sundarapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "86",
+      "Ghat name": "Sundarapalli Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Sundarapalli",
+      "History & significance": "Second ghat recorded at Sundarapalli.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "87",
+      "Ghat name": "Kota Ghat (Ramaghattalu)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Kota",
+      "History & significance": "\"Rama ghattalu\" or the steps of Rama, traditionally linked to the Ramayana route along the Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "88",
+      "Ghat name": "Kota Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Kota",
+      "History & significance": "Village ghat adjoining Ramaghattalu.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "89",
+      "Ghat name": "Masakapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Masakapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "90",
+      "Ghat name": "Masakapalli Ghat (new)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Masakapalli",
+      "History & significance": "New ghat at Masakapalli.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "91",
+      "Ghat name": "Pedalanka Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Pedalanka",
+      "History & significance": "Island ghat near the Kotipalli channel.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "92",
+      "Ghat name": "Brahmampuri Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "K. Gangavaram",
+      "Village / Location": "Brahmapuri",
+      "History & significance": "Village ghat whose name means \"abode of Brahma\".",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "93",
+      "Ghat name": "Pillanka Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Tallarevu",
+      "Village / Location": "Pillanka",
+      "History & significance": "Island ghat on the Coringa-Godavari system.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "94",
+      "Ghat name": "Govalanka (Gopulanka) Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Tallarevu",
+      "Village / Location": "Gopulanka",
+      "History & significance": "Major delta ghat on the Gautami, a principal Kakinada-district snanam point.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "95",
+      "Ghat name": "Injaram Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Tallarevu",
+      "Village / Location": "Injaram",
+      "History & significance": "Village ghat near the Coringa mangroves.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "96",
+      "Ghat name": "Kajuluru Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Kajuluru",
+      "Village / Location": "Kajuluru",
+      "History & significance": "Mandal-headquarters ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "97",
+      "Ghat name": "Purushottapatnam Ghat (new)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Devipatnam",
+      "Village / Location": "Purushothapatnam",
+      "History & significance": "Ghat at the mouth of the Papikondalu gorge; a natural bathing point on the upper Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "98",
+      "Ghat name": "Ramachandrapuram Ghat (new)",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Ramachandrapuram",
+      "History & significance": "Newly developed village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "99",
+      "Ghat name": "Vasanthawada Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Vasanthawada",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "100",
+      "Ghat name": "Kattunga Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Kattunga",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "101",
+      "Ghat name": "Narkedimilli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Narkedimilli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "102",
+      "Ghat name": "Ankampalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Ankampalem",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "103",
+      "Ghat name": "Ganti Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Kothapeta",
+      "Village / Location": "Ganti",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "104",
+      "Ghat name": "Rajavaram Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Rajavaram",
+      "History & significance": "Second ghat recorded at Rajavaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "105",
+      "Ghat name": "Velicheru Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Athreyapuram",
+      "Village / Location": "Velicheru",
+      "History & significance": "Second ghat recorded at Velicheru.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "106",
+      "Ghat name": "Bellampudi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Bellampudi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "107",
+      "Ghat name": "Gopalapuram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ravulapalem",
+      "Village / Location": "Gopalapuram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "108",
+      "Ghat name": "K. Munjavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Munjavaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "109",
+      "Ghat name": "L. Gannavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Gannavaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "110",
+      "Ghat name": "K. Yenugupalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "K. Yenugupalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "111",
+      "Ghat name": "Gannavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Gannavaram",
+      "History & significance": "Mandal-headquarters ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "112",
+      "Ghat name": "Nagullanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Nagullanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "113",
+      "Ghat name": "Adurru Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Mamidikuduru",
+      "Village / Location": "Adurru",
+      "History & significance": "Ghat beside Adurru, a major Buddhist stupa site of the Satavahana era, giving the village ghat archaeological significance.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "114",
+      "Ghat name": "Thondavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ambajipeta",
+      "Village / Location": "Thondavaram",
+      "History & significance": "Village ghat on the Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "115",
+      "Ghat name": "Thondavaram Ghat (2nd entry)",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Ambajipeta",
+      "Village / Location": "Thondavaram",
+      "History & significance": "Second ghat recorded at Thondavaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "116",
+      "Ghat name": "P. Gannavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "P. Gannavaram",
+      "History & significance": "Town ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "117",
+      "Ghat name": "Y. Kothapalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Y. Kothapalli",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "118",
+      "Ghat name": "Katarilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Katarilanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "119",
+      "Ghat name": "Gopayalanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Allavaram",
+      "Village / Location": "Gopayalanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "120",
+      "Ghat name": "Godi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Allavaram",
+      "Village / Location": "Godi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "121",
+      "Ghat name": "Bendamurlanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Allavaram",
+      "Village / Location": "Bendamurlanka",
+      "History & significance": "Lanka village ghat on the Vasishta.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "122",
+      "Ghat name": "Tekisettipalem Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Tekisettipalem",
+      "History & significance": "Village ghat near the river mouth.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "123",
+      "Ghat name": "Gudimula Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Gudimoola",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "124",
+      "Ghat name": "Rameswaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Rameswaram",
+      "History & significance": "Ghat named for Rameswara, in the coastal delta.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "125",
+      "Ghat name": "Dindi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Malikipuram",
+      "Village / Location": "Dindi",
+      "History & significance": "Ghat at Dindi, a well-known delta backwater resort area.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "126",
+      "Ghat name": "Ramarajulanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Malikipuram",
+      "Village / Location": "Ramarajulanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "127",
+      "Ghat name": "Appanaramunilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Malikipuram",
+      "Village / Location": "Appanaramunilanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "128",
+      "Ghat name": "Kalyanam Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Sakhinetipalli",
+      "History & significance": "Ghat used for kalyanam (wedding) rituals.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "129",
+      "Ghat name": "Sakhinetipalli Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Sakhinetipalli",
+      "History & significance": "Mandal-headquarters ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "130",
+      "Ghat name": "Gondi Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Gondi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "131",
+      "Ghat name": "Sk. Pallilanka Ramalayam Temple Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Sk. Pallilanka",
+      "History & significance": "Ghat attached to the Ramalayam temple.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "132",
+      "Ghat name": "Sk. Pallilanka Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "Sakhinetipalli",
+      "Village / Location": "Sk. Pallilanka",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "133",
+      "Ghat name": "Pathainjaram Ghat",
+      "District (2027)": "Kakinada",
+      "Mandal / Taluk": "Tallarevu",
+      "Village / Location": "Pathainjaram",
+      "History & significance": "Village ghat near the Coringa reserve.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "134",
+      "Ghat name": "Mulakallanka Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Mulakallanka",
+      "History & significance": "Island ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "135",
+      "Ghat name": "Jalimudi Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Jalimudi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "136",
+      "Ghat name": "Katavaram Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Katavaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "137",
+      "Ghat name": "Singavaram Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Singavaram",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "138",
+      "Ghat name": "Vangalapudi Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Sithanagaram",
+      "Village / Location": "Vangalapudi",
+      "History & significance": "Village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "139",
+      "Ghat name": "Munjavaram Ghat",
+      "District (2027)": "Dr. B.R. Ambedkar Konaseema",
+      "Mandal / Taluk": "P. Gannavaram",
+      "Village / Location": "Munjavaram",
+      "History & significance": "Second ghat recorded at Munjavaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "140",
+      "Ghat name": "Venkatareddipeta Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Nellipaka",
+      "Village / Location": "Venkatareddipeta",
+      "History & significance": "Agency village ghat on the Godavari.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "141",
+      "Ghat name": "Vaddigudem Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Vaddigudem",
+      "History & significance": "Agency ghat in the Chintoor area.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "142",
+      "Ghat name": "Vaddigudem Ghat (Mutyalamma Temple)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Vaddigudem",
+      "History & significance": "Ghat beside the Mutyalamma temple.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "143",
+      "Ghat name": "Vaddigudem Ghat (Laxminarasimha Temple)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Vaddigudem",
+      "History & significance": "Ghat beside the Lakshmi Narasimha temple.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "144",
+      "Ghat name": "Siramagiri Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Sriramagiri",
+      "History & significance": "Agency village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "145",
+      "Ghat name": "Kunavaram Ghat (Pochamma Revu)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Kunavaram",
+      "Village / Location": "Kunavaram",
+      "History & significance": "Ghat at Pochamma revu, named for the village goddess.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "146",
+      "Ghat name": "Gommugudem Ghat (Sivalayam)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Kunavaram",
+      "Village / Location": "Gommugudem",
+      "History & significance": "Ghat beside the Sivalayam.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "147",
+      "Ghat name": "Kunavaram Ghat (Saibaba Temple)",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Kunavaram",
+      "Village / Location": "Kunavaram",
+      "History & significance": "Ghat at the Saibaba temple steps.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "148",
+      "Ghat name": "Jeediguppa Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Jeediguppa",
+      "History & significance": "Agency village ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "149",
+      "Ghat name": "Pochavaram Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "V. R. Puram",
+      "Village / Location": "Pochavaram",
+      "History & significance": "Ghat near the Saibaba temple at Pochavaram.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "150",
+      "Ghat name": "Nellipaka Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Nellipaka",
+      "Village / Location": "Nellipaka",
+      "History & significance": "Mandal-headquarters ghat.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "151",
+      "Ghat name": "Ushnagundalu (Gundala) Ghat",
+      "District (2027)": "Polavaram",
+      "Mandal / Taluk": "Nellipaka",
+      "Village / Location": "Gundala",
+      "History & significance": "The first bathing ghat on the Andhra Pradesh stretch of the Godavari, near the Polavaram project area.",
+      "Ghat type": "Local village ghat",
+      "Source": "Official AP ghat list (Pushkaram, 151-ghat East Godavari register); district mapped to 2022 reorganisation"
+    },
+    {
+      "S.No": "152",
+      "Ghat name": "Goshpada Kshetram Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Kovvur",
+      "Village / Location": "Kovvur",
+      "History & significance": "One of the five sacred Goshpada teerthas; legend holds that the Godavari was brought here by Sage Gautama and that a cow’s hoof (goshpada) opened the spring. A ancient bathing and shraddha site.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "153",
+      "Ghat name": "Gopadala Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Kovvur",
+      "Village / Location": "Kovvur",
+      "History & significance": "Kovvur-side ghat paired with Goshpada Kshetram; the main West-bank snanam point opposite Rajamahendravaram.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "154",
+      "Ghat name": "ISKCON Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "Ghat in front of the ISKCON temple, used for harinam and ISKCON-organised snanam.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "155",
+      "Ghat name": "Kambala Cheruvu Ghat",
+      "District (2027)": "East Godavari",
+      "Mandal / Taluk": "Rajahmundry Urban",
+      "Village / Location": "Rajahmundry",
+      "History & significance": "Ghat at the historic Kambala Cheruvu tank area, a listed Pushkaram bathing point.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "156",
+      "Ghat name": "Perantala Swamy Ghat",
+      "District (2027)": "West Godavari",
+      "Mandal / Taluk": "Narasapuram",
+      "Village / Location": "Narasapuram",
+      "History & significance": "Ghat beside the Perantala Swamy (Venkateswara) temple; Narasapuram is the principal West Godavari snanam town, at the Vasishta-Godavari confluence.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "157",
+      "Ghat name": "Pattiseema Ghat",
+      "District (2027)": "Polavaram",
+      "Mandal / Taluk": "Polavaram",
+      "Village / Location": "Pattisam",
+      "History & significance": "Ghat below the Pattisam Veerabhadra Swamy temple, where the Godavari leaves the hills and enters the plains; also the site of the Pattiseema lift scheme.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "158",
+      "Ghat name": "Gandi Pochamma Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Devipatnam",
+      "Village / Location": "Devipatnam",
+      "History & significance": "Ghat beside the Gandi Pochamma temple in the Papikondalu gorge, a major upper-river bathing and darshan point.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    },
+    {
+      "S.No": "159",
+      "Ghat name": "Devipatnam Ghat",
+      "District (2027)": "Alluri Sitharama Raju",
+      "Mandal / Taluk": "Devipatnam",
+      "Village / Location": "Devipatnam",
+      "History & significance": "Mandal-headquarters ghat on the Godavari, serving the Papikondalu boat route.",
+      "Ghat type": "Key / major ghat",
+      "Source": "District administration / 2027 Pushkaram plan"
+    }
+  ]
+}
