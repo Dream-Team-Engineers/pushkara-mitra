@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.0.5](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.4...v1.0.5) (2026-11-05)
+
+
+### Bug Fixes
+
+* override minimatch and glob to patched versions ([8633605](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/8633605b1e3c2464c286806b9cfbc9b43a5b99e8))
+* override minimatch and glob to patched versions; track open decisions ([ab2722e](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/ab2722e3e67517e2b4456e36438664f84f94b9b7))
+
+## [1.0.4](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.3...v1.0.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* enforce Worker security policy on static assets ([d3c17ee](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d3c17ee3c35f5e3be4cd2270c574a7f8236bc040))
+* fail closed on invalid dependency scan evidence ([f801ae6](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/f801ae6f8b4d550a58a2fdee81ed116537c985a0))
+* verify GitHub protections before reporting success ([d39a85b](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d39a85b3b634d9548d3bb2cdf2626fad2c39b1a9))
+
+## [1.0.3](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.2...v1.0.3) (2026-11-05)
+
+
+### Bug Fixes
+
+* pause unreviewed preview credential execution ([64a4477](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/64a447789484764b55a38bb98c1b04ed486d18ba))
+
 ## [1.0.2](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.1...v1.0.2) (2026-11-04)
 
 

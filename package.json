@@ -1,6 +1,6 @@
 {
   "name": "pushkara-mitra",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "private": true,
   "description": "Independent, Telugu-first, offline-capable pilgrim assistance PWA for the Godavari Pushkaralu 2027. Not an official application.",
   "license": "UNLICENSED",
@@ -41,5 +41,9 @@
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "wrangler": "^4.156.0"
+  },
+  "overrides": {
+    "minimatch": "^11.0.4",
+    "glob": "^14.0.3"
   }
 }
