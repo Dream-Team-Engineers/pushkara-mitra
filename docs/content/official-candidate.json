@@ -1,0 +1,47 @@
+{
+  "reviewStatus": "NEEDS_REVIEW",
+  "checkedOn": "2026-11-05",
+  "festival": {
+    "name": "Godavari Pushkaralu 2027",
+    "startDate": "2027-06-26",
+    "endDate": "2027-07-07",
+    "source": "https://eastgodavari.ap.gov.in/godavari-pushkaralu-2027/",
+    "sourceLastUpdated": "2026-01-29"
+  },
+  "ghatsSource": {
+    "url": "https://eastgodavari.ap.gov.in/ghats/",
+    "sourceLastUpdated": "2025-11-28"
+  },
+  "groups": [
+    {
+      "name": "Rajamahendravaram",
+      "places": [
+        "Kotilingala Revu",
+        "Pushkar Ghat",
+        "Saraswati Ghat",
+        "Gowthami Ghat",
+        "Tummalapalli Vari Revu",
+        "Sri Narasimha Nagar Ghat",
+        "Dowleswaram Barrage Ghat",
+        "Venkateswara Ghat"
+      ]
+    },
+    {
+      "name": "Kovvur",
+      "places": [
+        "Goshpada Kshetram (Main Kovvur Ghat)",
+        "Subrahmanyeswara Ghat",
+        "Nagareswaram Ghat"
+      ]
+    },
+    {
+      "name": "Other nearby ghats",
+      "places": [
+        "Purushottapatnam Ghat",
+        "Seethanagaram Ghat",
+        "Pattiseema Ghat",
+        "Vangalapudi Ghat"
+      ]
+    }
+  ]
+}
