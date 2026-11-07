@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.6...v1.1.0) (2026-11-07)
+
+
+### Features
+
+* integrate mobile review UI onto main ([e953ae4](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e953ae437cb5fa6a91f7c04851fdc3d1cb465f4a))
+
 ## [1.0.6](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.5...v1.0.6) (2026-11-07)
 
 
