@@ -62,11 +62,11 @@ async function stop(child) {
   if (child.exitCode === null && child.signalCode === null) signal('SIGKILL');
 }
 
-async function checkEnvironment(environment) {
+async function checkEnvironment(environment, mock = false) {
   interruption.signal.throwIfAborted();
   const port = await availablePort();
   const origin = `http://127.0.0.1:${port}`;
-  const label = environment ?? 'default';
+  const label = mock ? 'local-mock' : (environment ?? 'default');
   const args = [
     join(root, 'node_modules/wrangler/wrangler-dist/cli.js'),
     'dev',
@@ -83,6 +83,7 @@ async function checkEnvironment(environment) {
     'error',
   ];
   if (environment) args.push('--env', environment);
+  if (mock) args.push('--var', 'LOCAL_SYNTHETIC_DEMO:enabled');
   const child = spawn(process.execPath, args, {
     cwd: root,
     detached: process.platform !== 'win32',
@@ -136,10 +137,18 @@ async function checkEnvironment(environment) {
       ['GET', '/index.html', 307],
       ['GET', '/sw.js', 200],
       ['GET', '/manifest.webmanifest', 200],
+      ['GET', '/assets/quick-access-synthetic-v1.jpg', 200],
+      ['GET', '/assets/fonts/Roboto-400-latin.woff', 200],
+      ['GET', '/assets/fonts/NotoSansTelugu-400.woff', 200],
+      ['GET', '/assets/fonts/NotoSansDevanagari-400.woff', 200],
       ['GET', '/healthz', 200],
       ['HEAD', '/healthz', 200],
       ['GET', '/missing-route', 404],
+      ['GET', '/docs/content/official-candidate.json', 404],
+      ['GET', '/docs/content/user-ghats-candidate.json', 404],
+      ['GET', '/docs/content/official-content-review.html', 404],
       ['GET', '/api', 404],
+      ['GET', '/api/demo/events', mock ? 200 : 404],
       ['GET', '/api/v1/me/missing', 404],
       ['GET', '/admin', 404],
       ['GET', '/admin/missing', 404],
@@ -176,6 +185,18 @@ async function checkEnvironment(environment) {
         if (method === 'GET') assert.equal(response.headers.get('Location'), '/');
       }
       if (path === '/sw.js' && method === 'GET') assert.match(body, /addEventListener/);
+      if (path.endsWith('.woff'))
+        assert.match(
+          response.headers.get('Content-Type') ?? '',
+          /font\/woff/i,
+          `${context}: font MIME`,
+        );
+      if (path.endsWith('.jpg'))
+        assert.match(
+          response.headers.get('Content-Type') ?? '',
+          /image\/jpeg/i,
+          `${context}: image MIME`,
+        );
       if (path === '/manifest.webmanifest')
         assert.match(JSON.parse(body).name, /^Pushkara Mitra(?:\s|$)/, `${context}: app identity`);
       if (path === '/healthz' && (method === 'GET' || method === 'HEAD')) {
@@ -185,6 +206,18 @@ async function checkEnvironment(environment) {
           `${context}: health caching`,
         );
         if (method === 'GET') assert.deepEqual(JSON.parse(body), { status: 'ok' });
+      }
+      if (path === '/api/demo/events' && method === 'GET') {
+        assert.equal(response.headers.get('Cache-Control'), 'no-store');
+        if (mock) {
+          const payload = JSON.parse(body);
+          assert.equal(payload.synthetic, true);
+          assert.equal(payload.source, 'local-mock');
+          assert.deepEqual(
+            payload.events.map((event) => event.code),
+            ['M1', 'M2'],
+          );
+        }
       }
     }
     console.log(`${label}: ${cases.length} actual local routing cases passed.`);
@@ -201,8 +234,9 @@ try {
   for (const environment of [undefined, 'preview', 'staging', 'production']) {
     count += await checkEnvironment(environment);
   }
+  count += await checkEnvironment(undefined, true);
   console.log(
-    `${count} routing cases passed across four local configurations; no deployment performed.`,
+    `${count} routing cases passed across four local configurations and one opt-in mock; no deployment performed.`,
   );
 } catch (error) {
   console.error(error instanceof Error ? error.message : 'Local routing verification failed.');

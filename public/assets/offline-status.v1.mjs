@@ -1,7 +1,7 @@
 // When any precached content changes, bump this version AND public/sw.js together.
 // A previously active worker or registration.ready is not evidence of this revision.
-export const EXPECTED_STATIC_CACHE = 'pushkara-static-prototype-v6';
-export const STATIC_STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V6';
+export const EXPECTED_STATIC_CACHE = 'pushkara-static-prototype-v23';
+export const STATIC_STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V23';
 
 export function verifyStaticController(controller, timeoutMs = 1800) {
   if (

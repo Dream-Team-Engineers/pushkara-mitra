@@ -6,7 +6,7 @@ An independent, Telugu-first, offline-capable pilgrim assistance PWA for the God
 
 > **Engineering readiness is not legal sign-off.** Passing CI means the code meets engineering gates. It says nothing about legal compliance. Legal status is tracked separately in [docs/compliance](docs/compliance/) and every item starts as `NEEDS REVIEW`.
 
-**Status:** repository scaffold only (Kickoff Prompt V1, Phase 1). There are no application features yet, only a `/healthz` endpoint, security headers, stubs and the guard rails around them.
+**Status on `review/local-integration-snapshot-20261106`:** local review build with an original mobile-first PWA, a review-pending Plan screen, a Ghats screen showing 159 user-submitted names and localities as an explicitly unverified draft, offline static shell and disabled sensitive-service screens. The released `main` branch and approval state must be checked separately. This branch does not provide approved festival content, accounts, registration, emergency response, device location, payments or production services.
 
 ## Architecture and delivery
 
@@ -33,6 +33,8 @@ npm run dev
 ```
 
 `npm run check` runs lint, typecheck, tests and the format check. Secrets are never committed: copy `.dev.vars.example` to `.dev.vars` and fill it locally.
+
+The [local integration runbook](docs/operations/local-integration.md) explains the review-pending app and test-only mock boundary. `npm run test:routing` exercises real local HTTP handling without deployment.
 
 ## Rules that matter
 

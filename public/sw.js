@@ -1,15 +1,26 @@
 // Original public prototype. Only exact, own, static GET resources are cacheable.
 const CACHE_PREFIX = 'pushkara-static-prototype-';
 // Bump this AND offline-status.v1.mjs whenever any precached resource changes.
-const CACHE_NAME = `${CACHE_PREFIX}v6`;
-const STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V6';
+const CACHE_NAME = `${CACHE_PREFIX}v23`;
+const STATUS_MESSAGE = 'PUSHKARA_STATIC_STATUS_V23';
 // Cache canonical URLs only: /index.html is a redirect, not an offline resource.
 const STATIC_PATHS = [
   '/',
   '/assets/shell.v1.css',
   '/assets/shell.v1.mjs',
+  '/assets/mobile-sections.v1.mjs',
+  '/assets/ghats-draft-view.v1.mjs',
+  '/assets/ghats-draft.v1.mjs',
+  '/assets/icons.v1.mjs',
   '/assets/offline-status.v1.mjs',
   '/assets/mitra-mark.svg',
+  '/assets/quick-access-synthetic-v1.jpg',
+  '/assets/fonts/Roboto-400-latin.woff',
+  '/assets/fonts/Roboto-700-latin.woff',
+  '/assets/fonts/NotoSansTelugu-400.woff',
+  '/assets/fonts/NotoSansTelugu-700.woff',
+  '/assets/fonts/NotoSansDevanagari-400.woff',
+  '/assets/fonts/NotoSansDevanagari-700.woff',
   '/manifest.webmanifest',
 ];
 self.addEventListener('install', (event) => {

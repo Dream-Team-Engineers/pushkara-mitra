@@ -51,8 +51,17 @@ const paths = [
   '/',
   '/assets/shell.v1.css',
   '/assets/shell.v1.mjs',
+  '/assets/mobile-sections.v1.mjs',
+  '/assets/icons.v1.mjs',
   '/assets/offline-status.v1.mjs',
   '/assets/mitra-mark.svg',
+  '/assets/quick-access-synthetic-v1.jpg',
+  '/assets/fonts/Roboto-400-latin.woff',
+  '/assets/fonts/Roboto-700-latin.woff',
+  '/assets/fonts/NotoSansTelugu-400.woff',
+  '/assets/fonts/NotoSansTelugu-700.woff',
+  '/assets/fonts/NotoSansDevanagari-400.woff',
+  '/assets/fonts/NotoSansDevanagari-700.woff',
   '/manifest.webmanifest',
 ];
 const expectedCache = /^export const EXPECTED_STATIC_CACHE = ['"]([^'"]+)['"];$/m.exec(
@@ -83,7 +92,15 @@ async function load(hash = 'home') {
   await page.locator(`#route-${hash}`).waitFor({ state: 'visible' });
 }
 async function route(name) {
-  await page.locator(`[data-route="${name}"]`).focus();
+  const primary = page.locator(`.primary-nav [data-route="${name}"]`);
+  const bottom = page.locator(`.bottom-nav [data-route="${name}"]`);
+  if (await primary.isVisible()) await primary.focus();
+  else if (await bottom.isVisible()) await bottom.focus();
+  else {
+    await page.evaluate((target) => (window.location.hash = target), name);
+    await page.locator(`#route-${name}`).waitFor({ state: 'visible' });
+    return;
+  }
   await page.keyboard.press('Enter');
   await page.locator(`#route-${name}`).waitFor({ state: 'visible' });
 }
@@ -110,6 +127,12 @@ try {
   await check('Telugu default, visible route and eight original product-area cards', async () => {
     await load();
     assert.equal(await page.locator('html').getAttribute('lang'), 'te');
+    assert.deepEqual(
+      await page
+        .locator('#language option')
+        .evaluateAll((options) => options.map((option) => option.value)),
+      ['te', 'en', 'hi'],
+    );
     assert.equal(await page.locator('.route-panel:visible').count(), 1);
     assert.equal(await page.locator('#area-grid .area-card').count(), 8);
   });
@@ -142,29 +165,96 @@ try {
     await load();
     await route('plan');
     assert.equal(await page.evaluate(() => document.activeElement.id), 'main');
-    assert.equal(await page.locator('[aria-current="page"]').getAttribute('data-route'), 'plan');
+    assert.equal(
+      await page.locator('.primary-nav [aria-current="page"]').getAttribute('data-route'),
+      'plan',
+    );
     await route('updates');
     await page.goBack();
     await page.locator('#route-plan').waitFor({ state: 'visible' });
-    assert.equal(await page.locator('[aria-current="page"]').getAttribute('data-route'), 'plan');
+    assert.equal(
+      await page.locator('.primary-nav [aria-current="page"]').getAttribute('data-route'),
+      'plan',
+    );
   });
-  await check('Keyboard filters preserve focus and update pressed state/results', async () => {
-    await load('plan');
-    const before = await page.locator('.event-card').count();
-    await page.locator('[data-filter="care"]').focus();
-    await page.keyboard.press('Enter');
-    assert.equal(await page.locator('[data-filter="care"]').getAttribute('aria-pressed'), 'true');
-    assert.equal(await page.evaluate(() => document.activeElement.dataset.filter), 'care');
-    const filtered = await page.locator('.event-card').count();
-    assert.ok(filtered > 0 && filtered < before);
-    assert.match(await page.locator('#result-count').textContent(), new RegExp(String(filtered)));
-    await page.locator('[data-filter="all"]').focus();
-    await page.keyboard.press('Space');
-    assert.equal(await page.locator('.event-card').count(), before);
+  await check('Mobile bottom navigation and icon shortcuts stay usable at 390px', async () => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    try {
+      await load('explore');
+      assert.equal(await page.locator('.bottom-nav a:visible').count(), 5);
+      assert.equal(await page.locator('#primary-nav').isVisible(), false);
+      assert.equal(await page.locator('#route-explore .section-link-card svg').count(), 12);
+      await page.locator('.bottom-nav [data-route="plan"]').click();
+      await page.locator('#route-plan').waitFor({ state: 'visible' });
+      assert.equal(await page.locator('#route-plan .notice[role="status"]').count(), 1);
+      assert.equal(
+        await page.locator('.bottom-nav [aria-current="page"]').getAttribute('data-route'),
+        'plan',
+      );
+      await page.locator('.bottom-nav [data-route="home"]').click();
+      await page.locator('#route-home').waitFor({ state: 'visible' });
+      assert.equal(await page.locator('#quick-grid .quick-tile svg').count(), 8);
+      const symbolBox = await page.locator('#quick-grid .quick-tile svg').first().boundingBox();
+      const targetBox = await page.locator('#quick-grid .quick-tile').first().boundingBox();
+      assert.ok(symbolBox && symbolBox.width <= 16);
+      assert.ok(targetBox && targetBox.width >= 44 && targetBox.height >= 44);
+      const positions = await page.locator('#quick-grid .quick-tile').evaluateAll((tiles) =>
+        tiles.slice(0, 5).map((tile) => ({
+          x: tile.getBoundingClientRect().x,
+          y: tile.getBoundingClientRect().y,
+        })),
+      );
+      assert.ok(positions.slice(0, 4).every((position) => position.y === positions[0].y));
+      assert.ok(positions[4].y > positions[0].y);
+      assert.ok(
+        await page
+          .locator('#quick-grid .quick-name')
+          .evaluateAll((labels) =>
+            labels.every((label) => label.scrollWidth <= label.clientWidth + 1),
+          ),
+      );
+      assert.match(
+        await page
+          .locator('#quick-grid .quick-icon')
+          .first()
+          .evaluate((el) => getComputedStyle(el, '::after').backgroundImage),
+        /quick-access-synthetic-v1\.jpg/,
+      );
+      assert.equal(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+        true,
+      );
+      await page.locator('.feature-details summary').click();
+      assert.equal(await page.locator('#area-grid .area-image').count(), 8);
+      assert.equal(await page.locator('#area-grid a.area-card').count(), 7);
+      await page.locator('#area-grid a[href="#pass"]').click();
+      await page.locator('#route-pass').waitFor({ state: 'visible' });
+    } finally {
+      await page.setViewportSize({ width: 1280, height: 900 });
+    }
+  });
+  await check('Plan shows review-pending status without sample events or mock fetch', async () => {
+    const requests = [];
+    const record = (request) => {
+      if (new URL(request.url()).pathname === '/api/demo/events') requests.push(request.url());
+    };
+    page.on('request', record);
+    try {
+      await page.goto(`${origin.origin}/?local-mock=1#plan`, { waitUntil: 'networkidle' });
+      await page.locator('#route-plan .notice[role="status"]').waitFor({ state: 'visible' });
+      assert.equal(await page.locator('.event-card, [data-filter]').count(), 0);
+      assert.deepEqual(requests, []);
+    } finally {
+      page.off('request', record);
+    }
   });
   await check('Visible keyboard focus and theme state', async () => {
     await load();
     await page.locator('#theme').focus();
+    assert.equal(await page.locator('#theme .theme-dot').count(), 1);
+    assert.ok((await page.locator('#theme .theme-icon').boundingBox()).width <= 44);
+    assert.ok((await page.locator('#theme').boundingBox()).height >= 44);
+    assert.ok((await page.locator('#theme .theme-label').textContent()).trim());
     await page.keyboard.press('Space');
     assert.equal(await page.locator('#theme').getAttribute('aria-pressed'), 'true');
     const focus = await page.locator('#theme').evaluate((el) => {
@@ -176,13 +266,49 @@ try {
     await page.keyboard.press('Space');
     assert.equal(await page.locator('#theme').getAttribute('aria-pressed'), 'false');
   });
+  await check('Theme label stays above its icon in all three languages', async () => {
+    await load();
+    try {
+      for (const width of [320, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const lang of ['te', 'en', 'hi']) {
+          await page.selectOption('#language', lang);
+          for (const state of ['false', 'true']) {
+            assert.equal(await page.locator('#theme').getAttribute('aria-pressed'), state);
+            const label = page.locator('#theme .theme-label');
+            const labelBox = await label.boundingBox();
+            const iconBox = await page.locator('#theme .theme-icon').boundingBox();
+            assert.ok(labelBox && iconBox && labelBox.y + labelBox.height <= iconBox.y + 1);
+            if (lang !== 'en') assert.doesNotMatch(await label.textContent(), /[A-Za-z]/);
+            await page.locator('#theme').click();
+          }
+        }
+      }
+    } finally {
+      await page.setViewportSize({ width: 1280, height: 900 });
+    }
+    await page.selectOption('#language', 'te');
+    await page.evaluate(() => (window.location.hash = 'stays'));
+    await page.locator('#route-stays').waitFor({ state: 'visible' });
+    assert.doesNotMatch(await page.locator('#route-stays .tag').first().textContent(), /[A-Za-z]/);
+  });
   await check('Language controls update document language without empty content', async () => {
     await load();
-    for (const lang of ['te', 'en', 'hi', 'mr']) {
+    for (const lang of ['te', 'en', 'hi']) {
       await page.selectOption('#language', lang);
       assert.equal(await page.locator('html').getAttribute('lang'), lang);
       assert.ok((await page.locator('#home-title').textContent()).trim());
       assert.equal(await page.locator('.area-card').count(), 8);
+      if (lang === 'hi') {
+        await page.evaluate(() => (window.location.hash = 'explore'));
+        await page.locator('#route-explore').waitFor({ state: 'visible' });
+        const menuText = [
+          ...(await page.locator('#quick-grid .quick-name').allTextContents()),
+          ...(await page.locator('.bottom-nav a span').allTextContents()),
+          ...(await page.locator('#route-explore .section-link-card h2').allTextContents()),
+        ];
+        assert.ok(menuText.every((value) => value.trim() && !/[A-Za-z]/.test(value)));
+      }
     }
     return {
       nativeLanguageReview: 'NOT PERFORMED; translations remain unreviewed',
@@ -192,7 +318,7 @@ try {
     await load();
     const failures = [];
     let cases = 0;
-    for (const lang of ['te', 'en', 'hi', 'mr']) {
+    for (const lang of ['te', 'en', 'hi']) {
       await page.selectOption('#language', lang);
       for (const width of [320, 375, 1280])
         for (const scale of [1, 2]) {
@@ -317,15 +443,13 @@ try {
     };
   });
   await check(
-    'Current controller acknowledges exactly six public resources within bounded time',
+    'Current controller acknowledges exactly fifteen public resources within bounded time',
     async () => {
       await load();
       await page.waitForFunction(
         () =>
           navigator.serviceWorker.controller &&
-          document
-            .querySelector('#offline-status')
-            ?.textContent.includes('Static pages ready offline'),
+          document.querySelector('#offline-status')?.dataset.offlineState === 'ready-online',
         null,
         { timeout: 10000 },
       );
@@ -338,11 +462,11 @@ try {
     },
   );
   await check(
-    'Offline reload/navigation/filter and protected/query/authorized cache exclusion',
+    'Offline reload/navigation and protected/query/authorized cache exclusion',
     async () => {
       await load('plan');
       await page.waitForFunction(
-        () => document.querySelector('#offline-status')?.textContent.includes('ready offline'),
+        () => document.querySelector('#offline-status')?.dataset.offlineState === 'ready-online',
         null,
         { timeout: 10000 },
       );
@@ -361,14 +485,12 @@ try {
       });
       await context.setOffline(true);
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.locator('.event-card').first().waitFor({ timeout: 6000 });
+      await page.locator('#route-plan .notice[role="status"]').waitFor({ timeout: 6000 });
       await page.waitForFunction(
-        () => document.querySelector('#offline-status')?.textContent.includes('Offline · Static'),
+        () => document.querySelector('#offline-status')?.dataset.offlineState === 'ready-offline',
         null,
         { timeout: 6000 },
       );
-      await page.locator('[data-filter="care"]').click();
-      assert.ok((await page.locator('.event-card').count()) > 0);
       const blocked = await page.evaluate(async () => {
         const out = [];
         for (const path of ['/healthz', '/api/qa-not-real', '/admin/qa-not-real', '/?qa=1']) {
@@ -483,9 +605,9 @@ try {
         timeout: 10000,
       });
       await f.waitForTimeout(2000);
-      assert.doesNotMatch(
-        await f.locator('#offline-status').textContent(),
-        /ready offline|Offline · Static/,
+      assert.equal(
+        await f.locator('#offline-status').getAttribute('data-offline-state'),
+        'not-verified',
       );
       phase = 'failed';
       await f.evaluate(async () => {
@@ -500,9 +622,9 @@ try {
       await f.waitForFunction(() => window.__qaUpgradeState === 'redundant', null, {
         timeout: 10000,
       });
-      assert.doesNotMatch(
-        await f.locator('#offline-status').textContent(),
-        /ready offline|Offline · Static/,
+      assert.equal(
+        await f.locator('#offline-status').getAttribute('data-offline-state'),
+        'not-verified',
       );
       assert.ok((await snapshotCaches(f)).some((c) => c.name.endsWith('qa-legacy')));
       phase = 'current';
@@ -510,10 +632,7 @@ try {
         await (await navigator.serviceWorker.getRegistration()).update();
       });
       await f.waitForFunction(
-        () =>
-          document
-            .querySelector('#offline-status')
-            ?.textContent.includes('Static pages ready offline'),
+        () => document.querySelector('#offline-status')?.dataset.offlineState === 'ready-online',
         null,
         { timeout: 10000 },
       );
@@ -546,14 +665,14 @@ try {
       await f.reload({ waitUntil: 'domcontentloaded' });
       await f.locator('.area-card').first().waitFor({ timeout: 6000 });
       await f.waitForFunction(
-        () => document.querySelector('#offline-status')?.textContent.includes('Offline · Static'),
+        () => document.querySelector('#offline-status')?.dataset.offlineState === 'ready-offline',
         null,
         { timeout: 6000 },
       );
       return {
         legacy: 'not falsely ready',
         failedUpgrade: 'legacy remains; not falsely ready',
-        current: 'six cached resources and functional offline reload',
+        current: 'fifteen cached resources and functional offline reload',
         scope:
           'Synthetic legacy/failure fixture; not an old released artifact. Legacy in-flight fetch may recreate an old public cache; current acknowledged cache, not perpetual old-cache absence, is verified.',
       };

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#302744" />
+    <meta name="theme-color" content="#302923" />
     <meta name="description" content="An original, independent pilgrim companion prototype." />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/assets/mitra-mark.svg" />
@@ -30,15 +30,25 @@
         ><select id="language" aria-describedby="translation-note">
           <option value="te">తెలుగు</option>
           <option value="en">English</option>
-          <option value="hi">हिन्दी</option>
-          <option value="mr">मराठी</option></select
+          <option value="hi">हिन्दी</option></select
         ><button id="theme" class="quiet-button" type="button" aria-pressed="false">
-          <span data-text="dark">చీకటి రంగులు</span>
+          <span class="theme-label" data-text="dark">డార్క్ మోడ్</span>
+          <span class="theme-icon" aria-hidden="true"><span class="theme-dot"></span></span>
         </button>
       </div>
     </header>
     <div class="app-layout">
-      <nav class="primary-nav" aria-label="Main navigation">
+      <button
+        id="mobile-menu-button"
+        class="mobile-menu-button"
+        type="button"
+        aria-controls="primary-nav"
+        aria-expanded="false"
+        data-text="menu"
+      >
+        మెనూ
+      </button>
+      <nav id="primary-nav" class="primary-nav" aria-label="Main navigation">
         <a href="#home" data-route="home"
           ><span class="nav-number">01</span><span data-text="home">నా పుష్కరం</span></a
         ><a href="#plan" data-route="plan"
@@ -47,6 +57,8 @@
           ><span class="nav-number">03</span><span data-text="updates">వార్తలు</span></a
         ><a href="#about" data-route="about"
           ><span class="nav-number">04</span><span data-text="about">ఈ నమూనా గురించి</span></a
+        ><a href="#explore" data-route="explore"
+          ><span class="nav-number">05</span><span data-text="exploreNav">విభాగాలు</span></a
         >
       </nav>
       <main id="main" tabindex="-1">
@@ -59,7 +71,7 @@
               నమూనా.
             </p>
             <a class="primary-link" href="#plan"
-              ><span data-text="explore">నమూనా ప్రణాళికను చూడండి</span
+              ><span data-text="explore">యాత్ర ప్రణాళికను చూడండి</span
               ><span aria-hidden="true">></span></a
             >
             <div class="river-art" aria-hidden="true">
@@ -67,20 +79,35 @@
             </div>
           </div>
           <div class="notice" role="note">
-            <strong data-text="demoTitle">నిజమైన కార్యక్రమాలు కావు</strong>
+            <strong data-text="demoTitle">అధికారిక సమాచారం సమీక్షలో ఉంది</strong>
             <p data-text="demoCopy">
-              ఇక్కడి కార్యక్రమాలు పరీక్ష కోసం మాత్రమే. ధృవీకరించిన తేదీలు, ప్రయాణ సమాచారం లేదా
-              అత్యవసర సేవలు అందుబాటులో లేవు.
+              తేదీలు మరియు ప్రదేశాల సమాచారం సమీక్షించిన తర్వాత ఇక్కడ చూపిస్తాం. ప్రత్యక్ష ప్రయాణ
+              లేదా అత్యవసర సేవలు అందుబాటులో లేవు.
             </p>
           </div>
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow" data-text="journeys">YOUR COMPANION, STEP BY STEP</p>
-              <h2 data-text="areas">ప్రయాణంలో మీకు తోడు</h2>
+          <section class="quick-section" aria-labelledby="quick-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow" data-text="localReview">పుష్కర మిత్ర / స్థానిక సమీక్ష</p>
+                <h2 id="quick-title" data-text="quickAccess">త్వరిత ప్రాప్యత</h2>
+              </div>
             </div>
-            <span class="small-label" data-text="eightAreas">ఎనిమిది విభాగాల రూపకల్పన</span>
-          </div>
-          <div id="area-grid" class="area-grid"></div>
+            <p class="quick-copy" data-text="quickCopy">
+              చిత్రాలు కల్పితం. ప్రత్యక్ష సమాచారం లేదు.
+            </p>
+            <div id="quick-grid" class="quick-grid"></div>
+          </section>
+          <details class="feature-details">
+            <summary data-text="featureDetails">మరిన్ని నమూనా ఫీచర్లు</summary>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow" data-text="journeys">YOUR COMPANION, STEP BY STEP</p>
+                <h2 data-text="areas">ప్రయాణంలో మీకు తోడు</h2>
+              </div>
+              <span class="small-label" data-text="eightAreas">ఎనిమిది విభాగాల రూపకల్పన</span>
+            </div>
+            <div id="area-grid" class="area-grid"></div>
+          </details>
           <div class="offline-note">
             <span class="offline-symbol" aria-hidden="true">↺</span>
             <div>
@@ -96,41 +123,28 @@
           </div>
         </section>
         <section class="route-panel" id="route-plan" aria-labelledby="plan-title" hidden>
-          <p class="eyebrow" data-text="demoOnly">SYNTHETIC FIXTURES · NOT AN EVENT SCHEDULE</p>
-          <h1 id="plan-title" data-text="planTitle">ఒక సాధారణ ప్రణాళికను ఊహించండి.</h1>
+          <p class="eyebrow" data-text="demoOnly">అధికారిక సమాచారం · సమీక్షలో ఉంది</p>
+          <h1 id="plan-title" data-text="planTitle">మీ యాత్రను ప్లాన్ చేసుకోండి.</h1>
           <p class="page-summary" data-text="planCopy">
-            ఫిల్టర్ మరియు పేజీ పనితీరును పరీక్షించే కల్పిత ఉదాహరణలు. బుకింగ్‌లు, తేదీలు లేదా వాస్తవ
-            ప్రదేశాలు లేవు.
+            అధికారిక తేదీలు మరియు ప్రదేశాల సమాచారం మానవ సమీక్షలో ఉంది.
           </p>
-          <div class="filter-group" role="group" aria-label="Demo activity filters">
-            <button type="button" data-filter="all" aria-pressed="true" data-text="all">
-              అన్నీ</button
-            ><button type="button" data-filter="prepare" aria-pressed="false" data-text="prepare">
-              సిద్ధత</button
-            ><button type="button" data-filter="care" aria-pressed="false" data-text="care">
-              సంరక్షణ</button
-            ><button type="button" data-filter="reflect" aria-pressed="false" data-text="reflect">
-              విశ్రాంతి
-            </button>
-          </div>
-          <p id="result-count" class="small-label" role="status"></p>
-          <div id="event-list" class="event-list"></div>
-          <div class="notice">
-            <strong data-text="notLive">ఇది ప్రత్యక్ష సేవ కాదు</strong>
+          <div class="notice" role="status">
+            <strong data-text="notLive">సమీక్ష పూర్తయ్యే వరకు సమాచారం అందుబాటులో లేదు</strong>
             <p data-text="planBoundary">
-              నిజమైన తేదీలు, మ్యాప్‌లు, వసతి లేదా ప్రయాణ సూచనలు సమీక్ష తరువాత మాత్రమే జోడిస్తాము.
+              తేదీలు మరియు ప్రదేశాల కోసం అధికారిక మూలాలు పరిశీలిస్తున్నాం. ఆమోదం తర్వాత మాత్రమే
+              యాప్‌లో చూపిస్తాం.
             </p>
           </div>
         </section>
         <section class="route-panel" id="route-updates" aria-labelledby="updates-title" hidden>
-          <p class="eyebrow">BUILD NOTES / NO LIVE FEED</p>
+          <p class="eyebrow" data-text="buildNote">నిర్మాణ సమాచారం / ప్రత్యక్ష వార్తలు లేవు</p>
           <h1 id="updates-title" data-text="updatesTitle">ఏది సిద్ధంగా ఉందో స్పష్టంగా.</h1>
           <div class="status-card">
             <span class="tag" data-text="prototype">మానవ సమీక్ష కోసం నమూనా</span>
             <h2 data-text="publicSlice">పబ్లిక్ పేజీల మొదటి నమూనా</h2>
             <p data-text="sliceCopy">
-              నావిగేషన్, భాష ఎంపిక, నమూనా ఫిల్టర్లు మరియు ఆఫ్‌లైన్ పేజీలను పరీక్షించవచ్చు. ఇది ఉత్సవ
-              వార్తల ఫీడ్ కాదు.
+              నావిగేషన్, భాష ఎంపిక మరియు ఆఫ్‌లైన్ పేజీలను పరీక్షించవచ్చు. ఇది ఉత్సవ వార్తల ఫీడ్
+              కాదు.
             </p>
           </div>
           <div class="notice">
@@ -142,7 +156,7 @@
           </div>
         </section>
         <section class="route-panel" id="route-about" aria-labelledby="about-title" hidden>
-          <p class="eyebrow">INDEPENDENT BY DESIGN</p>
+          <p class="eyebrow" data-text="independentNote">స్వతంత్ర రూపకల్పన</p>
           <h1 id="about-title" data-text="aboutTitle">నమ్మకానికి ముందు స్పష్టత.</h1>
           <div class="reading-card">
             <h2 data-text="independent">స్వతంత్ర యాప్</h2>
@@ -156,10 +170,9 @@
               మెమరీలో మాత్రమే ఉంటాయి. హోస్టింగ్ కనెక్షన్ డేటా నిర్వహణకు గోప్యతా సమీక్ష ఇంకా అవసరం.
             </p>
             <h2 data-text="reviewTitle">సమీక్ష ఇంకా అవసరం</h2>
-            <p id="translation-note">
-              All Telugu, Hindi and Marathi text is an unreviewed prototype translation scaffold.
-              Native-language and legal review are pending. Demo content is synthetic. This unmerged
-              prototype is not approval to launch or enable services.
+            <p id="translation-note" data-text="translationNote">
+              తెలుగు మరియు హిందీ అనువాదాలు ఇంకా సమీక్షించని నమూనాలు. భాషా మరియు చట్టపరమైన సమీక్ష
+              అవసరం. ఉదాహరణలు కల్పితం. ఈ నమూనా సేవలను ప్రారంభించడానికి అనుమతి కాదు.
             </p>
           </div>
         </section>
@@ -171,8 +184,17 @@
         >
       </main>
     </div>
+    <nav class="bottom-nav" aria-label="Mobile primary navigation">
+      <a href="#home" data-route="home"><span data-text="homeTab">హోమ్</span></a>
+      <a href="#ghats" data-route="ghats"><span data-text="ghatsTab">ఘాట్లు</span></a>
+      <a href="#plan" data-route="plan"><span data-text="planTab">ప్రణాళిక</span></a>
+      <a href="#stays" data-route="stays"><span data-text="staysTab">వసతి</span></a>
+      <a href="#explore" data-route="explore"><span data-text="more">మరిన్ని</span></a>
+    </nav>
     <footer class="site-footer">
-      <span class="small-label">Unreviewed translation scaffold · Human review pending</span>
+      <span class="small-label" data-text="footReview"
+        >సమీక్షించని అనువాదాలు · మానవ సమీక్ష అవసరం</span
+      >
       <p data-text="footer">స్వతంత్ర నమూనా · అధికారిక సేవ కాదు · నిజమైన కార్యక్రమ సమాచారం లేదు</p>
       <a href="#about" data-text="reviewDetails">సమీక్ష వివరాలు</a>
     </footer>
