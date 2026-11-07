@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.6](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.5...v1.0.6) (2026-11-07)
+
+
+### Bug Fixes
+
+* verify independent reviews and prepare foundation adoption ([ddad42a](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/ddad42a09524aa12b51bc9e912e6f35e49f38006))
+* verify independent reviews and prepare foundation adoption ([0a32daf](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/0a32dafbf3af90fe9eb6b2780090ce869aee5eb7))
+
 ## [1.0.5](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.4...v1.0.5) (2026-11-05)
 
 
