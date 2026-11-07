@@ -7,8 +7,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f6f4ef",
-  "theme_color": "#302744",
+  "background_color": "#f7f3eb",
+  "theme_color": "#302923",
   "icons": [
     {
       "src": "/assets/mitra-mark.svg",

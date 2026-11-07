@@ -52,7 +52,7 @@ function serviceWorker(options: { installFails?: boolean; missingPath?: string }
         Promise.resolve([
           'pushkara-static-prototype-v0',
           'pushkara-static-prototype-v1',
-          'pushkara-static-prototype-v6',
+          'pushkara-static-prototype-v23',
           'unrelated-app-cache',
         ]),
       delete: (name: string) => {
@@ -118,7 +118,7 @@ describe('public prototype cache boundary', () => {
     expect(pending).toBeDefined();
     const response = await pending;
     expect(await response?.text()).toBe('static:/assets/shell.v1.css');
-    expect(worker.opened).toEqual(['pushkara-static-prototype-v6']);
+    expect(worker.opened).toEqual(['pushkara-static-prototype-v23']);
     expect(worker.network).toEqual([]);
   });
 
@@ -197,7 +197,7 @@ async function workerStatus(options: { missingPath?: string } = {}): Promise<unk
 }
 
 describe('offline installation and current-controller acknowledgement', () => {
-  it('waits for all six canonical static resources before skipWaiting', async () => {
+  it('waits for all fifteen canonical static resources before skipWaiting', async () => {
     const worker = serviceWorker();
     let install: Promise<void> | undefined;
     worker.listeners.get('install')?.({
@@ -208,9 +208,13 @@ describe('offline installation and current-controller acknowledgement', () => {
     expect(install).toBeDefined();
     expect(worker.skipped()).toBe(false);
     await install;
-    expect(worker.installedPaths()).toHaveLength(6);
+    expect(worker.installedPaths()).toHaveLength(17);
     expect(worker.installedPaths()).not.toContain('/index.html');
     expect(worker.installedPaths()).toContain('/assets/offline-status.v1.mjs');
+    expect(worker.installedPaths()).toContain('/assets/icons.v1.mjs');
+    expect(worker.installedPaths()).toContain('/assets/quick-access-synthetic-v1.jpg');
+    expect(worker.installedPaths()).toContain('/assets/fonts/NotoSansTelugu-400.woff');
+    expect(worker.installedPaths()).toContain('/assets/fonts/NotoSansDevanagari-700.woff');
     expect(worker.skipped()).toBe(true);
   });
 
