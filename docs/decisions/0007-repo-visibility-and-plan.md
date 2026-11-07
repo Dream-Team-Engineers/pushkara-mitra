@@ -1,7 +1,15 @@
 # 0007. Repository visibility and GitHub plan
 
-Status: **Proposed. The owners decide.**
+Status: **Owner selected private with enforced protections; provisioning, independent review and verification PENDING.**
 Date: 2026-11-02
+
+## Owner selection — 2026-11-05 (IST)
+
+The requesting user, identifying as LEAD, selected: **keep private; the owner will arrange a plan that supports enforced protections.** This choice supersedes the earlier public-first recommendation as a selection; it does not claim a purchased plan, enabled control or final independent approval. Do not make the source public or purchase a plan on the owner's behalf.
+
+Before marking this ADR implemented, independently review the selected controls and read back their actual state: protected main/default branch; independent human/code-owner approval; no self-approval; stale-review dismissal and current final-head approval; resolved review threads; all required current checks; no unauthorized bypass, force pushes or branch deletion; signed commits and protected release tags as applicable. Re-verify capabilities for the actual selected plan; the historical matrix below is not authoritative proof of current capabilities.
+
+Settings changes remain restricted to the reviewed setup script after plan availability and human approval. Existing production and preview credential stop gates remain. If required controls cannot be read or are unsupported, report BLOCKED/UNKNOWN and keep dependent merges blocked rather than silently substituting manual enforcement. No temporary manual bypass has been approved by the requesting user.
 
 ## Context
 
