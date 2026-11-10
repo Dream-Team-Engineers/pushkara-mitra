@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.7.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.6.0...v1.7.0) (2026-11-10)
+
+
+### Features
+
+* **web:** serve the new frontend build (dist/web) from the Worker ([bb2e759](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/bb2e759d7149f2edf0374efc17878a2b9e20329b))
+* **web:** serve the new frontend build from the Worker (cut-over) ([bc27849](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/bc27849fbafebad1709afde58e64c0f064074793))
+
+
+### Bug Fixes
+
+* **ci:** drop redundant eslint global and correct the Hindi font smoke check ([30d3632](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/30d36327d190cdc4257358ad3774963c487cff18))
+* **ci:** drop redundant fetch global; check Hindi fonts on the Home screen only ([f29af8e](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/f29af8e689681abc7a332adb2b40cb7b69d38863))
+* **ci:** use globalThis.fetch in the smoke test ([fe33892](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/fe33892c26a1a550694ae43edd18e904b076c7a6))
+* **ci:** use globalThis.fetch in the smoke test ([6ccbb9d](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/6ccbb9d5d1b31ebff60df3fe61fb93fd6b5532fa))
+
 ## [1.6.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.5.0...v1.6.0) (2026-11-10)
 
 
