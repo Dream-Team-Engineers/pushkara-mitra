@@ -1,6 +1,6 @@
 # 0011. Frontend stack and hosting
 
-Status: **Proposed.** Owner acceptance required before any scaffold or migration. Prepared 2026-11-10 (IST) on `main` `1f1fe72`.
+Status: **Owner accepted on 2026-11-10 (IST), by instruction in the requesting session. Independent review of this pull request is still required before merge.** Prepared on `main` `1f1fe72`.
 
 ## Context
 
@@ -56,3 +56,18 @@ Path-based routes (for example `/ghats/:id`) need an app-shell fallback in the W
 - `wrangler.toml` `assets.directory` changes to the Vite output folder in a reviewed Phase 1 PR.
 - The current `public/` shell is retired screen by screen; Playwright parity tests decide each switch.
 - No geolocation, personal-data submission, SOS dispatch or production deploy is authorised by this ADR.
+
+## Owner decisions recorded 2026-11-10 (IST)
+
+Given by the owner in the requesting session. They are not a GitHub Approve review, a legal opinion or a security sign-off.
+
+| ID  | Decision                                                                                                                                         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F1  | Keep Home plus the ten modules of the decided prototype as the information architecture. The eight-area shell is superseded for the new frontend |
+| F2  | Start the visual design fresh from the UI workflow prototype (ink blue, teal, saffron tokens). The existing repo design is not carried over       |
+| F3  | Keep Worker static assets with `run_worker_first = true`. The deviation from the Cloudflare Pages baseline is accepted                          |
+| F8  | Verify each dependency, font and data licence at its upstream source when it is first needed, before it is added                                 |
+
+Stack: Option A (Preact, strict TypeScript, Vite), migrated screen by screen, is accepted with the recommendation above.
+
+Still open: F4 (budgets, proposed values stand until measured), F5 (fixed in Phase 1 and 2), F6 (branch protection, ADR 0007), F7 (release versioning).

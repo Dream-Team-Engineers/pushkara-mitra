@@ -2,9 +2,9 @@
 
 Proposal under [ADR 0011](../decisions/0011-frontend-stack-and-hosting.md). Nothing here is implemented or approved.
 
-## Information architecture (decision F1)
+## Information architecture (decision F1, decided)
 
-The master prompt lists Home plus ten modules; the repo shell and `PRODUCT_BLUEPRINT.md` use eight areas. One way to reconcile them, keeping the blueprint's areas as navigation groups:
+The owner chose Home plus the ten prototype modules (ADR 0011, 2026-11-10). The blueprint area column is kept only as a cross-reference to `PRODUCT_BLUEPRINT.md`.
 
 | Master prompt module   | Blueprint area     | Proposed route           |
 | ---------------------- | ------------------ | ------------------------ |
