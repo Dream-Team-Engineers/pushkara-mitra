@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.6.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.5.0...v1.6.0) (2026-11-10)
+
+
+### Features
+
+* **web:** add inert prototypes, self-hosted fonts, service worker and browser smoke test ([3c32ec2](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/3c32ec29aac50c6c6198c5a83ea13c0769eb46d9))
+* **web:** add Pilgrim Pass, My Group, Maps, Emergency and Partners as inert prototypes ([d2c17d9](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d2c17d9e2a2c429abcc1ad0734b2a2b71311316f))
+* **web:** list bundled fonts and software with their licences in Settings ([395a01a](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/395a01aff757fde2ef066b87bf6345dfcc945b46))
+* **web:** self-hosted fonts, build-generated service worker, manifest and update prompt ([781646c](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/781646c3168438adfbafb22351b5c01d2b7e47bc))
+
+
+### Bug Fixes
+
+* **web:** latest language request wins; failed catalogue load cannot blank the app ([d50fc22](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d50fc228f4a9c96582b40ada0c6f491df9bce0d5))
+* **web:** register the worker after a late boot; reload only after the person accepts an update ([57307dc](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/57307dcf8267946a4f0f339054e3c541b11ae39e))
+* **web:** satisfy lint and typecheck for the service worker build and test ([9c2ce2b](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/9c2ce2be3208c4628d5e95cd94d47074956f6562))
+
 ## [1.5.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.4.0...v1.5.0) (2026-11-10)
 
 
