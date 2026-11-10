@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.1.0...v1.2.0) (2026-11-10)
+
+
+### Features
+
+* **frontend:** add design tokens with light, dark and outdoor themes ([63c0130](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/63c01304e3c1199ca5392fd40174b9b8cae7e7a6))
+* **frontend:** add design tokens with light, dark and outdoor themes ([0774824](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/07748245715412e51d4ffdc4d8860d319da210ce))
+
 ## [1.1.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.0.6...v1.1.0) (2026-11-07)
 
 
