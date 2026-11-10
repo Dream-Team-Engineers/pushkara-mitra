@@ -238,6 +238,12 @@
     "partners.shift.sample": "[घाट] · [समय] · समन्वयक: [नाम] (नमूना)",
     "partners.emergency": "आपातकालीन संपर्क",
     "pwa.updateReady": "नया संस्करण तैयार है",
-    "pwa.updateApply": "अभी अपडेट करें"
+    "pwa.updateApply": "अभी अपडेट करें",
+    "settings.about.title": "परिचय और लाइसेंस",
+    "settings.about.intro": "पुष्कर मित्र एक स्वतंत्र ऐप है, सरकारी सेवा नहीं। इसमें नीचे दिए गए अन्य घटकों का उपयोग हुआ है।",
+    "settings.about.fonts": "फ़ॉन्ट",
+    "settings.about.software": "सॉफ़्टवेयर",
+    "settings.about.licenceText": "लाइसेंस का पाठ",
+    "settings.about.reviewPending": "इस सूची की कानूनी समीक्षा अभी नहीं हुई है।"
   }
 }

@@ -238,6 +238,12 @@
     "partners.shift.sample": "[ఘాట్] · [సమయం] · సమన్వయకర్త: [పేరు] (నమూనా)",
     "partners.emergency": "అత్యవసర సంప్రదింపులు",
     "pwa.updateReady": "కొత్త వెర్షన్ సిద్ధంగా ఉంది",
-    "pwa.updateApply": "అప్‌డేట్ చేయండి"
+    "pwa.updateApply": "అప్‌డేట్ చేయండి",
+    "settings.about.title": "గురించి మరియు లైసెన్స్‌లు",
+    "settings.about.intro": "పుష్కర మిత్ర ఒక స్వతంత్ర యాప్. ఇది ప్రభుత్వ సేవ కాదు. ఇందులో ఈ క్రింది ఇతరుల భాగాలు ఉపయోగించాం.",
+    "settings.about.fonts": "ఫాంట్లు",
+    "settings.about.software": "సాఫ్ట్‌వేర్",
+    "settings.about.licenceText": "లైసెన్స్ పాఠం",
+    "settings.about.reviewPending": "ఈ జాబితా న్యాయ సమీక్షకు ఇంకా పంపలేదు."
   }
 }

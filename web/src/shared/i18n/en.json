@@ -238,6 +238,12 @@
     "partners.shift.sample": "[Ghat] · [hh:mm – hh:mm] · Lead: [coordinator] (sample)",
     "partners.emergency": "Emergency contacts",
     "pwa.updateReady": "A new version is ready",
-    "pwa.updateApply": "Update now"
+    "pwa.updateApply": "Update now",
+    "settings.about.title": "About and licences",
+    "settings.about.intro": "Pushkara Mitra is an independent app, not a government service. It uses the third-party components below.",
+    "settings.about.fonts": "Fonts",
+    "settings.about.software": "Software",
+    "settings.about.licenceText": "Licence text",
+    "settings.about.reviewPending": "This list has not had legal review yet."
   }
 }
