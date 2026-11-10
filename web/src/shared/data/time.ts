@@ -5,16 +5,16 @@ import { signal } from '@preact/signals';
  * Dates are NOT officially confirmed; the UI says so while `datesConfirmed` is false.
  * Times are Indian Standard Time.
  */
-export const EVENT = {
-  start: Date.parse('2027-06-26T00:00:00+05:30'),
-  end: Date.parse('2027-07-07T23:59:59+05:30'),
-  datesConfirmed: false,
-} as const;
-
 export interface EventWindow {
   readonly start: number;
   readonly end: number;
 }
+
+export const EVENT: EventWindow & { readonly datesConfirmed: boolean } = {
+  start: Date.parse('2027-06-26T00:00:00+05:30'),
+  end: Date.parse('2027-07-07T23:59:59+05:30'),
+  datesConfirmed: false,
+};
 
 export type Countdown =
   | {
