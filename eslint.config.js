@@ -4,6 +4,10 @@ import tseslint from 'typescript-eslint';
 const nodeGlobals = {
   process: 'readonly',
   console: 'readonly',
+  fetch: 'readonly',
+  URL: 'readonly',
+  WebSocket: 'readonly',
+  setTimeout: 'readonly',
 };
 
 export default tseslint.config(
