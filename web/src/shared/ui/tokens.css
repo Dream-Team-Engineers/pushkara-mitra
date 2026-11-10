@@ -1,0 +1,111 @@
+/*
+ * Pushkara Mitra design tokens (ADR 0011, decision F2: fresh design from the prototype).
+ * Three themes: light (default), dark, and outdoor (high contrast for bright sunlight).
+ * The app sets data-theme on <html>; nothing here depends on JavaScript to be readable.
+ * Every text and control pair listed in tests/guards/design-tokens.test.ts is contrast-tested.
+ * Colour is never the only signal: pair it with text or an icon.
+ */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+  --ground: #f7f4ec;
+  --surface: #ffffff;
+  --text: #12304a;
+  --text-muted: #51616e;
+  --primary: #0f6e6e;
+  --primary-fill: #0f6e6e;
+  --on-primary: #ffffff;
+  --primary-soft: #e3f1ef;
+  --accent: #d9822b;
+  --accent-text: #8a4a0f;
+  --accent-soft: #fdf1e3;
+  --danger: #b42318;
+  --danger-fill: #b42318;
+  --on-danger: #ffffff;
+  --danger-soft: #fce8e6;
+  --line: #e3dccb;
+  --line-strong: #857d6e;
+  --header-bg: #12304a;
+  --header-text: #ffffff;
+  --header-text-muted: #c9d6e2;
+  --focus: #0b5fd3;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --ground: #0f1c28;
+  --surface: #172a3a;
+  --text: #f2efe6;
+  --text-muted: #a9b8c4;
+  --primary: #5cc4bd;
+  --primary-fill: #0f6e6e;
+  --on-primary: #ffffff;
+  --primary-soft: #143d40;
+  --accent: #d9822b;
+  --accent-text: #f2b66d;
+  --accent-soft: #3a2a14;
+  --danger: #ff9a8c;
+  --danger-fill: #b42318;
+  --on-danger: #ffffff;
+  --danger-soft: #4a1a15;
+  --line: #2c4254;
+  --line-strong: #8497a6;
+  --header-bg: #0a141d;
+  --header-text: #ffffff;
+  --header-text-muted: #c9d6e2;
+  --focus: #8ab4ff;
+}
+
+[data-theme='outdoor'] {
+  color-scheme: light;
+  --ground: #ffffff;
+  --surface: #ffffff;
+  --text: #06141f;
+  --text-muted: #2f3d48;
+  --primary: #084c4c;
+  --primary-fill: #084c4c;
+  --on-primary: #ffffff;
+  --primary-soft: #e3f1ef;
+  --accent: #d9822b;
+  --accent-text: #5a3008;
+  --accent-soft: #fdf1e3;
+  --danger: #8f1c13;
+  --danger-fill: #8f1c13;
+  --on-danger: #ffffff;
+  --danger-soft: #fce8e6;
+  --line: #5b6b78;
+  --line-strong: #12304a;
+  --header-bg: #06141f;
+  --header-text: #ffffff;
+  --header-text-muted: #e6edf3;
+  --focus: #0b3fa8;
+}
+
+:root {
+  /* Type: 16px minimum body text; captions never below 14px. Sizes in rem so 200% text works. */
+  --font-latin: 'Inter', system-ui, sans-serif;
+  --font-telugu: 'Noto Sans Telugu', system-ui, sans-serif;
+  --font-body: var(--font-latin), var(--font-telugu);
+  --text-caption: 0.875rem;
+  --text-body: 1rem;
+  --text-card-title: 1.125rem;
+  --text-screen-title: 1.25rem;
+  --text-logo: 1.875rem;
+  --leading-body: 1.5;
+  --leading-telugu: 1.6;
+
+  /* Space and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-feature: 20px;
+
+  /* Interaction: 48px minimum touch target; visible focus ring */
+  --target-min: 48px;
+  --focus-ring: 3px solid var(--focus);
+  --focus-offset: 2px;
+}
