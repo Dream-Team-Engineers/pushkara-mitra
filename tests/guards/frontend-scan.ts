@@ -32,6 +32,14 @@ const NETWORK: readonly [string, RegExp][] = [
   ['form submit', /\.\s*(?:submit|requestSubmit)\s*\(|\baction\s*=|<form\b/i],
 ];
 
+const DEVICE_CAPTURE: readonly [string, RegExp][] = [
+  ['file input', /\btype\s*=\s*["']file["']/],
+  ['capture attribute', /\bcapture\s*=/],
+  ['getUserMedia', /\bgetUserMedia\b|\bmediaDevices\b/],
+  ['barcode or QR scan', /\bBarcodeDetector\b/],
+  ['dial, sms or mail link', /\b(?:tel|sms|mailto):/],
+];
+
 function scanWith(patterns: readonly [string, RegExp][], source: string): string[] {
   const code = stripComments(source);
   return patterns.filter(([, re]) => re.test(code)).map(([label]) => label);
@@ -39,6 +47,7 @@ function scanWith(patterns: readonly [string, RegExp][], source: string): string
 
 export const findGeolocationUse = (source: string): string[] => scanWith(GEOLOCATION, source);
 export const findBrowserStorage = (source: string): string[] => scanWith(BROWSER_STORAGE, source);
+export const findDeviceCapture = (source: string): string[] => scanWith(DEVICE_CAPTURE, source);
 export const findNetworkUse = (source: string): string[] => scanWith(NETWORK, source);
 
 /** Flags must be constants, never derived from the URL, storage or the network. */

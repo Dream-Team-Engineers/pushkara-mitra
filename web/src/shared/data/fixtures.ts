@@ -215,3 +215,37 @@ export const UPDATES: readonly UpdateFixture[] = [
     detail: '[ghat · temple or official source]',
   },
 ];
+
+export type HelplineKind = 'emergency' | 'ambulance' | 'police' | 'control';
+
+/**
+ * Helplines are listed WITHOUT numbers until an owner-supplied, officially verified source
+ * exists (master instructions section 10). `number` stays null and the screen says so.
+ */
+export interface HelplineFixture extends PublicMeta {
+  readonly id: string;
+  readonly kind: HelplineKind;
+  readonly number: string | null;
+}
+
+export const HELPLINES: readonly HelplineFixture[] = [
+  { ...SYNTHETIC, id: 'h1', kind: 'emergency', number: null },
+  { ...SYNTHETIC, id: 'h2', kind: 'ambulance', number: null },
+  { ...SYNTHETIC, id: 'h3', kind: 'police', number: null },
+  { ...SYNTHETIC, id: 'h4', kind: 'control', number: null },
+];
+
+export type HelpPointKind = 'firstAid' | 'police' | 'lost';
+
+export interface HelpPointFixture extends PublicMeta {
+  readonly id: string;
+  readonly kind: HelpPointKind;
+  readonly ghat: string;
+  readonly distance: string;
+}
+
+export const HELP_POINTS: readonly HelpPointFixture[] = [
+  { ...SYNTHETIC, id: 'p1', kind: 'firstAid', ghat: '[Ghat]', distance: '[x] m' },
+  { ...SYNTHETIC, id: 'p2', kind: 'police', ghat: '[Ghat]', distance: '[x] m' },
+  { ...SYNTHETIC, id: 'p3', kind: 'lost', ghat: '[Ghat]', distance: '[x] m' },
+];
