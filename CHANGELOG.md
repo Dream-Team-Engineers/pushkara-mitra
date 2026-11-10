@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.2.0...v1.3.0) (2026-11-10)
+
+
+### Features
+
+* **web:** add te/en/hi message catalogues and parity guard ([2b30b20](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/2b30b202e32a17c496cb77ffed54a51172fdef96))
+
 ## [1.2.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.1.0...v1.2.0) (2026-11-10)
 
 
