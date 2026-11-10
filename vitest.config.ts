@@ -1,4 +1,5 @@
 import { cloudflareTest } from '@cloudflare/vitest-plugin';
+import preact from '@preact/preset-vite';
 import { defineConfig } from 'vitest/config';
 
 const coverage = {
@@ -17,6 +18,15 @@ export default defineConfig({
         test: {
           name: 'worker',
           include: ['tests/worker/**/*.test.ts'],
+        },
+      },
+      {
+        // Frontend logic and server-rendered component tests run on Node (no DOM library).
+        plugins: [preact()],
+        test: {
+          name: 'web',
+          environment: 'node',
+          include: ['web/src/**/*.test.{ts,tsx}'],
         },
       },
       {

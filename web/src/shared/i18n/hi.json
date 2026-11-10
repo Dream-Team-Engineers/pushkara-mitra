@@ -72,6 +72,17 @@
     "settings.language": "भाषा",
     "settings.theme.light": "हल्का",
     "settings.theme.dark": "गहरा",
-    "settings.theme.outdoor": "धूप में स्पष्ट"
+    "settings.theme.outdoor": "धूप में स्पष्ट",
+    "settings.title": "सेटिंग्स",
+    "settings.theme.title": "थीम",
+    "nav.main": "मुख्य नेविगेशन",
+    "status.notFound.title": "पृष्ठ नहीं मिला",
+    "status.notFound.body": "इस पते पर कोई पृष्ठ नहीं है। होम पर जाएँ।",
+    "status.comingSoon": "यह स्क्रीन अभी तैयार नहीं है।",
+    "home.city": "राजमहेंद्रवरम",
+    "home.weather.unavailable": "मौसम की जानकारी उपलब्ध नहीं · स्रोत का लाइसेंस लंबित",
+    "action.pause": "स्क्रॉल रोकें",
+    "action.resume": "स्क्रॉल जारी रखें",
+    "state.updatedOn": "{date} को अपडेट किया गया"
   }
 }

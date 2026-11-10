@@ -72,6 +72,17 @@
     "settings.language": "భాష",
     "settings.theme.light": "లైట్",
     "settings.theme.dark": "డార్క్",
-    "settings.theme.outdoor": "ఎండలో స్పష్టంగా"
+    "settings.theme.outdoor": "ఎండలో స్పష్టంగా",
+    "settings.title": "సెట్టింగ్‌లు",
+    "settings.theme.title": "థీమ్",
+    "nav.main": "ప్రధాన నావిగేషన్",
+    "status.notFound.title": "పేజీ కనబడలేదు",
+    "status.notFound.body": "ఈ చిరునామాలో పేజీ లేదు. హోమ్‌కు వెళ్లండి.",
+    "status.comingSoon": "ఈ స్క్రీన్ ఇంకా సిద్ధం కాలేదు.",
+    "home.city": "రాజమహేంద్రవరం",
+    "home.weather.unavailable": "వాతావరణ సమాచారం అందుబాటులో లేదు · మూలం అనుమతి పొందాలి",
+    "action.pause": "స్క్రోల్ ఆపండి",
+    "action.resume": "స్క్రోల్ కొనసాగించండి",
+    "state.updatedOn": "{date} న నవీకరించబడింది"
   }
 }
