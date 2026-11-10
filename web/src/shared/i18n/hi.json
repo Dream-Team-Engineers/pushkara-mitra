@@ -236,6 +236,8 @@
     "partners.report.note": "रिपोर्ट सार्वजनिक भीड़ स्तर बदलने से पहले कर्मचारियों की समीक्षा में जाती हैं। लोगों की तस्वीरें नहीं।",
     "partners.shift.title": "मेरी ड्यूटी",
     "partners.shift.sample": "[घाट] · [समय] · समन्वयक: [नाम] (नमूना)",
-    "partners.emergency": "आपातकालीन संपर्क"
+    "partners.emergency": "आपातकालीन संपर्क",
+    "pwa.updateReady": "नया संस्करण तैयार है",
+    "pwa.updateApply": "अभी अपडेट करें"
   }
 }
