@@ -62,11 +62,12 @@ function load(
     const key = (input: string | Request) =>
       new URL(typeof input === 'string' ? input : input.url, 'https://app.test').pathname;
     return Promise.resolve({
-      addAll: async (requests: Request[]) => {
+      addAll: (requests: Request[]) => {
         for (const request of requests) {
           fetched.push(request.url);
           store.set(key(request), fetcher(request.url));
         }
+        return Promise.resolve();
       },
       match: (input: string | Request) => Promise.resolve(store.get(key(input))),
       put: (input: string | Request, response: Response) => {
