@@ -64,8 +64,8 @@ Given by the owner in the requesting session. They are not a GitHub Approve revi
 | ID  | Decision                                                                                                                                         |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | F1  | Keep Home plus the ten modules of the decided prototype as the information architecture. The eight-area shell is superseded for the new frontend |
-| F2  | Start the visual design fresh from the UI workflow prototype (ink blue, teal, saffron tokens). The existing repo design is not carried over       |
-| F3  | Keep Worker static assets with `run_worker_first = true`. The deviation from the Cloudflare Pages baseline is accepted                          |
+| F2  | Start the visual design fresh from the UI workflow prototype (ink blue, teal, saffron tokens). The existing repo design is not carried over      |
+| F3  | Keep Worker static assets with `run_worker_first = true`. The deviation from the Cloudflare Pages baseline is accepted                           |
 | F8  | Verify each dependency, font and data licence at its upstream source when it is first needed, before it is added                                 |
 
 Stack: Option A (Preact, strict TypeScript, Vite), migrated screen by screen, is accepted with the recommendation above.
