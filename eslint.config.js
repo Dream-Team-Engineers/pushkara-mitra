@@ -7,7 +7,16 @@ const nodeGlobals = {
 };
 
 export default tseslint.config(
-  { ignores: ['node_modules/', 'dist/', 'coverage/', '.wrangler/', 'public/sw.js'] },
+  {
+    ignores: [
+      'node_modules/',
+      'dist/',
+      'coverage/',
+      '.wrangler/',
+      'public/sw.js',
+      'web/build/sw.template.js',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {

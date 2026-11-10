@@ -73,7 +73,10 @@ const initialJs = pick(initialJsPaths);
 const initialCss = pick(initialCssPaths);
 const allCss = files.filter((file) => file.ext === '.css');
 const routeChunks = files.filter((file) => file.ext === '.js' && !initialJsPaths.has(file.path));
-const fonts = files.filter((file) => ['.woff2', '.woff', '.ttf', '.otf'].includes(file.ext));
+const allFonts = files.filter((file) => ['.woff2', '.woff', '.ttf', '.otf'].includes(file.ext));
+// Hindi fonts download only when Hindi text is shown (unicode-range), so they are reported apart.
+const onDemandFonts = allFonts.filter((file) => /Devanagari/.test(file.path));
+const fonts = allFonts.filter((file) => !onDemandFonts.includes(file));
 const htmlFile = byPath.get('index.html');
 
 const results = [
@@ -85,7 +88,7 @@ const results = [
   ],
   ['All CSS (gzip)', sum(allCss), BUDGETS.css],
   ['Initial JavaScript + CSS (gzip)', sum(initialJs) + sum(initialCss), BUDGETS.initialJsAndCss],
-  ['Fonts in build', sum(fonts), BUDGETS.fonts],
+  ['Fonts for the default language (Latin + Telugu)', sum(fonts), BUDGETS.fonts],
   [
     'First visit estimate (HTML + initial JS + CSS + fonts)',
     (htmlFile?.size ?? 0) + sum(initialJs) + sum(initialCss) + sum(fonts),
@@ -105,6 +108,7 @@ const lines = [
   ),
   '',
   `Initial JS files: ${[...initialJsPaths].join(', ') || 'none'}`,
+  `On-demand Hindi fonts (not in the first visit): ${kb(sum(onDemandFonts))}`,
   `Route chunks: ${routeChunks.length} (${routeChunks.map((file) => `${file.path} ${kb(file.size)}`).join(', ') || 'none'})`,
 ];
 console.log(lines.join('\n'));

@@ -1,6 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { online } from '../shared/data/time';
 import { t } from '../shared/i18n/i18n';
+import { UpdateBanner } from '../shared/pwa/UpdateBanner';
 import { AppHeader, BottomBar } from '../shared/ui/Layout';
 import { RouteView } from './RouteView';
 import { current, titleKeyFor } from './router';
@@ -31,6 +32,7 @@ export function App() {
           {t('state.offline')}
         </p>
       )}
+      <UpdateBanner />
       <main id="main" tabIndex={-1}>
         <RouteView />
       </main>

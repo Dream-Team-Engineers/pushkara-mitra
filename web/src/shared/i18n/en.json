@@ -236,6 +236,8 @@
     "partners.report.note": "Reports go to staff review before they change the public crowd level. No photos of people.",
     "partners.shift.title": "My shift",
     "partners.shift.sample": "[Ghat] · [hh:mm – hh:mm] · Lead: [coordinator] (sample)",
-    "partners.emergency": "Emergency contacts"
+    "partners.emergency": "Emergency contacts",
+    "pwa.updateReady": "A new version is ready",
+    "pwa.updateApply": "Update now"
   }
 }

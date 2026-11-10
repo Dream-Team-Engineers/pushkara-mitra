@@ -1,0 +1,50 @@
+/* Self-hosted, SIL OFL 1.1 (licence files in /fonts). No external font request. unicode-range keeps
+   each file from downloading until a character needs it, so Hindi fonts load only for Hindi. */
+@font-face {
+  font-family: 'Mitra Roboto';
+  src: url('/fonts/Roboto-400-latin.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0, U+00B7, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20B9;
+}
+@font-face {
+  font-family: 'Mitra Roboto';
+  src: url('/fonts/Roboto-700-latin.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0, U+00B7, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20B9;
+}
+@font-face {
+  font-family: 'Mitra Telugu';
+  src: url('/fonts/NotoSansTelugu-400.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0C00-0C7F, U+200C-200D;
+}
+@font-face {
+  font-family: 'Mitra Telugu';
+  src: url('/fonts/NotoSansTelugu-700.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0C00-0C7F, U+200C-200D;
+}
+@font-face {
+  font-family: 'Mitra Devanagari';
+  src: url('/fonts/NotoSansDevanagari-400.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+A8E0-A8FF, U+200C-200D;
+}
+@font-face {
+  font-family: 'Mitra Devanagari';
+  src: url('/fonts/NotoSansDevanagari-700.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+A8E0-A8FF, U+200C-200D;
+}
