@@ -10,7 +10,7 @@
     "npm": ">=10"
   },
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "vite build && wrangler dev",
     "dev:web": "vite",
     "build:web": "vite build",
     "budget:web": "node scripts/measure-web-bundle.mjs",
