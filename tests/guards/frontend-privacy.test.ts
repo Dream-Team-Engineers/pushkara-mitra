@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   findBrowserStorage,
+  findDeviceCapture,
   findGeolocationUse,
   findNetworkUse,
   listCodeFiles,
@@ -45,6 +46,13 @@ describe('frontend privacy guard: real sources', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('uses no camera, file picker, scanner or dial/sms/mail link until each is approved', () => {
+    const offenders = files
+      .filter((file) => findDeviceCapture(file.source).length > 0)
+      .map((file) => file.path);
+    expect(offenders).toEqual([]);
+  });
+
   it('keeps feature (prototype) code off the network and forms inert', () => {
     const offenders = features
       .filter((file) => !NETWORK_ALLOW_LIST.includes(file.path))
@@ -72,6 +80,19 @@ describe('frontend privacy guard: scanners detect violations', () => {
     expect(findBrowserStorage('(await caches.open("c")).put(r, s)')).toEqual(['Cache Storage']);
     expect(findBrowserStorage('document.cookie = "a=1"')).toEqual(['cookie']);
     expect(findBrowserStorage('const note = 1;')).toEqual([]);
+  });
+
+  it('flags device capture and contact links', () => {
+    expect(findDeviceCapture('<input type="file" accept="image/*" capture="user">')).toEqual([
+      'file input',
+      'capture attribute',
+    ]);
+    expect(findDeviceCapture('navigator.mediaDevices.getUserMedia({ video: true })')).toEqual([
+      'getUserMedia',
+    ]);
+    expect(findDeviceCapture('new BarcodeDetector()')).toEqual(['barcode or QR scan']);
+    expect(findDeviceCapture('<a href="tel:112">')).toEqual(['dial, sms or mail link']);
+    expect(findDeviceCapture('const a = 1;')).toEqual([]);
   });
 
   it('flags network and submit paths', () => {
