@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import preact from '@preact/preset-vite';
 import { defineConfig } from 'vite';
 import { serviceWorkerPlugin } from './web/build/sw';
@@ -12,7 +12,7 @@ export default defineConfig({
   root: 'web',
   plugins: [
     preact(),
-    serviceWorkerPlugin(fileURLToPath(new URL('./web/build/sw.template.js', import.meta.url))),
+    serviceWorkerPlugin(resolve(import.meta.dirname, 'web/build/sw.template.js')),
   ],
   build: {
     outDir: '../dist/web',
