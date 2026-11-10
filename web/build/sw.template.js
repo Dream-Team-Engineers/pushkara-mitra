@@ -2,6 +2,8 @@
 // Only exact, own, static GET resources are cached. No query strings, no Authorization requests, no
 // /api, /auth or /admin paths. Nothing user-specific, and never a location, is ever cached.
 const CACHE_PREFIX = 'pushkara-app-';
+// Caches written by the earlier public prototype worker; removed once this worker takes over.
+const LEGACY_PREFIX = 'pushkara-static-prototype-';
 const CACHE_NAME = CACHE_PREFIX + '__VERSION__';
 const PRECACHE = __PRECACHE__;
 const OPTIONAL = __OPTIONAL__;
@@ -32,7 +34,11 @@ self.addEventListener('activate', (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            .filter(
+              (key) =>
+                key.startsWith(LEGACY_PREFIX) ||
+                (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME),
+            )
             .map((key) => caches.delete(key)),
         ),
       )

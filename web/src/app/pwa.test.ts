@@ -185,6 +185,7 @@ describe('generated service worker', () => {
   it('deletes only older app caches on activate', async () => {
     const stores = new Map<string, Map<string, Response>>([
       ['pushkara-app-v0', new Map()],
+      ['pushkara-static-prototype-v23', new Map()],
       ['unrelated-cache', new Map()],
     ]);
     const h = load(PRECACHE, 'v1', undefined, stores);

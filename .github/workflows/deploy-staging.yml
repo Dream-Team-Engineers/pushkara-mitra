@@ -45,6 +45,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Build the frontend (wrangler.toml serves dist/web)
+        run: npm run build:web
       - name: Deploy to staging
         id: deploy
         env:

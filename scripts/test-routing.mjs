@@ -131,16 +131,31 @@ async function checkEnvironment(environment, mock = false) {
     }
     assert.ok(ready, `${label}: local Wrangler did not become ready.`);
 
+    // The built app's entry script has a content-hashed name, so it is found from the HTML.
+    const homeHtml = await (await request('/')).text();
+    const entryScript = /<script[^>]+src="([^"]+)"/.exec(homeHtml)?.[1];
+    assert.ok(entryScript, `${label}: the home page references an entry script`);
+    const entryResponse = await request(entryScript);
+    assert.equal(entryResponse.status, 200, `${label}: entry script status`);
+    assert.match(
+      entryResponse.headers.get('Content-Type') ?? '',
+      /javascript/i,
+      `${label}: entry script MIME`,
+    );
+    await entryResponse.arrayBuffer();
+
     const cases = [
       ['GET', '/', 200],
       ['HEAD', '/', 200],
       ['GET', '/index.html', 307],
       ['GET', '/sw.js', 200],
       ['GET', '/manifest.webmanifest', 200],
-      ['GET', '/assets/quick-access-synthetic-v1.jpg', 200],
-      ['GET', '/assets/fonts/Roboto-400-latin.woff', 200],
-      ['GET', '/assets/fonts/NotoSansTelugu-400.woff', 200],
-      ['GET', '/assets/fonts/NotoSansDevanagari-400.woff', 200],
+      ['GET', '/icon-192.png', 200],
+      ['GET', '/mitra-mark.svg', 200],
+      ['GET', '/fonts/Roboto-400-latin.woff', 200],
+      ['GET', '/fonts/NotoSansTelugu-400.woff', 200],
+      ['GET', '/fonts/NotoSansDevanagari-400.woff', 200],
+      ['GET', '/fonts/Roboto-OFL.txt', 200],
       ['GET', '/healthz', 200],
       ['HEAD', '/healthz', 200],
       ['GET', '/missing-route', 404],
@@ -191,10 +206,10 @@ async function checkEnvironment(environment, mock = false) {
           /font\/woff/i,
           `${context}: font MIME`,
         );
-      if (path.endsWith('.jpg'))
+      if (path.endsWith('.png'))
         assert.match(
           response.headers.get('Content-Type') ?? '',
-          /image\/jpeg/i,
+          /image\/png/i,
           `${context}: image MIME`,
         );
       if (path === '/manifest.webmanifest')
