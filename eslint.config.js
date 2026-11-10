@@ -4,10 +4,23 @@ import tseslint from 'typescript-eslint';
 const nodeGlobals = {
   process: 'readonly',
   console: 'readonly',
+  fetch: 'readonly',
+  URL: 'readonly',
+  WebSocket: 'readonly',
+  setTimeout: 'readonly',
 };
 
 export default tseslint.config(
-  { ignores: ['node_modules/', 'dist/', 'coverage/', '.wrangler/', 'public/sw.js'] },
+  {
+    ignores: [
+      'node_modules/',
+      'dist/',
+      'coverage/',
+      '.wrangler/',
+      'public/sw.js',
+      'web/build/sw.template.js',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {

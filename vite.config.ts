@@ -1,5 +1,7 @@
+import { resolve } from 'node:path';
 import preact from '@preact/preset-vite';
 import { defineConfig } from 'vite';
+import { serviceWorkerPlugin } from './web/build/sw';
 
 /**
  * Frontend build (ADR 0011). Source lives in web/, output goes to dist/web.
@@ -8,7 +10,10 @@ import { defineConfig } from 'vite';
  */
 export default defineConfig({
   root: 'web',
-  plugins: [preact()],
+  plugins: [
+    preact(),
+    serviceWorkerPlugin(resolve(import.meta.dirname, 'web/build/sw.template.js')),
+  ],
   build: {
     outDir: '../dist/web',
     emptyOutDir: true,

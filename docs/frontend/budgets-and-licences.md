@@ -32,6 +32,8 @@ Where `docs/performance-budget.md` and the frontend master prompt differ, the st
 2. First visit: the estimate is just over 300 KB because every font and the image are precached; fix 1 plus an AVIF/WebP image should bring it under.
 3. Type and targets: raise body text to 16 px and targets to 48 px (decision F5).
 
+**Update 2026-11-10 (new frontend build, not yet served):** fonts for the default language (Roboto 400/700 Latin subset plus Noto Sans Telugu 400/700) total 77,644 bytes as WOFF, measured by `scripts/measure-web-bundle.mjs`; Hindi fonts (81,652 bytes) load only when Hindi text is shown. WOFF2 conversion was not possible here (the `brotli` module is not installed), so the figure is WOFF, not WOFF2. Existing Telugu and Devanagari subsets lack six letters used by the new copy (ఐ ఔ ఛ ఠ ऊ ञ); they fall back to system fonts until someone with network access re-subsets from the upstream fonts. Field and device measurements are still outstanding.
+
 ## Measurement method
 
 - Lab profile: Chrome with 4x CPU throttle, 400 ms RTT, 1.6 Mbps down, 750 kbps up; mobile viewport 360 x 800.

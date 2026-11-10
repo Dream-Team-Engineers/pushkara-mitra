@@ -88,6 +88,21 @@ describe('Settings screen', () => {
   });
 });
 
+describe('Settings about and licences', () => {
+  it.each(LOCALES)('lists fonts and software with licences in %s', async (code) => {
+    await setLocale(code);
+    const html = render(<SettingsScreen />);
+    expect(html).toContain(t('settings.about.title'));
+    for (const name of ['Roboto', 'Noto Sans Telugu', 'Noto Sans Devanagari', 'Preact']) {
+      expect(html).toContain(name);
+    }
+    expect(html).toContain('SIL OFL 1.1');
+    expect(html).toContain('href="/fonts/Roboto-OFL.txt"');
+    expect(html).toContain(t('settings.about.reviewPending'));
+    expect(accessibilityIssues(html)).toEqual([]);
+  });
+});
+
 describe('Status screens', () => {
   it('renders the not-found screen with a way home', () => {
     const html = render(<NotFoundScreen />);

@@ -4,12 +4,30 @@ import { selectLocale } from '../../shared/i18n/select';
 import { THEMES, type Theme } from '../../shared/prefs/preferences';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { setTheme, theme } from '../../shared/ui/theme';
+import { FONT_NOTICES, SOFTWARE_NOTICES, type Notice } from './notices';
 
 const THEME_LABELS = {
   light: 'settings.theme.light',
   dark: 'settings.theme.dark',
   outdoor: 'settings.theme.outdoor',
 } as const satisfies Record<Theme, Parameters<typeof t>[0]>;
+
+function NoticeList({ items }: { readonly items: readonly Notice[] }) {
+  return (
+    <ul class="notice-list">
+      {items.map((item) => (
+        <li key={item.name}>
+          <span>
+            {item.name} · {item.licence}
+          </span>
+          {item.licenceTextPath === undefined ? null : (
+            <a href={item.licenceTextPath}>{t('settings.about.licenceText')}</a>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function SettingsScreen() {
   const loadFailed = useSignal(false);
@@ -57,6 +75,17 @@ export default function SettingsScreen() {
           </button>
         ))}
       </fieldset>
+      <section class="about" aria-labelledby="about-title">
+        <h2 id="about-title">{t('settings.about.title')}</h2>
+        <p>{t('settings.about.intro')}</p>
+        <h3>{t('settings.about.fonts')}</h3>
+        <NoticeList items={FONT_NOTICES} />
+        <h3>{t('settings.about.software')}</h3>
+        <NoticeList items={SOFTWARE_NOTICES} />
+        <p class="notice" role="note">
+          {t('settings.about.reviewPending')}
+        </p>
+      </section>
       <p class="disclaimer">{t('app.disclaimer')}</p>
     </>
   );

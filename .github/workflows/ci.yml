@@ -68,6 +68,16 @@ jobs:
         run: |
           npm run build:web
           npm run budget:web
+      - name: Browser smoke test of the built frontend (routes, service worker, offline)
+        run: npm run smoke:web
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-dist
+          path: |
+            dist/web/
+            dist/web-budget.json
+          retention-days: 7
+          if-no-files-found: error
       - name: Verify real local asset and Worker routing
         run: npm run test:routing
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

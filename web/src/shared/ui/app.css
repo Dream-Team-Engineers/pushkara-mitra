@@ -146,6 +146,18 @@ main:focus {
   text-align: center;
 }
 
+.update-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
 .bottom-bar {
   position: fixed;
   inset-inline: 0;
@@ -785,4 +797,327 @@ details.note summary {
   color: var(--primary);
   font-weight: 700;
   cursor: pointer;
+}
+
+/* Prototype screens: forms, pass card, group, map, SOS. Entries live in memory only. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-4);
+}
+
+.actions--flush,
+.field--flush {
+  margin-inline: 0;
+}
+
+.notice--flush {
+  margin-inline: 0;
+}
+
+.card-list--flush {
+  padding-inline: 0;
+}
+
+.button--danger {
+  background: var(--surface);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.field__error {
+  min-height: 1.25rem;
+  color: var(--danger);
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+.field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.field--check input {
+  flex: none;
+  width: 1.5rem;
+  min-height: 1.5rem;
+  accent-color: var(--primary-fill);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.stepper {
+  display: flex;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-caption);
+}
+
+.stepper li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+}
+
+.stepper li[aria-current='step'] {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.stepper__dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+}
+
+.stepper li[aria-current='step'] .stepper__dot {
+  background: var(--primary-fill);
+  color: var(--on-primary);
+  border-color: var(--primary-fill);
+}
+
+.pass-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-feature);
+}
+
+.pass-card__title {
+  font-size: var(--text-card-title);
+}
+
+.pass-card__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.pass-card__rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.pass-card__rows dt {
+  color: var(--text-muted);
+}
+
+.pass-card__rows dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.qr-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 10rem;
+  height: 10rem;
+  padding: var(--space-3);
+  border: 3px dashed var(--line-strong);
+  border-radius: var(--radius-input);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  text-align: center;
+}
+
+.code-card {
+  margin: var(--space-4);
+}
+
+.code {
+  font-size: var(--text-screen-title);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.member {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.member__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.member .button {
+  min-width: var(--target-min);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 3.5rem;
+  min-height: var(--target-min);
+  margin: 0 var(--space-4);
+  padding: 0;
+  background: var(--ground);
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+}
+
+.switch__knob {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--line-strong);
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.switch[disabled] {
+  cursor: not-allowed;
+}
+
+.state-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-4) 0;
+  font-weight: 700;
+}
+
+.state-line__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--line-strong);
+  border-radius: 999px;
+}
+
+.map-figure {
+  margin: var(--space-3) var(--space-4) 0;
+}
+
+.map-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+}
+
+.map-figure figcaption {
+  margin-block-start: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.map__land {
+  fill: var(--ground);
+}
+
+.map__river {
+  fill: var(--primary-soft);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.map__ghat {
+  fill: var(--text);
+}
+
+.map__pin {
+  stroke: var(--text);
+  stroke-width: 3;
+}
+
+.map__pin--live {
+  fill: var(--primary-fill);
+}
+
+.map__pin--stale {
+  fill: var(--surface);
+  stroke-dasharray: 4 3;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--space-4) 0;
+  font-size: var(--text-caption);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend__swatch {
+  width: 1rem;
+  height: 1rem;
+  border: 3px solid var(--text);
+  border-radius: 999px;
+}
+
+.legend__swatch--live {
+  background: var(--primary-fill);
+}
+
+.legend__swatch--stale {
+  border-style: dashed;
+  background: var(--surface);
+}
+
+.sos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4);
+}
+
+.sos__button {
+  width: 100%;
+  min-height: 5rem;
+  padding: var(--space-3);
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 3px dashed var(--danger);
+  border-radius: var(--radius-feature);
+  font: inherit;
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+.about {
+  margin-block: var(--space-6);
+}
+
+.notice-list {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+}
+
+.notice-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--line);
 }
