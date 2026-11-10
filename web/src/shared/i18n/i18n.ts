@@ -54,13 +54,24 @@ export function t(key: MessageKey, params?: MessageParams): string {
   return params === undefined ? template : interpolate(template, params);
 }
 
-export async function setLocale(next: Locale): Promise<void> {
+let latestRequest = 0;
+
+/**
+ * Switches language. Only the most recent request wins: a slower, earlier download that finishes
+ * last is discarded and reports `false`. A failed download rejects and leaves the current
+ * language in place.
+ */
+export async function setLocale(next: Locale): Promise<boolean> {
+  latestRequest += 1;
+  const request = latestRequest;
   const messages = await LOADERS[next]();
+  if (request !== latestRequest) return false;
   batch(() => {
     catalogue.value = messages;
     locale.value = next;
   });
   if (typeof document !== 'undefined') document.documentElement.lang = next;
+  return true;
 }
 
 export function formatNumber(value: number): string {
