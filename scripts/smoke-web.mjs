@@ -179,6 +179,14 @@ try {
     'Language is Telugu by default',
     (await evaluate('document.documentElement.lang')) === 'te',
   );
+  const fonts = await evaluate(
+    `performance.getEntriesByType('resource').map((e) => new URL(e.name).pathname).filter((p) => p.startsWith('/fonts/'))`,
+  );
+  check(
+    'No Hindi font downloaded for the Telugu Home screen',
+    !fonts.some((p) => p.includes('Devanagari')),
+    fonts.join(', '),
+  );
   for (const route of ROUTES) {
     const outcome = await visit(route);
     check(`Online: ${route} renders`, outcome.rendered);
@@ -213,14 +221,6 @@ try {
   check(
     'Cache holds no API, auth or admin paths',
     !cachedPaths.some((p) => /^\/(api|auth|admin)/.test(p)),
-  );
-  const fonts = await evaluate(
-    `performance.getEntriesByType('resource').map((e) => new URL(e.name).pathname).filter((p) => p.startsWith('/fonts/'))`,
-  );
-  check(
-    'No Hindi font downloaded in Telugu',
-    !fonts.some((p) => p.includes('Devanagari')),
-    fonts.join(', '),
   );
 
   // 3. Offline: reload with the network off and visit every route from the cache.
