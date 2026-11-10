@@ -11,7 +11,13 @@ import { startRouter } from './router';
 async function boot(): Promise<void> {
   initTheme();
   const { locale } = readPreferences(browserStore());
-  if (locale !== null && locale !== DEFAULT_LOCALE) await setLocale(locale);
+  if (locale !== null && locale !== DEFAULT_LOCALE) {
+    try {
+      await setLocale(locale);
+    } catch {
+      // Keep the bundled Telugu catalogue; the person can choose again in Settings.
+    }
+  }
   startRouter();
   startClock();
   watchOnline();

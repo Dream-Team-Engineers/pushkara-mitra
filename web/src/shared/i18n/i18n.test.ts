@@ -46,6 +46,22 @@ describe('t and setLocale', () => {
   });
 });
 
+describe('overlapping language requests', () => {
+  it('keeps only the latest request and reports the stale one as not applied', async () => {
+    const first = setLocale('en');
+    const second = setLocale('te');
+    expect(await first).toBe(false);
+    expect(await second).toBe(true);
+    expect(locale.value).toBe('te');
+    expect(t('nav.home')).toBe(te.messages['nav.home']);
+  });
+
+  it('applies a request that nothing has replaced', async () => {
+    expect(await setLocale('hi')).toBe(true);
+    expect(locale.value).toBe('hi');
+  });
+});
+
 describe('locale helpers', () => {
   it('recognises only the three supported locales', () => {
     for (const value of LOCALES) expect(isLocale(value)).toBe(true);

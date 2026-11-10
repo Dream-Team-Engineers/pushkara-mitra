@@ -1,11 +1,7 @@
-import { locale, LOCALE_NAMES, LOCALES, setLocale, t, type Locale } from '../../shared/i18n/i18n';
-import {
-  browserStore,
-  LOCALE_KEY,
-  THEMES,
-  writePreference,
-  type Theme,
-} from '../../shared/prefs/preferences';
+import { useSignal } from '@preact/signals';
+import { locale, LOCALE_NAMES, LOCALES, t } from '../../shared/i18n/i18n';
+import { selectLocale } from '../../shared/i18n/select';
+import { THEMES, type Theme } from '../../shared/prefs/preferences';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { setTheme, theme } from '../../shared/ui/theme';
 
@@ -15,12 +11,8 @@ const THEME_LABELS = {
   outdoor: 'settings.theme.outdoor',
 } as const satisfies Record<Theme, Parameters<typeof t>[0]>;
 
-async function chooseLocale(next: Locale): Promise<void> {
-  await setLocale(next);
-  writePreference(browserStore(), LOCALE_KEY, next);
-}
-
 export default function SettingsScreen() {
+  const loadFailed = useSignal(false);
   return (
     <>
       <ScreenHeader titleKey="settings.title" />
@@ -34,13 +26,21 @@ export default function SettingsScreen() {
             lang={option}
             aria-pressed={locale.value === option}
             onClick={() => {
-              void chooseLocale(option);
+              loadFailed.value = false;
+              selectLocale(option).catch(() => {
+                loadFailed.value = true;
+              });
             }}
           >
             {LOCALE_NAMES[option]}
           </button>
         ))}
       </fieldset>
+      {loadFailed.value ? (
+        <p class="notice notice--warn" role="alert">
+          {t('state.error')}
+        </p>
+      ) : null}
       <fieldset class="choice-group">
         <legend>{t('settings.theme.title')}</legend>
         {THEMES.map((option) => (
