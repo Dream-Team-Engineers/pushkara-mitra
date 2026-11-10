@@ -1,8 +1,8 @@
 # Licence register
 
-Allow-list: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, CC0-1.0, Unlicense, BlueOak-1.0.0. Anything else fails `licence-check` unless it is a reviewed exception in [licence-exceptions.json](licence-exceptions.json). The Worker backend has no server runtime dependencies. The package manifest now declares three frontend runtime dependencies for a future Preact build; they are not yet part of the deployed static assets.
+Allow-list: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, CC0-1.0, Unlicense, BlueOak-1.0.0. Anything else fails `licence-check` unless it is a reviewed exception in [licence-exceptions.json](licence-exceptions.json). The Worker backend has no server runtime dependencies. The package manifest now declares four frontend runtime dependencies for a future Preact build; they are not yet part of the deployed static assets.
 
-The npm inventory below comes from the installed packages and their metadata via `license-checker-rseidelsohn`, matched to the current lockfile. The four direct Preact package licences were also checked at their upstream sources on 2026-11-10 (IST), as linked below. Other metadata has not been independently verified. Regenerate this table whenever dependencies change. Status `NEEDS REVIEW` stays until the owners or counsel sign off.
+The npm inventory below comes from the installed packages and their metadata via `license-checker-rseidelsohn`, matched to the current lockfile. The five direct Preact package licences were also checked at their upstream sources on 2026-11-10 (IST), as linked below. Other metadata has not been independently verified. Regenerate this table whenever dependencies change. Status `NEEDS REVIEW` stays until the owners or counsel sign off.
 
 ## CI tools and actions
 
@@ -23,27 +23,17 @@ Source licence for this repository: undecided. `LICENSE` is an "All rights reser
 
 ## Direct Preact licence evidence
 
-| Package               | Installed version | Upstream licence                                                 |
-| --------------------- | ----------------- | ---------------------------------------------------------------- |
-| `preact`              | 11.2.0            | [MIT](https://github.com/preactjs/preact/blob/main/LICENSE)      |
-| `@preact/signals`     | 2.11.4            | [MIT](https://github.com/preactjs/signals/blob/main/LICENSE)     |
-| `preact-iso`          | 2.12.2            | [MIT](https://github.com/preactjs/preact-iso/blob/main/LICENSE)  |
-| `@preact/preset-vite` | 2.10.6            | [MIT](https://github.com/preactjs/preset-vite/blob/main/LICENSE) |
+| Package                   | Installed version | Upstream licence                                                             |
+| ------------------------- | ----------------- | ---------------------------------------------------------------------------- |
+| `preact`                  | 11.2.0            | [MIT](https://github.com/preactjs/preact/blob/main/LICENSE)                  |
+| `@preact/signals`         | 2.11.4            | [MIT](https://github.com/preactjs/signals/blob/main/LICENSE)                 |
+| `preact-iso`              | 2.12.2            | [MIT](https://github.com/preactjs/preact-iso/blob/main/LICENSE)              |
+| `preact-render-to-string` | 6.8.2             | [MIT](https://github.com/preactjs/preact-render-to-string/blob/main/LICENSE) |
+| `@preact/preset-vite`     | 2.10.6            | [MIT](https://github.com/preactjs/preset-vite/blob/main/LICENSE)             |
 
 This source check does not measure bundled size or constitute legal sign-off. Preserve applicable licence notices when the frontend is distributed.
 
-## Direct Preact licence evidence
-
-| Package               | Installed version | Upstream licence                                                 |
-| --------------------- | ----------------- | ---------------------------------------------------------------- |
-| `preact`              | 11.2.0            | [MIT](https://github.com/preactjs/preact/blob/main/LICENSE)      |
-| `@preact/signals`     | 2.11.4            | [MIT](https://github.com/preactjs/signals/blob/main/LICENSE)     |
-| `preact-iso`          | 2.12.2            | [MIT](https://github.com/preactjs/preact-iso/blob/main/LICENSE)  |
-| `@preact/preset-vite` | 2.10.6            | [MIT](https://github.com/preactjs/preset-vite/blob/main/LICENSE) |
-
-This source check does not measure bundled size or constitute legal sign-off. Preserve applicable licence notices when the frontend is distributed.
-
-## npm packages (431)
+## npm packages (432)
 
 | Package                                       | Version           | Licence                                  | Scope                   | Status                                      |
 | --------------------------------------------- | ----------------- | ---------------------------------------- | ----------------------- | ------------------------------------------- |
@@ -389,6 +379,7 @@ This source check does not measure bundled size or constitute legal sign-off. Pr
 | postcss-selector-parser                       | 7.1.7             | MIT                                      | transitive dev          | ACCEPTED (allow-list)                       |
 | preact                                        | 11.2.0            | MIT                                      | direct frontend runtime | ACCEPTED (allow-list)                       |
 | preact-iso                                    | 2.12.2            | MIT                                      | direct frontend runtime | ACCEPTED (allow-list)                       |
+| preact-render-to-string                       | 6.8.2             | MIT                                      | direct frontend runtime | ACCEPTED (allow-list)                       |
 | prelude-ls                                    | 1.2.1             | MIT                                      | transitive dev          | ACCEPTED (allow-list)                       |
 | prettier                                      | 3.9.10            | MIT                                      | direct dev              | ACCEPTED (allow-list)                       |
 | proc-log                                      | 6.1.0             | ISC                                      | transitive dev          | ACCEPTED (allow-list)                       |
