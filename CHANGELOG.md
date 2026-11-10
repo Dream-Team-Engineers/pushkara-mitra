@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.4.0...v1.5.0) (2026-11-10)
+
+
+### Features
+
+* **web:** add Ghats, Stay, Travel, Culture/News and Conditions screens ([5ec700f](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5ec700f15654503e5c2ace006473e1d308b3775b))
+
 ## [1.4.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.3.0...v1.4.0) (2026-11-10)
 
 
