@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.4.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.3.0...v1.4.0) (2026-11-10)
+
+
+### Features
+
+* **web:** add Preact + Vite scaffold, hash router, shared UI and Home screen ([ebd76e8](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/ebd76e8da48243c7ba9f2af6cdc12ae7983890d1))
+* **web:** add Preact + Vite scaffold, router, shared UI and Home ([bb5cd09](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/bb5cd09ec610b0539d52126551322bb4005fe5ba))
+
+
+### Bug Fixes
+
+* **deps:** include preact-iso required peer ([5c37602](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5c3760258db6ff7a93cc7bf10bb265043df3ebac))
+* **web:** flag forms without an action attribute in the privacy guard ([5497822](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5497822e62f23be98d140d28bf1c74dbd1562e81))
+* **web:** flag forms without an action attribute in the privacy guard ([81aba7a](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/81aba7ad7d0ee353eca9c38dbe91f90bfcf99a18))
+* **web:** type EVENT.datesConfirmed as boolean so the pending-dates branch lints ([928d6d4](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/928d6d48789853ae30edd50ccd6fa6ad527443df))
+
 ## [1.3.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.2.0...v1.3.0) (2026-11-10)
 
 
