@@ -83,8 +83,8 @@
 
 :root {
   /* Type: 16px minimum body text; captions never below 14px. Sizes in rem so 200% text works. */
-  --font-latin: 'Inter', system-ui, sans-serif;
-  --font-telugu: 'Noto Sans Telugu', system-ui, sans-serif;
+  --font-latin: 'Mitra Roboto', system-ui, sans-serif;
+  --font-telugu: 'Mitra Telugu', 'Mitra Devanagari', system-ui, sans-serif;
   --font-body: var(--font-latin), var(--font-telugu);
   --text-caption: 0.875rem;
   --text-body: 1rem;
