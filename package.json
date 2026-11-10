@@ -11,8 +11,11 @@
   },
   "scripts": {
     "dev": "wrangler dev",
+    "dev:web": "vite",
+    "build:web": "vite build",
+    "budget:web": "node scripts/measure-web-bundle.mjs",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",

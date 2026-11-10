@@ -15,8 +15,12 @@ import {
  */
 const ROOT = join(import.meta.dirname, '..', '..', 'web', 'src');
 
-/** Files allowed to touch browser storage. Only language/theme preference, once it exists. */
-const STORAGE_ALLOW_LIST: readonly string[] = [];
+/**
+ * Files allowed to touch browser storage: language and theme preference only
+ * (docs/compliance/data-inventory.md). Everything stored there is validated on read and
+ * covered by web/src/shared/prefs/preferences.test.ts.
+ */
+const STORAGE_ALLOW_LIST: readonly string[] = ['shared/prefs/preferences.ts'];
 /** Files allowed to use the network. Public read-only content client, once it exists. */
 const NETWORK_ALLOW_LIST: readonly string[] = [];
 

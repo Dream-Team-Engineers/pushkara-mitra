@@ -72,6 +72,17 @@
     "settings.language": "Language",
     "settings.theme.light": "Light",
     "settings.theme.dark": "Dark",
-    "settings.theme.outdoor": "Outdoor (high contrast)"
+    "settings.theme.outdoor": "Outdoor (high contrast)",
+    "settings.title": "Settings",
+    "settings.theme.title": "Theme",
+    "nav.main": "Main navigation",
+    "status.notFound.title": "Page not found",
+    "status.notFound.body": "There is no page at this address. Go to Home.",
+    "status.comingSoon": "This screen is not ready yet.",
+    "home.city": "Rajamahendravaram",
+    "home.weather.unavailable": "Weather unavailable · source to be licensed",
+    "action.pause": "Pause scrolling",
+    "action.resume": "Resume scrolling",
+    "state.updatedOn": "Updated {date}"
   }
 }
