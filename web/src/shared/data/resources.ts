@@ -1,5 +1,5 @@
 import { loadPublic } from './client';
-import { GHATS, STAYS, TRAVEL, UPDATES } from './fixtures';
+import { GHATS, HELP_POINTS, HELPLINES, STAYS, TRAVEL, UPDATES } from './fixtures';
 import { createResource } from './resource';
 
 const MINUTE = 60_000;
@@ -12,3 +12,5 @@ export const travelResource = createResource(() => loadPublic(TRAVEL), 6 * HOUR)
 export const updatesResource = createResource(() => loadPublic(UPDATES), 30 * MINUTE);
 /** Crowd levels share the ghat records and go stale faster than the ghat listing itself. */
 export const crowdResource = createResource(() => loadPublic(GHATS), 10 * MINUTE);
+export const helplinesResource = createResource(() => loadPublic(HELPLINES), 24 * HOUR);
+export const helpPointsResource = createResource(() => loadPublic(HELP_POINTS), 24 * HOUR);
