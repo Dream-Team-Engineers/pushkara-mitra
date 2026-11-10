@@ -72,7 +72,9 @@ const pick = (paths) => [...paths].map((path) => byPath.get(path)).filter(Boolea
 const initialJs = pick(initialJsPaths);
 const initialCss = pick(initialCssPaths);
 const allCss = files.filter((file) => file.ext === '.css');
-const routeChunks = files.filter((file) => file.ext === '.js' && !initialJsPaths.has(file.path));
+const routeChunks = files.filter(
+  (file) => file.ext === '.js' && file.path !== 'sw.js' && !initialJsPaths.has(file.path),
+);
 const allFonts = files.filter((file) => ['.woff2', '.woff', '.ttf', '.otf'].includes(file.ext));
 // Hindi fonts download only when Hindi text is shown (unicode-range), so they are reported apart.
 const onDemandFonts = allFonts.filter((file) => /Devanagari/.test(file.path));
