@@ -47,7 +47,9 @@ describe('frontend privacy guard: real sources', () => {
   });
 
   it('uses no camera, file picker, scanner or dial/sms/mail link until each is approved', () => {
+    // Tests are excluded: they assert the absence of these patterns in rendered output.
     const offenders = files
+      .filter((file) => !/\.test\.tsx?$/.test(file.path))
       .filter((file) => findDeviceCapture(file.source).length > 0)
       .map((file) => file.path);
     expect(offenders).toEqual([]);
