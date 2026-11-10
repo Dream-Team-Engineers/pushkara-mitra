@@ -76,6 +76,10 @@ describe('frontend privacy guard: scanners detect violations', () => {
     expect(findNetworkUse('new WebSocket(u)')).toEqual(['WebSocket']);
     expect(findNetworkUse('form.requestSubmit()')).toEqual(['form submit']);
     expect(findNetworkUse('<form action="/x">')).toEqual(['form submit']);
+    expect(
+      findNetworkUse('<form><input name="phone" /><button type="submit">Send</button></form>'),
+    ).toEqual(['form submit']);
+    expect(findNetworkUse('<FORM method="get">')).toEqual(['form submit']);
     expect(findNetworkUse('const a = 1;')).toEqual([]);
   });
 });

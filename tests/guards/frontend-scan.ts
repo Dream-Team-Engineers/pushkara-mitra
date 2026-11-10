@@ -27,7 +27,9 @@ const NETWORK: readonly [string, RegExp][] = [
   ['sendBeacon', /\bsendBeacon\b/],
   ['WebSocket', /\bWebSocket\b/],
   ['EventSource', /\bEventSource\b/],
-  ['form submit', /\.\s*(?:submit|requestSubmit)\s*\(|\baction\s*=/],
+  // Any <form> element counts: a native submit needs no `action` and no .submit() call
+  // (it GETs the current URL with the fields in the query string). Fails closed.
+  ['form submit', /\.\s*(?:submit|requestSubmit)\s*\(|\baction\s*=|<form\b/i],
 ];
 
 function scanWith(patterns: readonly [string, RegExp][], source: string): string[] {
