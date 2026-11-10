@@ -90,7 +90,7 @@ const wsUrl = await new Promise((resolve, reject) => {
 });
 
 const port = new URL(wsUrl).port;
-const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
+const targets = await (await globalThis.fetch(`http://127.0.0.1:${port}/json/list`)).json();
 const page = targets.find((target) => target.type === 'page');
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((resolve, reject) => {
