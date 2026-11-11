@@ -64,7 +64,7 @@ This source check does not measure bundled size or constitute legal sign-off. Pr
 | @cloudflare/unenv-preset                      | 2.16.2            | MIT OR Apache-2.0                        | transitive dev          | ACCEPTED (allow-list)                       |
 | @cloudflare/vitest-plugin                     | 1.6.0             | MIT                                      | direct dev              | ACCEPTED (allow-list)                       |
 | @cloudflare/workerd-windows-64                | 1.20261104.1      | Apache-2.0                               | transitive dev          | ACCEPTED (allow-list)                       |
-| @cloudflare/workers-types                     | 5.20261106.1      | MIT OR Apache-2.0                        | direct dev              | ACCEPTED (allow-list)                       |
+| @cloudflare/workers-types                     | 5.20261107.1      | MIT OR Apache-2.0                        | direct dev              | ACCEPTED (allow-list)                       |
 | @commitlint/cli                               | 21.2.4            | MIT                                      | direct dev              | ACCEPTED (allow-list)                       |
 | @commitlint/config-conventional               | 21.2.4            | MIT                                      | direct dev              | ACCEPTED (allow-list)                       |
 | @commitlint/config-validator                  | 21.2.3            | MIT                                      | transitive dev          | ACCEPTED (allow-list)                       |
