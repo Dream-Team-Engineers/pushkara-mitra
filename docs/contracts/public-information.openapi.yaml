@@ -3,8 +3,9 @@ info:
   title: Pushkara Mitra public information — proposed contract
   version: 0.1.0-proposed
   description: |
-    DESIGN ONLY. GET /healthz documents current scaffold behavior. The public
-    information endpoint is PROPOSED and is not implemented or approved.
+    GET /healthz documents current scaffold behavior. The public information endpoint
+    is implemented in code but PROPOSED and NOT APPROVED: no copy is approved, so every
+    locale returns 404 INFORMATION_UNAVAILABLE, and the frontend flag that calls it is off.
     G0 scope/standards approval and reviewed public copy are prerequisites.
     This file creates no endpoint, resource, data collection or release authority.
 x-review-status: PROPOSED
@@ -36,7 +37,7 @@ paths:
   /api/public/information:
     get:
       operationId: getPublicInformation
-      x-implementation-status: PROPOSED_NOT_IMPLEMENTED
+      x-implementation-status: IMPLEMENTED_NO_APPROVED_COPY
       summary: Read a reviewed, nonpersonal application information document
       description: |
         PROPOSED. Read only, with no account, analytics, database or geolocation.

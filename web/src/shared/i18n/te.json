@@ -244,6 +244,7 @@
     "settings.about.fonts": "ఫాంట్లు",
     "settings.about.software": "సాఫ్ట్‌వేర్",
     "settings.about.licenceText": "లైసెన్స్ పాఠం",
-    "settings.about.reviewPending": "ఈ జాబితా న్యాయ సమీక్షకు ఇంకా పంపలేదు."
+    "settings.about.reviewPending": "ఈ జాబితా న్యాయ సమీక్షకు ఇంకా పంపలేదు.",
+    "settings.about.published": "ప్రచురించిన సమాచారం"
   }
 }

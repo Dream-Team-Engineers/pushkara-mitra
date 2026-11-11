@@ -163,6 +163,10 @@ async function checkEnvironment(environment, mock = false) {
       ['GET', '/docs/content/user-ghats-candidate.json', 404],
       ['GET', '/docs/content/official-content-review.html', 404],
       ['GET', '/api', 404],
+      ['GET', '/api/public/information', 404],
+      ['GET', '/api/public/information?lang=te', 404],
+      ['GET', '/api/public/information?lang=xx', 400],
+      ['HEAD', '/api/public/information?lang=te', 404],
       ['GET', '/api/demo/events', mock ? 200 : 404],
       ['GET', '/api/v1/me/missing', 404],
       ['GET', '/admin', 404],
@@ -174,6 +178,7 @@ async function checkEnvironment(environment, mock = false) {
       ['POST', '/sw.js', 405],
       ['POST', '/healthz', 405],
       ['POST', '/api/missing', 405],
+      ['POST', '/api/public/information', 405],
       ['DELETE', '/healthz', 405],
     ];
     for (const [method, path, status] of cases) {

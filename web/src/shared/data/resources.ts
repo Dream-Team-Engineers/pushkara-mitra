@@ -1,6 +1,8 @@
 import { loadPublic } from './client';
+import type { Locale } from '../i18n/i18n';
+import { fetchPublicInformation, type PublicInformation } from './publicInformation';
 import { GHATS, HELP_POINTS, HELPLINES, STAYS, TRAVEL, UPDATES } from './fixtures';
-import { createResource } from './resource';
+import { createResource, type Resource } from './resource';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -14,3 +16,15 @@ export const updatesResource = createResource(() => loadPublic(UPDATES), 30 * MI
 export const crowdResource = createResource(() => loadPublic(GHATS), 10 * MINUTE);
 export const helplinesResource = createResource(() => loadPublic(HELPLINES), 24 * HOUR);
 export const helpPointsResource = createResource(() => loadPublic(HELP_POINTS), 24 * HOUR);
+
+const informationResources = new Map<Locale, Resource<PublicInformation | null>>();
+
+/** One in-memory resource per language. Null data means no approved copy is published yet. */
+export function informationResource(lang: Locale): Resource<PublicInformation | null> {
+  let resource = informationResources.get(lang);
+  if (resource === undefined) {
+    resource = createResource(() => fetchPublicInformation(lang), 6 * HOUR);
+    informationResources.set(lang, resource);
+  }
+  return resource;
+}
