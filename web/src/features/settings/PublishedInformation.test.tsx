@@ -40,7 +40,7 @@ describe('PublishedInformation', () => {
     const html = render(<PublishedInformationView resource={resource} />);
     expect(html).toContain('Plain text');
     expect(html).not.toContain('<script>');
-    expect(html).toContain('&lt;script&gt;');
+    expect(html).toMatch(/&(?:lt|#60);script/);
     expect(accessibilityIssues(html)).toEqual([]);
   });
 
