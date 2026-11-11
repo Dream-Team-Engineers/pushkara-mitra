@@ -1,7 +1,8 @@
 import { render } from 'preact-render-to-string';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { PublicInformation } from '../../shared/data/publicInformation';
 import { createResource } from '../../shared/data/resource';
+import { online } from '../../shared/data/time';
 import { accessibilityIssues } from '../../shared/testing/html';
 import { PublishedInformation, PublishedInformationView } from './PublishedInformation';
 
@@ -14,6 +15,14 @@ const DOC: PublicInformation = {
 };
 
 describe('PublishedInformation', () => {
+  // The server-render test environment has no navigator, so force the online state.
+  beforeEach(() => {
+    online.value = true;
+  });
+  afterEach(() => {
+    online.value = false;
+  });
+
   it('renders nothing while the flag is off, without touching the network', () => {
     expect(render(<PublishedInformation />)).toBe('');
     expect(render(<PublishedInformation enabled={false} />)).toBe('');

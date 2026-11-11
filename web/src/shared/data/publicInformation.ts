@@ -77,7 +77,8 @@ export async function fetchPublicInformation(
     if (isUnavailableBody(body)) return null;
     throw new Error('Unexpected 404 from the public information endpoint');
   }
-  if (response.status !== 200) throw new Error(`Public information failed: ${response.status}`);
+  if (response.status !== 200)
+    throw new Error(`Public information failed: ${String(response.status)}`);
   const body: unknown = await response.json();
   if (!isPublicInformation(body, lang)) {
     throw new Error('Public information does not match its contract');

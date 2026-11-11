@@ -51,10 +51,7 @@ describe('PUB-01 approved copy', () => {
   });
 
   it('serves nothing beyond the contract fields', async () => {
-    const body = (await handlePublicInformation(
-      url('?lang=hi'),
-      approvedEntries(),
-    ).json()) as object;
+    const body = await handlePublicInformation(url('?lang=hi'), approvedEntries()).json<object>();
     expect(Object.keys(body).sort()).toEqual(
       ['independentApplication', 'locale', 'paragraphs', 'revision', 'title'].sort(),
     );
