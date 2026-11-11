@@ -19,6 +19,7 @@ const REQUIRED_FLAGS: readonly FlagName[] = [
   'partnerContact',
   'payments',
   'donations',
+  'publishedInformation',
 ];
 
 describe('frontend feature flags', () => {

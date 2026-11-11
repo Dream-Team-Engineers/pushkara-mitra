@@ -244,6 +244,7 @@
     "settings.about.fonts": "Fonts",
     "settings.about.software": "Software",
     "settings.about.licenceText": "Licence text",
-    "settings.about.reviewPending": "This list has not had legal review yet."
+    "settings.about.reviewPending": "This list has not had legal review yet.",
+    "settings.about.published": "Published information"
   }
 }

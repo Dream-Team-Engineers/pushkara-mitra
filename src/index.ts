@@ -1,4 +1,5 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
+import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
 
 export { GroupLocation };
@@ -62,6 +63,15 @@ async function route(request: Request, env: Env): Promise<Response> {
       },
       { headers: { 'Cache-Control': 'no-store' } },
     );
+  }
+
+  if (pathname === PUBLIC_INFORMATION_PATH) {
+    return handlePublicInformation(new URL(request.url));
+  }
+
+  // Unmatched API paths are answered here and never fall through to static-asset lookup.
+  if (pathname === '/api' || pathname.startsWith('/api/')) {
+    return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
   }
 
   if (env.ASSETS) {

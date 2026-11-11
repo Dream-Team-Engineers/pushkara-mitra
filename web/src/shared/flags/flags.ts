@@ -26,6 +26,11 @@ export const FLAGS = {
   partnerContact: false,
   /** Razorpay or any payment flow. Payments review and merchant checks first. */
   payments: false,
+  /**
+   * Fetches reviewed app information from GET /api/public/information. Needs LEAD approval of the
+   * route and approved copy (docs/proposals/BACKEND_CONTRACT_ACCEPTANCE.md); until then it is off.
+   */
+  publishedInformation: false,
   /** Donation collection. Blocked until counsel approves recipient, FCRA and tax treatment. */
   donations: false,
 } as const;

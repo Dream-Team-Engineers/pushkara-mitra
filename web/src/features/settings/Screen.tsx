@@ -4,6 +4,7 @@ import { selectLocale } from '../../shared/i18n/select';
 import { THEMES, type Theme } from '../../shared/prefs/preferences';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { setTheme, theme } from '../../shared/ui/theme';
+import { PublishedInformation } from './PublishedInformation';
 import { FONT_NOTICES, SOFTWARE_NOTICES, type Notice } from './notices';
 
 const THEME_LABELS = {
@@ -82,6 +83,7 @@ export default function SettingsScreen() {
         <NoticeList items={FONT_NOTICES} />
         <h3>{t('settings.about.software')}</h3>
         <NoticeList items={SOFTWARE_NOTICES} />
+        <PublishedInformation />
         <p class="notice" role="note">
           {t('settings.about.reviewPending')}
         </p>

@@ -244,6 +244,7 @@
     "settings.about.fonts": "फ़ॉन्ट",
     "settings.about.software": "सॉफ़्टवेयर",
     "settings.about.licenceText": "लाइसेंस का पाठ",
-    "settings.about.reviewPending": "इस सूची की कानूनी समीक्षा अभी नहीं हुई है।"
+    "settings.about.reviewPending": "इस सूची की कानूनी समीक्षा अभी नहीं हुई है।",
+    "settings.about.published": "प्रकाशित जानकारी"
   }
 }
