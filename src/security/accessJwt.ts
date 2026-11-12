@@ -73,7 +73,7 @@ function decodeJsonObject(value: string): Record<string, unknown> | null {
   const bytes = decodeBase64Url(value);
   if (bytes === null) return null;
   try {
-    const parsed: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(bytes));
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return null;
     return parsed as Record<string, unknown>;
   } catch {
@@ -139,7 +139,7 @@ export async function verifyAccessToken(
   const material = jwk === null ? null : usableKey(jwk);
   if (material === null) return fail('unknown_key');
 
-  let valid = false;
+  let valid: boolean;
   try {
     const key = await crypto.subtle.importKey(
       'jwk',

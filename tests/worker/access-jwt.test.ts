@@ -28,7 +28,7 @@ interface Pair {
   readonly publicJwk: JsonWebKey;
 }
 async function makePair(modulusLength = 2048): Promise<Pair> {
-  const pair = await crypto.subtle.generateKey(
+  const pair = (await crypto.subtle.generateKey(
     {
       name: 'RSASSA-PKCS1-v1_5',
       modulusLength,
@@ -37,10 +37,10 @@ async function makePair(modulusLength = 2048): Promise<Pair> {
     },
     true,
     ['sign', 'verify'],
-  );
+  )) as CryptoKeyPair;
   return {
     privateKey: pair.privateKey,
-    publicJwk: await crypto.subtle.exportKey('jwk', pair.publicKey),
+    publicJwk: (await crypto.subtle.exportKey('jwk', pair.publicKey)) as JsonWebKey,
   };
 }
 
@@ -141,7 +141,7 @@ describe('fails closed with a fixed reason', () => {
     expect(await verify(forged)).toEqual({ ok: false, reason: 'bad_signature' });
 
     const valid = await sign(good);
-    const [h, , s] = valid.split('.');
+    const [h = '', , s = ''] = valid.split('.');
     const swapped = `${h}.${encodeJson({ iss: CONFIG.issuer, aud: [CONFIG.audience], sub: 'attacker', exp: NOW + 600 })}.${s}`;
     expect(await verify(swapped)).toEqual({ ok: false, reason: 'bad_signature' });
 
