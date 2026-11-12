@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.8.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.7.0...v1.8.0) (2026-11-11)
+
+
+### Features
+
+* **api:** add GET /api/public/information that serves only approved copy, gated off in the app ([787aff9](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/787aff98dc315bc3b047095f8e9d262b3027e46c))
+* **api:** add public information endpoint that serves only approved copy ([f0ac908](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/f0ac908ca45c7881e54ef64bc4f34268e8fd060e))
+
+
+### Bug Fixes
+
+* **test:** accept either entity form for escaped markup ([65e114e](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/65e114e19cf0c6050d020f52593338b2791a2150))
+* **test:** force online state in component tests; satisfy lint rules ([e3b50ba](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e3b50bad641e4c1103f3ff0f4f5af7c9894e2a82))
+
 ## [1.7.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.6.0...v1.7.0) (2026-11-10)
 
 
