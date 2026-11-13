@@ -1,0 +1,342 @@
+openapi: 3.1.0
+info:
+  title: Pushkara Mitra content workflow — proposed contract
+  version: 0.1.0-proposed
+  description: |
+    PROPOSED. NOT APPROVED. Creates no endpoint, table, role or data collection.
+    Public reads serve only approved items. Staff routes sit behind Cloudflare Access and
+    server-side RBAC (BF-02, BF-03, unapproved). Prerequisites: G1 identity and data gates,
+    an approved content data contract, and the first approver being named (OWNER_DECISION_PACK).
+    Companion design: docs/proposals/CONTENT_WORKFLOW.md.
+x-review-status: PROPOSED
+x-approval-evidence: null
+x-implementation-status: NOT_IMPLEMENTED
+paths:
+  /api/public/content:
+    get:
+      operationId: listPublicContent
+      summary: List approved items of one kind and language
+      description: |
+        No account, cookies or Authorization read. Unknown or repeated query keys give 400.
+        No cross-language fallback. Only status approved is ever returned. Cache-Control is
+        decided in the contract review (proposal in CONTENT_WORKFLOW.md section 5).
+      parameters:
+        - { name: kind, in: query, required: true, schema: { $ref: '#/components/schemas/Kind' } }
+        - { name: lang, in: query, required: true, schema: { $ref: '#/components/schemas/Locale' } }
+        - {
+            name: limit,
+            in: query,
+            required: false,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: cursor,
+            in: query,
+            required: false,
+            schema: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9_-]+$' },
+          }
+      responses:
+        '200':
+          description: Approved items, possibly an empty list
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    {
+                      type: array,
+                      maxItems: 50,
+                      items: { $ref: '#/components/schemas/PublicItem' },
+                    }
+                  nextCursor: { type: [string, 'null'], maxLength: 64 }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '429': { $ref: '#/components/responses/Throttled' }
+  /api/public/content/{id}:
+    get:
+      operationId: getPublicContent
+      summary: Read one approved item
+      parameters:
+        - { name: id, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+      responses:
+        '200':
+          description: The approved item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicItem' }
+        '404':
+          description: Not found, withdrawn, or not approved (all indistinguishable)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '429': { $ref: '#/components/responses/Throttled' }
+  /admin/api/v1/content:
+    get:
+      operationId: listContentForStaff
+      summary: List items in any state (staff)
+      x-permission: content.read
+      security: [{ AccessAssertion: [] }]
+      parameters:
+        - {
+            name: status,
+            in: query,
+            required: false,
+            schema: { $ref: '#/components/schemas/Status' },
+          }
+        - { name: kind, in: query, required: false, schema: { $ref: '#/components/schemas/Kind' } }
+        - {
+            name: limit,
+            in: query,
+            required: false,
+            schema: { type: integer, minimum: 1, maximum: 100, default: 50 },
+          }
+        - { name: cursor, in: query, required: false, schema: { type: string, maxLength: 64 } }
+      responses:
+        '200':
+          description: Items visible to the caller's role and scope
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    {
+                      type: array,
+                      maxItems: 100,
+                      items: { $ref: '#/components/schemas/StaffItem' },
+                    }
+                  nextCursor: { type: [string, 'null'] }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: createContentDraft
+      summary: Create a draft
+      x-permission: content.draft
+      x-audit: required
+      security: [{ AccessAssertion: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DraftInput' }
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StaffItem' }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '413': { $ref: '#/components/responses/TooLarge' }
+  /admin/api/v1/content/{id}:
+    patch:
+      operationId: editContentDraft
+      summary: Edit a draft (only while draft; creates a new revision)
+      x-permission: content.draft
+      x-audit: required
+      security: [{ AccessAssertion: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+        - { name: If-Match, in: header, required: true, schema: { type: string, maxLength: 64 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DraftInput' }
+      responses:
+        '200':
+          {
+            description: Updated draft,
+            content: { application/json: { schema: { $ref: '#/components/schemas/StaffItem' } } },
+          }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/TooLarge' }
+  /admin/api/v1/content/{id}/submit:
+    post:
+      operationId: submitContentForReview
+      summary: Move a draft to in_review
+      x-permission: content.draft
+      x-audit: required
+      security: [{ AccessAssertion: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+        - { name: If-Match, in: header, required: true, schema: { type: string, maxLength: 64 } }
+      responses:
+        '200':
+          {
+            description: Item now in_review,
+            content: { application/json: { schema: { $ref: '#/components/schemas/StaffItem' } } },
+          }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /admin/api/v1/content/{id}/approve:
+    post:
+      operationId: approveContent
+      summary: Approve the exact revision reviewed (never the author)
+      x-permission: content.approve
+      x-audit: required
+      security: [{ AccessAssertion: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+        - { name: If-Match, in: header, required: true, schema: { type: string, maxLength: 64 } }
+      responses:
+        '200':
+          {
+            description: Item now approved and publicly readable,
+            content: { application/json: { schema: { $ref: '#/components/schemas/StaffItem' } } },
+          }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /admin/api/v1/content/{id}/withdraw:
+    post:
+      operationId: withdrawContent
+      summary: Withdraw an approved item (immediate; any approver or safety moderator for safety items)
+      x-permission: content.withdraw
+      x-audit: required
+      security: [{ AccessAssertion: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+      responses:
+        '200':
+          {
+            description: Item now withdrawn,
+            content: { application/json: { schema: { $ref: '#/components/schemas/StaffItem' } } },
+          }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  securitySchemes:
+    AccessAssertion:
+      type: apiKey
+      in: header
+      name: Cf-Access-Jwt-Assertion
+      description: Proves identity only. Authority comes from a server-side role assignment, never from this header.
+  schemas:
+    Id: { type: string, minLength: 8, maxLength: 64, pattern: '^[a-z2-7]+$' }
+    Locale: { enum: [te, en, hi] }
+    Kind: { enum: [ghat, stay, travel, update, notice] }
+    Status: { enum: [draft, in_review, approved, withdrawn] }
+    Source:
+      type: object
+      additionalProperties: false
+      required: [name, retrievedOn]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        url: { type: string, maxLength: 300, pattern: '^https://' }
+        retrievedOn: { type: string, format: date }
+    DraftInput:
+      type: object
+      additionalProperties: false
+      required: [kind, locale, title, body, source]
+      properties:
+        kind: { $ref: '#/components/schemas/Kind' }
+        locale: { $ref: '#/components/schemas/Locale' }
+        title: { type: string, minLength: 1, maxLength: 120 }
+        body:
+          {
+            type: array,
+            minItems: 1,
+            maxItems: 12,
+            items: { type: string, minLength: 1, maxLength: 600 },
+          }
+        source: { $ref: '#/components/schemas/Source' }
+    PublicItem:
+      type: object
+      additionalProperties: false
+      required: [id, kind, locale, title, body, source, status, synthetic, updatedAt, revision]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        kind: { $ref: '#/components/schemas/Kind' }
+        locale: { $ref: '#/components/schemas/Locale' }
+        title: { type: string, maxLength: 120 }
+        body: { type: array, maxItems: 12, items: { type: string, maxLength: 600 } }
+        source: { $ref: '#/components/schemas/Source' }
+        status: { const: approved }
+        synthetic: { type: boolean }
+        updatedAt: { type: string, format: date-time }
+        revision: { type: string, pattern: '^[a-zA-Z0-9._-]{1,64}$' }
+    StaffItem:
+      type: object
+      additionalProperties: false
+      required:
+        [id, kind, locale, title, body, source, status, synthetic, revision, updatedAt, authorRef]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        kind: { $ref: '#/components/schemas/Kind' }
+        locale: { $ref: '#/components/schemas/Locale' }
+        title: { type: string }
+        body: { type: array, items: { type: string } }
+        source: { $ref: '#/components/schemas/Source' }
+        status: { $ref: '#/components/schemas/Status' }
+        synthetic: { type: boolean }
+        revision: { type: string }
+        updatedAt: { type: string, format: date-time }
+        authorRef: { type: string, description: Opaque staff reference, never a name or email }
+        reviewedByRef: { type: [string, 'null'] }
+        reviewedOn: { type: [string, 'null'], format: date }
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code: { type: string, maxLength: 40 }
+            message:
+              { type: string, maxLength: 120, description: A reviewed constant; never echoes input }
+  responses:
+    InvalidRequest:
+      {
+        description: Invalid request,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    Unauthenticated:
+      {
+        description: No valid Access assertion,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    Forbidden:
+      {
+        description: Verified identity without the needed role or scope,
+        or self-approval,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    NotFound:
+      {
+        description: Not found (same body as a forbidden id where existence must not leak),
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    Conflict:
+      {
+        description: Stale revision or illegal state transition,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    TooLarge:
+      {
+        description: Body over the size limit,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
+    Throttled:
+      {
+        description: Rate limit exceeded (BF-10,
+        unapproved),
+        content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } },
+      }
