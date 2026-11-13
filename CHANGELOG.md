@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.8.0...v1.9.0) (2026-11-13)
+
+
+### Features
+
+* **security:** add disabled Cloudflare Access token verifier with tests ([09ed717](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/09ed7170116acd4a4de3785a4ef3fd11c26bcad7))
+* **security:** add disabled Cloudflare Access token verifier with tests ([79773ec](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/79773ec840f106a38fbdf420449ee868147e72d3))
+
+
+### Bug Fixes
+
+* **security:** satisfy typecheck and lint for the Access verifier ([4d19590](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/4d195902c1d2f53e5beaa252f44f2d43c7730f12))
+
 ## [1.8.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.7.0...v1.8.0) (2026-11-11)
 
 
