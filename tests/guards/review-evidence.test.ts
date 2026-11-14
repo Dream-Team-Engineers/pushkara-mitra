@@ -47,8 +47,8 @@ describe('approval evidence regression', () => {
     expect(
       runChecklist(
         completeChecklist.replace(
-          '- [x] Human owner and independent reviewer identified',
-          '- [x] Human owner and independent reviewer identified — review pending',
+          '- [x] Sole maintainer and risk acceptance recorded',
+          '- [x] Sole maintainer and risk acceptance recorded — optional review pending',
         ),
       ).status,
     ).toBe(0);

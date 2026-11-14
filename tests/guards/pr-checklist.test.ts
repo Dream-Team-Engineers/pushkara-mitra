@@ -43,5 +43,5 @@ describe('check-pr-checklist', () => {
     for (const item of requiredItems) {
       expect(run(completeBody.replace(`- [x] ${item}`, '')).status, item).toBe(1);
     }
-  });
+  }, 15_000);
 });

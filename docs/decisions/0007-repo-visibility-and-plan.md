@@ -1,7 +1,15 @@
 # 0007. Repository visibility and GitHub plan
 
-Status: **Owner selected public for now; protection provisioning, independent review and verification PENDING.**
+Status: **Owner selected public and sole-maintainer operation for now; protection provisioning and verification PENDING.**
 Date: 2026-11-02
+
+## Owner update — sole maintainer, 2026-11-14 (IST)
+
+The requesting owner says `gkmraju` is now the sole available maintainer; the former LEAD and DEV2 moved to another project. This supersedes the independent-PR-review requirement for ordinary development while the team has one maintainer. The owner may still request outside review voluntarily. Do not claim an independent review occurred when it did not.
+
+The intended public-repository ruleset requires a pull request, strict current required checks, resolved review threads, linear history, signed commits and no bypass, force pushes or deletion. It requires **zero approving reviews** and no code-owner or last-push approval, so `gkmraju` can merge a fully checked PR alone. [GitHub documents zero-approval PR rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). A checked PR-body item is an owner attestation; GitHub's required checks are the enforceable gate. `CODEOWNERS` identifies `gkmraju` for ownership but does not require an impossible self-review. The production environment names `gkmraju` as its sole reviewer with self-review allowed; the production workflow remains fail-closed until a separate launch decision and implementation. Preview bootstrap remains manual, owner-dispatched, pinned to the exact merged main PR and subject to preflight and local checks.
+
+Apply the updated `scripts/setup-github.sh` only after its code is on `main`, then read back effective rules and environment settings. The public-visibility decision remains in effect; reconsider privacy after project completion. Historical selections and review requirements below describe earlier states, not this current operating choice. Legal, privacy, content and production-launch decisions remain separate gates.
 
 ## Owner update — 2026-11-14 (IST)
 
