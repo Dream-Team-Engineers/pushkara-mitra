@@ -6,6 +6,24 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Session summary and handover for next session — 2026-11-14 23:31:09 IST
+
+- **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation and deployments by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.
+- **Done today (oldest first, details in the entries below):**
+  1. 20:23 IST: Windows checks (lint, typecheck, worker/web tests, format, build) passed on `f9ad7ad`. WSL has no Linux Node, so it is not usable yet.
+  2. `3b5c285`: shell-based guard tests run on Windows via Git Bash; `npm run check` now passes locally.
+  3. 22:27 IST: first staging deploy from this machine (`3b5c285`).
+  4. `5740f16`: owner-approved public content API `/api/public/content/{kind}`; owner identity recorded (data fiduciary, grievance contact and nodal officer: Krishna Murthy Raju G, individual, dreamteamtech@zohomail.in; OQ-005, OQ-023); launch guide `docs/operations/LAUNCH_APPROVALS.md`. Staging 22:47 IST.
+  5. `8dd68a5` → `3ea871b`: owner approved 15 East Godavari ghats and confirmed festival dates 26 Jun to 7 Jul 2027 (OQ-004 closed). Staging 23:29 IST, version `c2f2ed80-b7f6-4387-b75d-8bd3d7b47deb`.
+- **Current state:** `main` at this entry's commit, version `1.12.0` (automated release-please merge #127). Staging live at https://pushkara-mitra-staging.dreamteamtech.workers.dev with real ghats and dates; stays, travel, updates, helplines and help points still show labelled samples. Production **not deployed**.
+- **Open items for next session:**
+  1. Helplines: owner to supply the official page for emergency, ambulance, police and control-room numbers.
+  2. godavaripushkaram2027.ap.gov.in and rmc.ap.gov.in render with JavaScript; owner to paste their text so events and details can be prepared for approval.
+  3. Native Telugu and Hindi review of the new ghats strings (OQ-019).
+  4. Launch guide steps 2–7: lawyer consultation (OQ-024), v1 read-only scope decision (OQ-021), Workers Paid upgrade (OQ-020, OQ-028), phone and accessibility testing, then explicit production approval.
+  5. Owner to decide whether to disable the release-please automation that still runs on GitHub.
+- **Legal status:** no legal compliance is certified; counsel review remains NEEDS REVIEW.
+
 ## First official content approved and on staging — 2026-11-14 23:29:20 IST
 
 - **Task / outcome:** Owner `gkmraju` approved the 15 ghat names and groupings from https://eastgodavari.ap.gov.in/ghats/ (page updated 28.11.2025; reviewed at `8dd68a5`) and confirmed the festival dates 26 June to 7 July 2027 from https://eastgodavari.ap.gov.in/godavari-pushkaralu-2027/ (page updated 29.01.2026), closing OQ-004. Commit `3ea871b` (on top of release `1.12.0`, `294936e`) deployed to staging, version `c2f2ed80-b7f6-4387-b75d-8bd3d7b47deb`. Result: **SUCCESS**.
