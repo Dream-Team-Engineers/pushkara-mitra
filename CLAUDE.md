@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**NEVER create feature branches, Pull Requests, or use release-please. Always work directly on the active branch, run `npm run check` locally to enforce all security/ADR tests, and deploy directly via `npx wrangler deploy`.**
+
 Operational summary. The binding rules are in [docs/ENGINEERING_STANDARDS.md](docs/ENGINEERING_STANDARDS.md) (currently a placeholder, OQ-002) and the Kickoff Prompt V1.
 
 ## Direct deployment (owner-approved workflow)
@@ -11,7 +13,7 @@ The owner allowed a direct Cloudflare deployment workflow on 2026-11-14. Use it 
 3. Use `npm run ship:staging` for staging. Use `npm run ship:production` only after the owner explicitly approves that production release and its outstanding legal and operational gates; the production CI workflow remains disabled until separately reviewed.
 4. Verify the deployed URL and `/healthz`, then record the source commit, environment, time, result, and rollback route. Do not claim a successful deployment from a passing local command alone.
 
-GitHub changes to `main` still use signed commits, PRs, required checks, and review. Direct Cloudflare deployment does not change GitHub branch protection or trigger Release Please.
+Owner direction (2026-11-14, supersedes the earlier PR-only wording): work directly on the active branch and push to `main` without PRs. This only succeeds once an admin has disabled the `protect-main` ruleset (see PROJECT_STATUS). Deploy with `npm run ship` (staging) or the explicit `ship:*` scripts, which build the web assets first; a bare `npx wrangler deploy` targets the top-level Worker, not a named environment, and does not build `dist/web`.
 
 ## Commands
 
@@ -32,7 +34,7 @@ GitHub changes to `main` still use signed commits, PRs, required checks, and rev
 
 1. **Location is never persisted or logged.** No `ctx.storage`, `state.storage`, `serializeAttachment`, KV or R2 `put` for location, and no coordinate fields in log calls. Guard: `tests/guards/no-location-persistence.test.ts`.
 2. **GitHub settings change only through `scripts/setup-github.sh`.** No ad-hoc `gh api` writes.
-3. **After the first push, never push to `main`.** Work goes through pull requests.
+3. ~~After the first push, never push to `main`.~~ Superseded by the owner's 2026-11-14 direction at the top of this file: no branches or PRs; the safety rules below still apply.
 4. **No secrets** in code, logs, docs, commits or fixtures.
 5. **Never use `pull_request_target`.** Pin every action to a full commit SHA with the version in a comment.
 6. **Never fabricate** a legal citation, effective date, licence term or compliance status. Mark it `NEEDS REVIEW` and add it to `docs/decisions/OPEN_QUESTIONS.md`.
