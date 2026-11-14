@@ -290,4 +290,3 @@ describe('solo-maintainer ruleset with mocked GitHub', () => {
     },
   );
 });
-
