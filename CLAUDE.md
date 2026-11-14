@@ -2,6 +2,12 @@
 
 Operational summary. The binding rules are in [docs/ENGINEERING_STANDARDS.md](docs/ENGINEERING_STANDARDS.md) (currently a placeholder, OQ-002) and the Kickoff Prompt V1.
 
+## Fast Deployment Protocol (Solo/Rapid Mode)
+- Do NOT create feature branches, pull requests, or trigger release-please unless explicitly asked.
+- Work directly on the current branch and commit changes locally with clear messages.
+- Before deploying, ALWAYS run npm run check to verify lint, typecheck, format, and ADR 0004 security guard tests.
+- Deploy directly to Cloudflare from the terminal using npx wrangler deploy (or npx wrangler deploy --env staging if configured).
+- 
 ## Commands
 
 | Task            | Command                                                             |
