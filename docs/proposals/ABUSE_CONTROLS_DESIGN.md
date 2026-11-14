@@ -23,16 +23,18 @@ Scraping and amplification of public reads; enumeration of group codes and invit
 
 ## 3. Layered design (proposal)
 
-| Layer                         | Control                                                                                                                         | Where                                                                                                     | Accuracy needed     |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------- |
-| 1. Edge                       | Cloudflare-side rules (WAF/rate rules, bot protection) for blanket flood protection                                             | Cloudflare configuration, reproducible through the reviewed setup process; plan features **not verified** | Coarse              |
-| 2. Public reads               | Edge cache first; Worker limiter keyed by route class, not by IP alone                                                          | Worker binding                                                                                            | Approximate is fine |
-| 3. Invitations and group join | Strict limiter per invitation id and per session, with uniform failure responses and short lockout; counter in a Durable Object | Durable Object (exact, in memory)                                                                         | Exact               |
-| 4. Staff routes               | Access in front, then a per-principal limiter after authentication                                                              | Worker binding                                                                                            | Approximate         |
-| 5. Inquiry forms              | Limiter per route plus size/schema caps and a honeypot-free design (no CAPTCHA decision yet)                                    | Worker binding                                                                                            | Approximate         |
-| 6. Durable Object WebSockets  | Per-connection message rate, message size cap, connection cap per group, idle timeout; close on violation                       | Durable Object                                                                                            | Exact               |
+| Layer                         | Control                                                                                                                                                                          | Where                                                                                                     | Accuracy needed     |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1. Edge                       | Cloudflare-side rules (WAF/rate rules, bot protection) for blanket flood protection                                                                                              | Cloudflare configuration, reproducible through the reviewed setup process; plan features **not verified** | Coarse              |
+| 2. Public reads               | Edge cache first; Worker limiter keyed by route class, not by IP alone                                                                                                           | Worker binding                                                                                            | Approximate is fine |
+| 3. Invitations and group join | Strict limiter per invitation id and per session, with uniform failure responses and short lockout; store the expiring counter and lockout durably in a dedicated limiter object | Durable Object storage (survives restart)                                                                 | Exact               |
+| 4. Staff routes               | Access in front, then a per-principal limiter after authentication                                                                                                               | Worker binding                                                                                            | Approximate         |
+| 5. Inquiry forms              | Limiter per route plus size/schema caps and a honeypot-free design (no CAPTCHA decision yet)                                                                                     | Worker binding                                                                                            | Approximate         |
+| 6. Durable Object WebSockets  | Per-connection message rate, message size cap, connection cap per group, idle timeout; close on violation                                                                        | Durable Object                                                                                            | Exact               |
 
 Common rules: deny-by-default behaviour when the limiter errors for protected or abuse-sensitive routes (fail closed), but fail open for public reads so an outage of the limiter does not take down visitor information; 429 with a fixed body and `Retry-After`; no key ever contains location, tokens or personal data; keys use route class plus an opaque identifier, hashed, never a raw IP in a log.
+
+For the strict invitation limiter, write each consumed attempt and lockout deadline to Durable Object storage before returning an allow or deny decision. Reconstruct state from storage after hibernation, eviction, or a runtime update; if storage is unavailable, deny the attempt. Expire and delete the opaque counter keys after the event window. In-memory caching may speed reads but is never the source of truth. Cloudflare states that hibernation discards in-memory state: https://developers.cloudflare.com/durable-objects/concepts/durable-object-lifecycle/ (retrieved 2026-11-14).
 
 ## 4. Proposed starting budgets (placeholders, not decisions)
 
@@ -53,7 +55,7 @@ Numbers are decided by the owners after the load test (ADR 0012 section 6), on t
 - Local tests with a fake limiter: denies after the limit, keys carry no personal data, uniform 429 body, `Retry-After` present, security headers on 429.
 - Failure-mode tests: limiter error on a protected route denies; on a public read allows; never throws to the client.
 - Load test against staging on the intended paid plan, measuring real overshoot of the per-location, eventually consistent counters.
-- DO limiter tests: exact counts, lockout, reset, and no persistence of keys beyond the event window.
+- DO limiter tests: exact counts, lockout, expiry and deletion, restart/hibernation recovery during the window, and fail-closed behaviour when storage is unavailable.
 
 ## 6. Open decisions
 
