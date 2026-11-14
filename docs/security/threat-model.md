@@ -48,6 +48,12 @@ Mitigations that exist today: strict CSP and security headers (tested), pinned t
 
 Risk ratings and the review sign-off are pending (M0 exit criterion: "threat model v1").
 
+## Sole-owner preview bootstrap boundary (2026-11-14)
+
+The preview bootstrap workflow can create a missing preview Worker and its initial SQLite-backed Durable Object namespace using a Cloudflare credential. Because `gkmraju` is the sole maintainer, the previous independent PR approval cannot be obtained. The owner-dispatched workflow instead checks the actor, manual confirmation, a recorded human preflight, a merged PR matching the immutable current `main` SHA, and local checks before the credential-bearing deployment step. GitHub's preview environment permits only `main`; the credential is scoped to the final preview step. The owner must inspect the Cloudflare account, Worker and namespace state and establish a single-writer window before dispatch.
+
+Residual risk: the preflight is an owner attestation, not a platform verification of account state or an atomic create-if-absent operation. A compromised owner account or concurrent out-of-band Cloudflare action could still cause an unsafe bootstrap. If the account, namespace or single-writer window is uncertain, stop; do not run or retry the workflow. This preview exception does not authorize production deployment, location persistence or public activation.
+
 ## Original public prototype candidate — review boundary
 
 This unmerged candidate adds only original public static pages and a six-resource offline allow-list. The canonical root and those assets must remain unconditional public representations; no authenticated or personalized response may be served at these paths. API/admin/auth, query-bearing, cross-origin, non-GET and Authorization-bearing requests are outside the service-worker cache. The redirected index.html alias is not precached or promised offline.
