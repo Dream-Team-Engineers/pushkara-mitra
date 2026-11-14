@@ -92,18 +92,18 @@ function launchChrome() {
     let buffer = '';
     const timer = setTimeout(() => reject(new Error('Chrome did not start')), START_TIMEOUT_MS);
     child.on('error', (error) => {
-      clearTimeout(timer);
+      globalThis.clearTimeout(timer);
       reject(error);
     });
     child.on('exit', () => {
-      clearTimeout(timer);
+      globalThis.clearTimeout(timer);
       reject(new Error('Chrome exited before it was ready'));
     });
     child.stderr.on('data', (chunk) => {
       buffer += chunk;
       const match = /DevTools listening on (ws:\/\/\S+)/.exec(buffer);
       if (match) {
-        clearTimeout(timer);
+        globalThis.clearTimeout(timer);
         resolve(match[1]);
       }
     });
