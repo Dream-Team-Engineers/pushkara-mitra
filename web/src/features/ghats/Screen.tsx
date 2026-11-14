@@ -46,7 +46,11 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
         {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
       </p>
       <p class="card__meta">{t('crowd.estimate')}</p>
-      {ghat.facilities.length === 0 ? null : (
+      {ghat.facilities.length === 0 ? (
+        ghat.synthetic ? null : (
+          <p class="card__meta">{t('ghats.facilitiesNotStated')}</p>
+        )
+      ) : (
         <ul class="tags" aria-label={t('ghats.facilities')}>
           {ghat.facilities.map((facility) => (
             <li key={facility}>{t(FACILITY_LABELS[facility])}</li>
@@ -67,7 +71,6 @@ export default function GhatsScreen() {
   return (
     <>
       <ScreenHeader titleKey="module.ghats.title" subtitleKey="module.ghats.subtitle" />
-      <p class="note">{t('ghats.note')}</p>
       <ChipGroup
         legend="ghats.filter"
         options={FILTERS}
@@ -80,14 +83,21 @@ export default function GhatsScreen() {
         resource={ghatsResource}
         render={(items) => {
           const visible = filterGhats(items, filter.value);
-          return visible.length === 0 ? (
-            <p class="note">{t('state.empty')}</p>
-          ) : (
-            <ul class="card-list">
-              {visible.map((ghat) => (
-                <GhatCard key={ghat.id} ghat={ghat} />
-              ))}
-            </ul>
+          // Samples say they are samples; approved data says what the source does not cover.
+          const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
+          return (
+            <>
+              <p class="note">{t(note)}</p>
+              {visible.length === 0 ? (
+                <p class="note">{t('state.empty')}</p>
+              ) : (
+                <ul class="card-list">
+                  {visible.map((ghat) => (
+                    <GhatCard key={ghat.id} ghat={ghat} />
+                  ))}
+                </ul>
+              )}
+            </>
           );
         }}
       />

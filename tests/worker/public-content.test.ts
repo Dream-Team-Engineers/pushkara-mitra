@@ -70,6 +70,14 @@ describe('shipped registry', () => {
   );
 });
 
+describe('shipped datasets awaiting approval', () => {
+  it.each(CONTENT_KINDS)('%s has no publishing problems once it has items', (kind) => {
+    const { dataset } = PUBLISHED_CONTENT[kind];
+    if (dataset.items.length === 0) return;
+    expect(publishableProblems(dataset)).toEqual([]);
+  });
+});
+
 describe('routing and query handling', () => {
   it('rejects unknown kinds without echoing them', async () => {
     const response = get('/api/public/content/secrets');
