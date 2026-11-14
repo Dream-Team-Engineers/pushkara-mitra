@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Public content API, owner identity recorded, staging redeployed — 2026-11-14 22:47:44 IST
+
+- **Task / outcome:** Commit `5740f16` adds `GET /api/public/content/{kind}` (served only with an owner approval record and passing validation; all six kinds are draft, so all return 404 `CONTENT_UNAVAILABLE` and the app keeps its labelled samples), records the owner's identity decisions (OQ-005, OQ-023) and adds `docs/operations/LAUNCH_APPROVALS.md`. Deployed to staging with `npm run ship:staging`, version `8ae56d06-0336-4316-bf37-9cbb7737bb38`. Result: **SUCCESS**.
+- **Owner decisions (2026-11-14):** Krishna Murthy Raju G (`gkmraju`), acting as an individual, is data fiduciary, grievance contact and nodal officer; contact dreamteamtech@zohomail.in. Counsel review **NEEDS REVIEW** (OQ-024). No legal compliance is certified.
+- **Actors:** Claude Code (agent) implemented and deployed at the owner's direction. Independent reviewer: **NONE**.
+- **Evidence:** `npm run check`: 41 files passed, 1 skipped; 571 tests passed, 24 skipped. Live: `/healthz` 200; `/api/public/content/ghats` and `/helplines` 404 `CONTENT_UNAVAILABLE`; unknown kind 404 `NOT_FOUND`; query string 400; `/` 200.
+- **Rollback:** `npx wrangler rollback 594c39b8-7aa6-4d6d-b17a-a21ad19bc07e --env staging`.
+- **Next action / owner:** owner works through `docs/operations/LAUNCH_APPROVALS.md` steps 2–7. Production not deployed.
+
 ## Staging deployed from Windows — 2026-11-14 22:27:03 IST
 
 - **Task / outcome:** Direct staging deployment under the owner-approved workflow in CLAUDE.md. Source commit `3b5c285` on `main` (which also makes the shell-based guards run on Windows via Git Bash). Deployed with `npm run ship:staging` to Worker `pushkara-mitra-staging`, version `594c39b8-7aa6-4d6d-b17a-a21ad19bc07e`. Result: **SUCCESS**.
