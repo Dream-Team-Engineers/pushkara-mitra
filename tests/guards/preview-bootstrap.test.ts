@@ -18,15 +18,25 @@ const basePr = {
   base: { ref: 'main', repo: { full_name: repository } },
   head: { sha: headSha, repo: { full_name: repository } },
 };
-function sourceResult(pr: unknown) {
+const approval = {
+  user: { login: 'siddhu949', type: 'User' },
+  state: 'APPROVED',
+  commit_id: headSha,
+  body: 'Reviewed preview-only provisioning.\nAPPROVE_PREVIEW_BOOTSTRAP',
+  submitted_at: '2026-11-04T11:00:00Z',
+};
+
+function reviewResult(pr: unknown, reviews: unknown) {
   const dir = mkdtempSync(join(tmpdir(), 'preview-review-'));
   try {
     writeFileSync(join(dir, 'pr.json'), JSON.stringify(pr));
+    writeFileSync(join(dir, 'reviews.json'), JSON.stringify(reviews));
     return spawnSync(
       process.execPath,
       [
         join(root, 'scripts/verify-preview-bootstrap-review.mjs'),
         join(dir, 'pr.json'),
+        join(dir, 'reviews.json'),
         mergeSha,
         repository,
         '99',
@@ -38,7 +48,7 @@ function sourceResult(pr: unknown) {
   }
 }
 
-describe('manual owner bootstrap boundary', () => {
+describe('manual bootstrap approval boundary', () => {
   it('is dispatch-only, checks immutable main and exposes Cloudflare secrets only to deployment', () => {
     const trigger = workflow.split('\non:\n')[1]?.split('\npermissions:')[0];
     expect(trigger).toContain('workflow_dispatch:');
@@ -57,7 +67,6 @@ describe('manual owner bootstrap boundary', () => {
   if (!guard) throw new Error('Bootstrap manual intent guard missing');
   const validIntent = {
     BOOTSTRAP_EVENT: 'workflow_dispatch',
-    BOOTSTRAP_ACTOR: 'gkmraju',
     BOOTSTRAP_REF: 'refs/heads/main',
     BOOTSTRAP_CONFIRMATION: 'BOOTSTRAP_PREVIEW',
     BOOTSTRAP_PR: '99',
@@ -68,7 +77,6 @@ describe('manual owner bootstrap boundary', () => {
   });
   for (const [key, value] of Object.entries({
     BOOTSTRAP_EVENT: 'pull_request',
-    BOOTSTRAP_ACTOR: 'someone-else',
     BOOTSTRAP_REF: 'refs/heads/feature',
     BOOTSTRAP_CONFIRMATION: 'yes',
     BOOTSTRAP_PR: '99; echo unsafe',
@@ -81,13 +89,38 @@ describe('manual owner bootstrap boundary', () => {
     });
   }
 
-  it('accepts only a merged source PR at the immutable main commit', () => {
-    expect(sourceResult(basePr).status).toBe(0);
-    expect(sourceResult({ ...basePr, merged_at: null }).status).toBe(1);
-    expect(sourceResult({ ...basePr, merge_commit_sha: 'c'.repeat(40) }).status).toBe(1);
-    expect(
-      sourceResult({ ...basePr, base: { ref: 'other', repo: { full_name: repository } } }).status,
-    ).toBe(1);
+  it('accepts final-head independent approval across paginated evidence', () => {
+    expect(reviewResult(basePr, [[], [approval]]).status).toBe(0);
+  });
+  const invalidReviews = [
+    [],
+    [{ ...approval, user: { login: 'gkmraju', type: 'User' } }],
+    [{ ...approval, user: { login: 'other-user', type: 'User' } }],
+    [{ ...approval, user: { login: 'siddhu949', type: 'Bot' } }],
+    [{ ...approval, commit_id: 'c'.repeat(40) }],
+    [{ ...approval, body: 'LGTM' }],
+    [approval, { ...approval, state: 'DISMISSED', submitted_at: '2026-11-04T11:30:00Z' }],
+    [
+      approval,
+      {
+        ...approval,
+        user: { login: 'amruthamudunuru39', type: 'User' },
+        state: 'CHANGES_REQUESTED',
+        submitted_at: '2026-11-04T11:30:00Z',
+      },
+    ],
+  ];
+  it.each(invalidReviews.map((reviews, i) => ({ reviews, i })))(
+    'rejects missing/self/stale/non-owner/dismissed approval case $i',
+    ({ reviews }) => {
+      expect(reviewResult(basePr, [reviews]).status).toBe(1);
+    },
+  );
+  it('rejects unmerged PRs and a different immutable run commit', () => {
+    expect(reviewResult({ ...basePr, merged_at: null }, [[approval]]).status).toBe(1);
+    expect(reviewResult({ ...basePr, merge_commit_sha: 'c'.repeat(40) }, [[approval]]).status).toBe(
+      1,
+    );
   });
 });
 
