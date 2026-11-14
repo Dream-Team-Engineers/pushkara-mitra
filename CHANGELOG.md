@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.11.0...v1.12.0) (2026-11-14)
+
+
+### Features
+
+* **content:** owner-approved public listings API and launch guide ([5740f16](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5740f16f0db4c70d99fc68c305397fa9e03359a1))
+* **ghats:** draft 15 official East Godavari ghats for owner approval ([8dd68a5](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/8dd68a5b04fee60d6904219692bd992c9cd8aecb))
+
 ## [1.11.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.10.0...v1.11.0) (2026-11-14)
 
 
