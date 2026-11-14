@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup-github.sh â€” idempotent GitHub configuration for Pushkara Mitra (Kickoff Prompt V1).
+# setup-github.sh — idempotent GitHub configuration for Pushkara Mitra (Kickoff Prompt V1).
 #
 # Usage:
 #   GH_REPO=<repo> OWNER=<user> DRY_RUN=1 ./scripts/setup-github.sh
