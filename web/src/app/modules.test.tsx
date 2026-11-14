@@ -64,6 +64,8 @@ describe('public module screens', () => {
     ['updates', UpdatesScreen],
     ['conditions', ConditionsScreen],
   ] as const;
+  /** Screens backed by an owner-approved dataset (ghats; conditions reads the same ghat list). */
+  const OWNER_APPROVED = new Set<string>(['ghats', 'conditions']);
 
   it.each(SCREENS)('%s shows a loading skeleton before data arrives', (_name, Screen) => {
     const html = render(<Screen />);
@@ -78,9 +80,24 @@ describe('public module screens', () => {
       const html = render(<Screen />);
       expect(countTag(html, 'h1'), name).toBe(1);
       expect(accessibilityIssues(html), name).toEqual([]);
-      expect(html, name).toContain(t('state.synthetic'));
-      expect(html, name).toContain(t('state.unverified'));
+      if (OWNER_APPROVED.has(name)) {
+        // Approved official data carries no sample badge and never states a crowd level.
+        expect(html, name).not.toContain(t('state.synthetic'));
+        expect(html, name).not.toContain(t('crowd.low'));
+      } else {
+        expect(html, name).toContain(t('state.synthetic'));
+        expect(html, name).toContain(t('state.unverified'));
+      }
     }
+  });
+
+  it('shows approved ghats with their source and without invented facilities', async () => {
+    await load();
+    const html = render(<GhatsScreen />);
+    expect(html).toContain('Kotilingala Revu');
+    expect(html).toContain(t('ghats.noteVerified'));
+    expect(html).not.toContain(t('ghats.note'));
+    expect(html).toContain(t('ghats.facilitiesNotStated'));
   });
 
   it('labels sponsored stays and discloses the ranking criteria', async () => {
@@ -92,11 +109,12 @@ describe('public module screens', () => {
     expect(html).not.toMatch(/href="https?:/);
   });
 
-  it('shows crowd levels as text and as an estimate, never as safety instructions', async () => {
+  it('shows no crowd level for official ghats, and frames crowds as estimates', async () => {
     await load();
     const html = render(<ConditionsScreen />);
-    expect(html).toContain(t('crowd.low'));
-    expect(html).toContain(t('crowd.high'));
+    expect(html).toContain(t('crowd.noData'));
+    expect(html).not.toContain(t('crowd.low'));
+    expect(html).not.toContain(t('crowd.high'));
     expect(html).toContain(t('conditions.crowdNote'));
   });
 

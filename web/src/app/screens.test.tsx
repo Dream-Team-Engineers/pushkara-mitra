@@ -72,8 +72,8 @@ describe('Home screen', () => {
     expect(html).not.toMatch(/\[TEMP\]|°C/);
   });
 
-  it('says the dates are not yet officially confirmed', () => {
-    expect(render(<HomeScreen />)).toContain(t('home.countdown.pending'));
+  it('drops the "not confirmed" note once the owner confirmed the dates (OQ-004)', () => {
+    expect(render(<HomeScreen />)).not.toContain(t('home.countdown.pending'));
   });
 });
 

@@ -29,9 +29,10 @@ describe('countdown', () => {
     expect(countdown(EVENT.end + 1)).toEqual({ phase: 'after' });
   });
 
-  it('keeps the dates marked as not officially confirmed (OQ-004)', () => {
-    expect(EVENT.datesConfirmed).toBe(false);
+  it('uses the owner-confirmed window of 26 June to 7 July 2027 IST (OQ-004)', () => {
+    expect(EVENT.datesConfirmed).toBe(true);
     expect(new Date(EVENT.start).toISOString()).toBe('2027-06-25T18:30:00.000Z');
+    expect(new Date(EVENT.end).toISOString()).toBe('2027-07-07T18:29:59.000Z');
   });
 });
 

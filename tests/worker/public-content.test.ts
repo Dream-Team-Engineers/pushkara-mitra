@@ -48,12 +48,29 @@ function approvedGhats(items: readonly Record<string, unknown>[] = [GHAT]): Cont
 }
 const get = (path: string) => handlePublicContent(new URL(`https://app.test${path}`), entries());
 
+/** Kinds the owner has approved. Adding one here must match an approval record in the registry. */
+const APPROVED_KINDS: readonly ContentKind[] = ['ghats'];
+const DRAFT_KINDS = CONTENT_KINDS.filter((kind) => !APPROVED_KINDS.includes(kind));
+
 describe('shipped registry', () => {
-  it('serves nothing until a human approves a dataset', () => {
-    for (const kind of CONTENT_KINDS) expect(approvedDataset(kind)).toBeNull();
+  it('serves exactly the owner-approved kinds', () => {
+    for (const kind of CONTENT_KINDS) {
+      expect(approvedDataset(kind) !== null).toBe(APPROVED_KINDS.includes(kind));
+    }
   });
 
-  it.each(CONTENT_KINDS)(
+  it('serves the approved ghats through the Worker', async () => {
+    const response = await worker.fetch(
+      new Request('https://app.test/api/public/content/ghats'),
+      {},
+    );
+    expect(response.status).toBe(200);
+    const body: unknown = await response.json();
+    expect(isPublishedDataset(body, 'ghats')).toBe(true);
+    expect((body as { items: unknown[] }).items).toHaveLength(15);
+  });
+
+  it.each(DRAFT_KINDS)(
     'answers 404 CONTENT_UNAVAILABLE for %s through the Worker',
     async (kind) => {
       const response = await worker.fetch(

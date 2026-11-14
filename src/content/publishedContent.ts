@@ -81,7 +81,13 @@ const GHATS_ENTRY: ContentEntry = {
       ghat('vangalapudi-ghat', 'Vangalapudi Ghat', 'other', 'Other nearby ghats'),
     ],
   },
-  review: { status: 'draft' },
+  review: {
+    status: 'approved',
+    reviewer: 'gkmraju',
+    reviewedRevision: '8dd68a5',
+    reviewedOn: '2026-11-14',
+    scope: 'Owner compared all 15 names and groupings with https://eastgodavari.ap.gov.in/ghats/',
+  },
 };
 
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {

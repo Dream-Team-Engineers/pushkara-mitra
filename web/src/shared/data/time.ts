@@ -1,9 +1,10 @@
 import { signal } from '@preact/signals';
 
 /**
- * Provisional Godavari Pushkaralu 2027 window (open question OQ-004).
- * Dates are NOT officially confirmed; the UI says so while `datesConfirmed` is false.
- * Times are Indian Standard Time.
+ * Godavari Pushkaralu 2027 window. Confirmed by the owner (gkmraju) on 2026-11-14 from
+ * https://eastgodavari.ap.gov.in/godavari-pushkaralu-2027/ ("held from June 26 to July 7, 2027",
+ * page updated 29.01.2026), closing OQ-004. Set `datesConfirmed` back to false if an official
+ * order changes them. Times are Indian Standard Time.
  */
 export interface EventWindow {
   readonly start: number;
@@ -13,7 +14,7 @@ export interface EventWindow {
 export const EVENT: EventWindow & { readonly datesConfirmed: boolean } = {
   start: Date.parse('2027-06-26T00:00:00+05:30'),
   end: Date.parse('2027-07-07T23:59:59+05:30'),
-  datesConfirmed: false,
+  datesConfirmed: true,
 };
 
 export type Countdown =
