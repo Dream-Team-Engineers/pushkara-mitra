@@ -21,7 +21,6 @@ DRY_RUN="${DRY_RUN:-1}"
 REPO="$GH_OWNER/$GH_REPO"
 # Must match job names in .github/workflows exactly (Kickoff Prompt V1, section 6.3).
 REQUIRED_CHECKS=(ci-lint ci-typecheck ci-test sast sca secrets-scan licence-check sbom workflow-security pr-checklist pr-title)
-GITHUB_ACTIONS_APP_ID=15368   # GitHub Actions app, so release-please can create tags
 ADMIN_ROLE_ID=5               # built-in "Repository admin" role
 
 log()  { printf '\n==> %s\n' "$*"; }
@@ -188,14 +187,16 @@ rulesets() {
   }')"
   upsert_ruleset protect-main "$main"
 
-  tags="$(jq -n --argjson app "$GITHUB_ACTIONS_APP_ID" --argjson admin "$ADMIN_ROLE_ID" '{
+  # release-please creates tags with GITHUB_TOKEN. GitHub does not accept the
+  # built-in Actions app as a ruleset bypass actor for this repository, so
+  # allow tag creation and prevent later edits or deletion instead.
+  tags="$(jq -n --argjson admin "$ADMIN_ROLE_ID" '{
     name: "protect-release-tags", target: "tag", enforcement: "active",
     conditions: {ref_name: {include: ["refs/tags/v*"], exclude: []}},
     bypass_actors: [
-      {actor_id: $admin, actor_type: "RepositoryRole", bypass_mode: "always"},
-      {actor_id: $app, actor_type: "Integration", bypass_mode: "always"}
+      {actor_id: $admin, actor_type: "RepositoryRole", bypass_mode: "always"}
     ],
-    rules: [{type: "creation"}, {type: "update"}, {type: "deletion"}]
+    rules: [{type: "update"}, {type: "deletion"}]
   }')"
   upsert_ruleset protect-release-tags "$tags"
   if [[ "$DRY_RUN" != 1 ]] && ! query "repos/$REPO/branches/main" --jq .protected | grep -qx true; then
