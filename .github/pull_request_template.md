@@ -22,5 +22,7 @@ Tick every item. For a conditional item that does not apply, tick it and write "
 - [ ] Sole maintainer and risk acceptance recorded
 - [ ] Privacy/security/child-safety impact and required approvals recorded
 - [ ] No unapproved production deployment, live payments, location persistence or public missing-person feature
-- [ ] CI and staging functional tests reviewed; rollback documented
-- [ ] Required CI checks verified before merge (a checked box alone is not evidence)
+
+## Merge review
+
+At merge time, review CI and staging functional results (or record N/A), confirm the rollback path, and verify the required checks on the current PR head in GitHub. The branch ruleset enforces required checks; the submission checklist does not attest to checks that have not run yet.
