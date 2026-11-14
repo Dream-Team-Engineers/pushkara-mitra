@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { isWindows } from './posix-shell';
 
 const script = join(import.meta.dirname, '../../scripts/audit-dev-dependencies.mjs');
 const report = (moderate: number, high = 0) => ({
@@ -33,7 +34,9 @@ function audit(stdout: unknown, status: number, raw = false, legacy = false) {
   }
 }
 
-describe('informational dependency findings versus scanner failure', () => {
+// The script runs on Linux CI runners and the test mocks `npm` with a #!/bin/sh file, which
+// Node cannot execute on Windows. CI still runs this suite on every push.
+describe.skipIf(isWindows)('informational dependency findings versus scanner failure', () => {
   it('accepts a completed clean audit', () => {
     expect(audit(report(0), 0).status).toBe(0);
   });

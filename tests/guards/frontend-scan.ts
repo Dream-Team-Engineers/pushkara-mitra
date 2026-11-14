@@ -72,5 +72,8 @@ export function listCodeFiles(dir: string): string[] {
 }
 
 export function readCode(root: string, files: string[]): { path: string; source: string }[] {
-  return files.map((file) => ({ path: relative(root, file), source: readFileSync(file, 'utf8') }));
+  return files.map((file) => ({
+    path: relative(root, file).replaceAll('\\', '/'),
+    source: readFileSync(file, 'utf8'),
+  }));
 }

@@ -2,7 +2,11 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { bash, hasPosixBash, isWindows, toolPath } from './posix-shell';
+
+// Each case starts Git Bash and several Node processes; that is far slower on Windows.
+if (isWindows) vi.setConfig({ testTimeout: 60_000 });
 
 const script = join(import.meta.dirname, '../../scripts/setup-github.sh');
 const mainPolicy = { id: 1, name: 'main', type: 'branch' };
@@ -112,10 +116,10 @@ function run(command: string, mode = 'ok', policies: unknown[] = [mainPolicy], d
       }),
     );
     writeFileSync(calls, '');
-    const result = spawnSync('bash', ['-c', 'source "$1"; eval "$2"', '--', script, command], {
+    const result = spawnSync(bash, ['-c', 'source "$1"; eval "$2"', '--', script, command], {
       encoding: 'utf8',
       env: {
-        PATH: `${bin}:${dirname(process.execPath)}:/usr/bin:/bin`,
+        PATH: toolPath(bin, dirname(process.execPath)),
         MOCK_MODE: mode,
         MOCK_STATE: state,
         MOCK_CALLS: calls,
@@ -138,7 +142,7 @@ function run(command: string, mode = 'ok', policies: unknown[] = [mainPolicy], d
   }
 }
 
-describe('deployment branch policy verification with mocked GitHub', () => {
+describe.skipIf(!hasPosixBash)('deployment branch policy verification with mocked GitHub', () => {
   it('verifies exact existing main branch policy without creating it', () => {
     const result = run('add_branch_policy preview main branch');
     expect(result.status).toBe(0);
@@ -190,7 +194,7 @@ describe('deployment branch policy verification with mocked GitHub', () => {
   );
 });
 
-describe('environment controls are verified, not assumed', () => {
+describe.skipIf(!hasPosixBash)('environment controls are verified, not assumed', () => {
   it('requests and confirms main-only environments plus owner-operated production review', () => {
     const result = run('environments');
     expect(result.status).toBe(0);
@@ -242,7 +246,7 @@ describe('environment controls are verified, not assumed', () => {
   });
 });
 
-describe('repository auto-merge stays disabled', () => {
+describe.skipIf(!hasPosixBash)('repository auto-merge stays disabled', () => {
   it('requests and reads back disabled auto-merge', () => {
     const result = run('repo_settings');
     expect(result.status).toBe(0);
@@ -258,7 +262,7 @@ describe('repository auto-merge stays disabled', () => {
   });
 });
 
-describe('solo-maintainer ruleset with mocked GitHub', () => {
+describe.skipIf(!hasPosixBash)('solo-maintainer ruleset with mocked GitHub', () => {
   it('requires PR and current checks without an impossible human approval', () => {
     const result = run('rulesets');
     expect(result.status).toBe(0);

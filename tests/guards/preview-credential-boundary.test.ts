@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
+import { bash, hasPosixBash, toolPath } from './posix-shell';
 
 const source = readFileSync(
   join(import.meta.dirname, '../../.github/workflows/preview.yml'),
@@ -64,12 +65,12 @@ describe('preview credential isolation pause', () => {
     },
   );
 
-  it('fails visibly without invoking any deployment tooling', () => {
+  it.skipIf(!hasPosixBash)('fails visibly without invoking any deployment tooling', () => {
     const script = source.split('        run: |\n')[1]?.replaceAll(/^ {10}/gm, '');
     expect(script).toBeDefined();
-    const result = spawnSync('bash', ['-c', script ?? 'exit 99'], {
+    const result = spawnSync(bash, ['-c', script ?? 'exit 99'], {
       encoding: 'utf8',
-      env: { PATH: '/usr/bin:/bin' },
+      env: { PATH: toolPath() },
     });
     expect(result.status).toBe(1);
     expect(result.stdout).toContain('Preview upload is paused');

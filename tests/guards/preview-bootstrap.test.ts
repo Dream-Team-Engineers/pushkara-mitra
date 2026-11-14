@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { bash, isWindows } from './posix-shell';
 
 const root = join(import.meta.dirname, '../..');
 const workflow = readFileSync(join(root, '.github/workflows/bootstrap-preview.yml'), 'utf8');
@@ -64,7 +65,7 @@ describe('manual owner bootstrap boundary', () => {
     BOOTSTRAP_PREFLIGHT: 'true',
   };
   it('accepts explicit main dispatch intent only', () => {
-    expect(spawnSync('bash', ['-c', guard], { env: validIntent }).status).toBe(0);
+    expect(spawnSync(bash, ['-c', guard], { env: validIntent }).status).toBe(0);
   });
   for (const [key, value] of Object.entries({
     BOOTSTRAP_EVENT: 'pull_request',
@@ -75,9 +76,9 @@ describe('manual owner bootstrap boundary', () => {
     BOOTSTRAP_PREFLIGHT: 'false',
   })) {
     it(`rejects invalid ${key}`, () => {
-      expect(
-        spawnSync('bash', ['-c', guard], { env: { ...validIntent, [key]: value } }).status,
-      ).toBe(1);
+      expect(spawnSync(bash, ['-c', guard], { env: { ...validIntent, [key]: value } }).status).toBe(
+        1,
+      );
     });
   }
 
@@ -160,7 +161,9 @@ function deployResult(mode: string, credentials = 'both') {
   }
 }
 
-describe('one-time preview deployment without external calls', () => {
+// bootstrap-preview.mjs runs on Linux CI and the test mocks npx/curl with shebang files, which
+// Node cannot execute on Windows. CI still runs this suite on every push.
+describe.skipIf(isWindows)('one-time preview deployment without external calls', () => {
   it.each(['none', 'token-only'])('does not deploy with %s credentials', (credentials) => {
     const result = deployResult('ok', credentials);
     expect(result.status).toBe(1);
