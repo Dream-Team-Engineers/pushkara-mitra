@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## First official content approved and on staging — 2026-11-14 23:29:20 IST
+
+- **Task / outcome:** Owner `gkmraju` approved the 15 ghat names and groupings from https://eastgodavari.ap.gov.in/ghats/ (page updated 28.11.2025; reviewed at `8dd68a5`) and confirmed the festival dates 26 June to 7 July 2027 from https://eastgodavari.ap.gov.in/godavari-pushkaralu-2027/ (page updated 29.01.2026), closing OQ-004. Commit `3ea871b` (on top of release `1.12.0`, `294936e`) deployed to staging, version `c2f2ed80-b7f6-4387-b75d-8bd3d7b47deb`. Result: **SUCCESS**.
+- **Sources not usable:** https://godavaripushkaram2027.ap.gov.in/ and https://rmc.ap.gov.in/events/events_list render in the browser with JavaScript; automated reading returned only page titles, so nothing was taken from them. The district Hotels page lists names only (no address, distance, price or contact), so stays stay on samples.
+- **Deployment incident:** an earlier staging deploy at 23:25:48 IST (version `b8e165a8-d23e-46f8-9366-919474dcc604`) ran from uncommitted working-tree files after a failed commit command. It contained the same changes and was replaced 3.5 minutes later by the committed build above.
+- **Evidence:** `npm ci` then `npm run ship:staging`: 578 tests passed, 24 skipped. Live: `/healthz` 200; `/api/public/content/ghats` 200 with 15 items, all `synthetic: false`, all `crowd: noData`; `/api/public/content/stays` 404; `/` 200.
+- **Rollback:** `npx wrangler rollback 8ae56d06-0336-4316-bf37-9cbb7737bb38 --env staging`.
+- **Independent reviewer:** NONE. Native-language review of the new te/hi strings is pending (OQ-019).
+
 ## Public content API, owner identity recorded, staging redeployed — 2026-11-14 22:47:44 IST
 
 - **Task / outcome:** Commit `5740f16` adds `GET /api/public/content/{kind}` (served only with an owner approval record and passing validation; all six kinds are draft, so all return 404 `CONTENT_UNAVAILABLE` and the app keeps its labelled samples), records the owner's identity decisions (OQ-005, OQ-023) and adds `docs/operations/LAUNCH_APPROVALS.md`. Deployed to staging with `npm run ship:staging`, version `8ae56d06-0336-4316-bf37-9cbb7737bb38`. Result: **SUCCESS**.
