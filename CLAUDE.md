@@ -2,12 +2,17 @@
 
 Operational summary. The binding rules are in [docs/ENGINEERING_STANDARDS.md](docs/ENGINEERING_STANDARDS.md) (currently a placeholder, OQ-002) and the Kickoff Prompt V1.
 
-## Fast Deployment Protocol (Solo/Rapid Mode)
-- Do NOT create feature branches, pull requests, or trigger release-please unless explicitly asked.
-- Work directly on the current branch and commit changes locally with clear messages.
-- Before deploying, ALWAYS run npm run check to verify lint, typecheck, format, and ADR 0004 security guard tests.
-- Deploy directly to Cloudflare from the terminal using npx wrangler deploy (or npx wrangler deploy --env staging if configured).
-- 
+## Direct deployment (owner-approved workflow)
+
+The owner allowed a direct Cloudflare deployment workflow on 2026-11-14. Use it only when a task explicitly calls for deployment to a named environment. This is a deployment path, not permission to push to protected `main`, merge a PR, or treat a release as deployed.
+
+1. Identify the exact source commit and destination account/environment. Keep credentials in the local credential store or private prompt.
+2. Run `npm ci`, `npm run check`, and `npm run build:web` from that source. The deployment scripts also run the last two checks and build steps before upload.
+3. Use `npm run ship:staging` for staging. Use `npm run ship:production` only after the owner explicitly approves that production release and its outstanding legal and operational gates; the production CI workflow remains disabled until separately reviewed.
+4. Verify the deployed URL and `/healthz`, then record the source commit, environment, time, result, and rollback route. Do not claim a successful deployment from a passing local command alone.
+
+GitHub changes to `main` still use signed commits, PRs, required checks, and review. Direct Cloudflare deployment does not change GitHub branch protection or trigger Release Please.
+
 ## Commands
 
 | Task            | Command                                                             |
