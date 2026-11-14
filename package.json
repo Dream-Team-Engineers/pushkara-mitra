@@ -10,8 +10,8 @@
     "npm": ">=10"
   },
   "scripts": {
-    "ship": "npm run check && npx wrangler deploy",
-    "ship:staging": "npm run check && npx wrangler deploy --env staging"
+    "ship:staging": "npm run check && npm run build:web && npx wrangler deploy --env staging",
+    "ship:production": "npm run check && npm run build:web && npx wrangler deploy --env production",
     "dev": "vite build && wrangler dev",
     "dev:web": "vite",
     "build:web": "vite build",
