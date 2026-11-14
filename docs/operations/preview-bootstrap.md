@@ -8,7 +8,7 @@ PR #34 now reports upload failures honestly. Wrangler attempt 3 reached `version
 
 Free-plan Durable Objects need SQLite-backed namespace provisioning. [ADR 0004 proposed Amendment 2](../decisions/0004-ephemeral-location.md#amendment-2-initial-preview-namespace-on-confirmed-workers-free-2026-11-04) proposes preview-only `new_sqlite_classes`, keeping the initial `v1` tag and the store unused. Staging/top-level/production and the storage prohibition are unchanged. The sole owner must record a technical disposition of this amendment before use; a proposal merge is not an approval record.
 
-## Required human preflight â€” do not guess
+## Required human preflight — do not guess
 
 An authorized owner must check all of the following and retain evidence without sharing secret values:
 
@@ -22,7 +22,7 @@ An authorized owner must check all of the following and retain evidence without 
 
 After the owner records the decision and merges the source PR, run immediately before further main changes. The merged PR's `merge_commit_sha` must equal the immutable workflow run SHA and current main. The workflow checks current main before dependency installation and again before deployment; if main moved, stop and inspect the new revision. Never reset main or select an arbitrary old ref to make the check pass.
 
-In GitHub **Actions â†’ Bootstrap preview (manual, one time) â†’ Run workflow**:
+In GitHub **Actions → Bootstrap preview (manual, one time) → Run workflow**:
 
 - Branch: **main**.
 - `confirmation`: **BOOTSTRAP_PREVIEW**.
