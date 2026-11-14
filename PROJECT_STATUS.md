@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Staging deployed from Windows — 2026-11-14 22:27:03 IST
+
+- **Task / outcome:** Direct staging deployment under the owner-approved workflow in CLAUDE.md. Source commit `3b5c285` on `main` (which also makes the shell-based guards run on Windows via Git Bash). Deployed with `npm run ship:staging` to Worker `pushkara-mitra-staging`, version `594c39b8-7aa6-4d6d-b17a-a21ad19bc07e`. Result: **SUCCESS**.
+- **Actors:** executed by Claude Code (agent) at the request of the local operator, using the operator's Wrangler OAuth login. Accountable human owner: `gkmraju` (per prior entry). Independent reviewer: **NONE**; none is claimed.
+- **Evidence:** `npm run check` inside the ship script: lint, typecheck and format passed; vitest 39 files passed, 1 skipped; 535 tests passed, 24 skipped (two Linux-only suites skipped on Windows, still run by CI). `vite build` passed. Post-deploy: `GET /healthz` → 200 `{"status":"ok"}`; `GET /` → 200 with CSP, HSTS, nosniff, Referrer-Policy and Permissions-Policy headers; `POST /` → 405.
+- **Rollback:** `npx wrangler rollback 9e3d3224-9b6b-4ae1-9275-1d3860125969 --env staging` (previous staging version, created 2026-11-14 16:49:42 UTC).
+- **Not established:** feature UAT, accessibility, load, legal sign-off or production readiness. Production was not deployed; it still needs the owner's explicit approval after the legal and operational gates.
+
 ## Solo-maintainer governance verified — 2026-11-14 14:05:51 IST
 
 - **Task / outcome:** At the owner's direction, `gkmraju` is the sole available maintainer. Codex prepared and merged [#114](https://github.com/Dream-Team-Engineers/pushkara-mitra/pull/114), [#115](https://github.com/Dream-Team-Engineers/pushkara-mitra/pull/115) and [#116](https://github.com/Dream-Team-Engineers/pushkara-mitra/pull/116) after their required current-head checks passed. There was no independent human reviewer; none is claimed. The reviewed changes enforce a PR with zero required approving reviews, strict required checks, resolved conversations, signed commits and squash-only history. The repository remains public by owner choice, with private visibility open for reconsideration after project completion.
