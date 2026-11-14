@@ -31,4 +31,4 @@ jobs:
 
   # Production deployment is intentionally disconnected from release creation.
   # Re-enable only in a separately reviewed change after an explicit human
-  # release decision and verification of enforceable independent approvals.
+  # release decision and verification of enforceable repository controls.

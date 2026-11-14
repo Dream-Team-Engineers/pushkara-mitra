@@ -1,15 +1,15 @@
 # Team ownership coverage for all paths; critical paths listed explicitly below.
 
-*                                 @amruthamudunuru39 @siddhu949 @gkmraju
-/src/payments*                    @amruthamudunuru39 @siddhu949 @gkmraju
-/src/donations*                   @amruthamudunuru39 @siddhu949 @gkmraju
-/src/durable-objects/             @amruthamudunuru39 @siddhu949 @gkmraju
-/src/security/                    @amruthamudunuru39 @siddhu949 @gkmraju
-/migrations/                      @amruthamudunuru39 @siddhu949 @gkmraju
-/docs/compliance/                 @amruthamudunuru39 @siddhu949 @gkmraju
-/docs/legal/                      @amruthamudunuru39 @siddhu949 @gkmraju
-/docs/security/                   @amruthamudunuru39 @siddhu949 @gkmraju
-/.github/                         @amruthamudunuru39 @siddhu949 @gkmraju
-/scripts/                         @amruthamudunuru39 @siddhu949 @gkmraju
-/wrangler.toml                    @amruthamudunuru39 @siddhu949 @gkmraju
-/docs/ENGINEERING_STANDARDS.md    @amruthamudunuru39 @siddhu949 @gkmraju
+*                                 @gkmraju
+/src/payments*                    @gkmraju
+/src/donations*                   @gkmraju
+/src/durable-objects/             @gkmraju
+/src/security/                    @gkmraju
+/migrations/                      @gkmraju
+/docs/compliance/                 @gkmraju
+/docs/legal/                      @gkmraju
+/docs/security/                   @gkmraju
+/.github/                         @gkmraju
+/scripts/                         @gkmraju
+/wrangler.toml                    @gkmraju
+/docs/ENGINEERING_STANDARDS.md    @gkmraju

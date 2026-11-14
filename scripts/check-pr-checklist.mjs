@@ -14,11 +14,11 @@ export const requiredItems = [
   'Strings externalised; works at 200% text size and with a screen reader',
   '`needs-owner-review` label added if payments, donations, location, children or audit code is touched',
   'No secrets',
-  'Human owner and independent reviewer identified',
+  'Sole maintainer and risk acceptance recorded',
   'Privacy/security/child-safety impact and required approvals recorded',
   'No unapproved production deployment, live payments, location persistence or public missing-person feature',
   'CI and staging functional tests reviewed; rollback documented',
-  'Independent human review and required checks verified (CODEOWNERS alone is not enforcement)',
+  'Required CI checks verified before merge (a checked box alone is not evidence)',
 ];
 
 export function findMissingItems(body) {
@@ -71,14 +71,14 @@ function main() {
     contradictory = findPendingReviewClaims(body);
   if (missing.length || open.length || contradictory.length) {
     console.error(
-      'Unfinished or contradictory checklist items remain. Leave pending reviews unticked; obtain the actual independent review first.',
+      'Missing, unfinished or contradictory checklist items remain. Record the owner and verify required CI before merging.',
     );
     for (const item of missing) console.error(`Missing checked item: ${item}`);
     for (const item of [...open, ...contradictory]) console.error(item);
     process.exit(1);
   }
   console.log(
-    'Checklist attestations are consistent. Actual approvals require independent GitHub review evidence.',
+    'Checklist attestations are consistent. Required CI and merge rules must still be verified on GitHub.',
   );
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

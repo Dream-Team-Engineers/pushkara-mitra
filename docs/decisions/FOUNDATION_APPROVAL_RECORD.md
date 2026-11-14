@@ -4,7 +4,8 @@ Recorded 2026-11-05 (IST). Base: `d4f33d150ac499c9eae92c2f247c369a15693d4f`. Thi
 
 ## Owner updates — 2026-11-14 (IST)
 
-- **Repository visibility:** The owner selected public for now, with a possible private-repository decision after project completion. This supersedes item 2 of the 5 Nov instructions below. Protection enforcement and independent review still require live verification; see ADR 0007.
+- **Repository visibility:** The owner selected public for now, with a possible private-repository decision after project completion. This supersedes item 2 of the 5 Nov instructions below. Protection enforcement still requires live verification; see ADR 0007 and the maintainer-availability update below.
+- **Maintainer availability:** The owner now states `gkmraju` is the sole available maintainer; former LEAD and DEV2 have moved to another project. For development PRs the owner authorizes a zero-approval, no-bypass ruleset with required current CI and recorded owner risk acceptance. This supersedes the earlier independent-review requirement while one maintainer is available; no past merge is retroactively approved. Production remains disabled pending a separate launch decision. See ADR 0007 for the intended controls and verify them live before claiming enforcement.
 - **Prelaunch identity decision:** The data fiduciary legal entity and named nodal/grievance contact are **UNDECIDED**. The owner asked that this question not be raised again during project completion. Record it as an important prelaunch gate and revisit it before launch; do not invent names, notices or legal approval. Work that depends on identified legal responsibility or live personal-data processing remains gated until the decision is recorded and reviewed.
 
 ## Actual LEAD instructions received

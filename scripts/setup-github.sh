@@ -2,8 +2,8 @@
 # setup-github.sh — idempotent GitHub configuration for Pushkara Mitra (Kickoff Prompt V1).
 #
 # Usage:
-#   GH_REPO=<repo> LEAD=<user> DEV2=<user> DEV3=<user> DRY_RUN=1 ./scripts/setup-github.sh
-#   GH_REPO=<repo> LEAD=<user> DEV2=<user> DEV3=<user> ./scripts/setup-github.sh
+#   GH_REPO=<repo> OWNER=<user> DRY_RUN=1 ./scripts/setup-github.sh
+#   GH_REPO=<repo> OWNER=<user> DRY_RUN=0 ./scripts/setup-github.sh
 #
 # Requires: gh (authenticated as a repo admin, with `project` scope), jq.
 # Run AFTER the first commit is pushed to main (rulesets would otherwise block it).
@@ -14,9 +14,7 @@ set -euo pipefail
 GH_OWNER="${GH_OWNER:-Dream-Team-Engineers}"
 GH_REPO="${GH_REPO:-pushkara-mitra}"
 PROJECT_NUMBER="${PROJECT_NUMBER:-2}"
-LEAD="${LEAD:-amruthamudunuru39}"
-DEV2="${DEV2:-siddhu949}"
-DEV3="${DEV3:-gkmraju}"
+OWNER="${OWNER:-gkmraju}"
 REQUIRE_SIGNED_COMMITS="${REQUIRE_SIGNED_COMMITS:-1}"
 DRY_RUN="${DRY_RUN:-1}"
 
@@ -127,13 +125,39 @@ security_features() {
 
 # ---------------------------------------------------------------- rulesets
 upsert_ruleset() {
-  local name="$1" body="$2" id
-  id="$(query "repos/$REPO/rulesets" --jq ".[] | select(.name==\"$name\") | .id" || true)"
+  local name="$1" body="$2" id observed
+  id="$(query "repos/$REPO/rulesets" --jq ".[] | select(.name==\"$name\") | .id")" \
+    || { warn "could not inspect existing rulesets; setup stopped"; return 1; }
   if [[ -n "$id" ]]; then
-    printf '%s' "$body" | api PUT "repos/$REPO/rulesets/$id"; ok "updated ruleset $name"
+    printf '%s' "$body" | api PUT "repos/$REPO/rulesets/$id"
   else
-    printf '%s' "$body" | api POST "repos/$REPO/rulesets"; ok "created ruleset $name"
+    printf '%s' "$body" | api POST "repos/$REPO/rulesets"
   fi
+  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: $name planned; not verified"; return; fi
+  id="$(query "repos/$REPO/rulesets" --jq ".[] | select(.name==\"$name\") | .id")" || return 1
+  [[ "$id" =~ ^[0-9]+$ ]] || { warn "$name has no unique ruleset ID after write"; return 1; }
+  observed="$(query "repos/$REPO/rulesets/$id")" || return 1
+  if ! jq -e --argjson desired "$body" '
+      .name == $desired.name and .target == $desired.target and
+      .enforcement == "active" and .conditions.ref_name == $desired.conditions.ref_name and
+      (.bypass_actors | map({actor_id, actor_type, bypass_mode}) | sort_by(.actor_id)) ==
+        ($desired.bypass_actors | sort_by(.actor_id)) and
+      (.rules | map(.type) | sort) == ($desired.rules | map(.type) | sort) and
+      (.rules as $actual | all($desired.rules[]; . as $want |
+        any($actual[]; .type == $want.type and
+          (if $want.type == "required_status_checks" then
+            .parameters.strict_required_status_checks_policy == $want.parameters.strict_required_status_checks_policy and
+            .parameters.do_not_enforce_on_create == $want.parameters.do_not_enforce_on_create and
+            ([.parameters.required_status_checks[].context] | sort) ==
+              ([$want.parameters.required_status_checks[].context] | sort)
+          elif $want.parameters then
+            .parameters as $got | ($want.parameters | keys | all(.[]; $got[.] == $want.parameters[.]))
+          else true end))))
+    ' <<<"$observed" >/dev/null; then
+    warn "$name active rules were not confirmed after write; setup stopped"
+    return 1
+  fi
+  ok "verified active ruleset $name"
 }
 
 rulesets() {
@@ -150,10 +174,10 @@ rulesets() {
       {type: "non_fast_forward"},
       {type: "required_linear_history"},
       {type: "pull_request", parameters: {
-        required_approving_review_count: 1,
-        dismiss_stale_reviews_on_push: true,
-        require_code_owner_review: true,
-        require_last_push_approval: true,
+        required_approving_review_count: 0,
+        dismiss_stale_reviews_on_push: false,
+        require_code_owner_review: false,
+        require_last_push_approval: false,
         required_review_thread_resolution: true,
         allowed_merge_methods: ["squash"]}},
       {type: "required_status_checks", parameters: {
@@ -174,6 +198,10 @@ rulesets() {
     rules: [{type: "creation"}, {type: "update"}, {type: "deletion"}]
   }')"
   upsert_ruleset protect-release-tags "$tags"
+  if [[ "$DRY_RUN" != 1 ]] && ! query "repos/$REPO/branches/main" --jq .protected | grep -qx true; then
+    warn "main is not reported protected after ruleset setup; setup stopped"
+    return 1
+  fi
 }
 
 # ---------------------------------------------------------------- environments
@@ -233,8 +261,9 @@ verify_environment() {
       (if $env == "production" then
         .can_admins_bypass == false and
         ([.protection_rules[]? | select(.type == "required_reviewers")] as $rules |
-          ($rules | length) == 1 and $rules[0].prevent_self_review == true and
+          ($rules | length) == 1 and $rules[0].prevent_self_review == false and
           ($rules[0].reviewers | type == "array") and
+          ($rules[0].reviewers | length) == 1 and
           ($rules[0].reviewers | all(.type == "User" and (.reviewer.id | type == "number"))) and
           ([$rules[0].reviewers[].reviewer.id] | sort) == ([$requested[].id] | sort))
       else true end)
@@ -258,20 +287,18 @@ environments() {
   add_branch_policy staging main branch
   if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: staging main-only planned; not applied"; else ok "verified staging (main only)"; fi
 
-  local reviewers lead_id dev2_id dev3_id
-  lead_id="$(user_id "$LEAD")" || return 1
-  dev2_id="$(user_id "$DEV2")" || return 1
-  dev3_id="$(user_id "$DEV3")" || return 1
+  local reviewers owner_id
+  owner_id="$(user_id "$OWNER")" || return 1
   reviewers="$(jq -n \
-    --argjson a "$lead_id" --argjson b "$dev2_id" --argjson c "$dev3_id" \
-    '[{type:"User",id:$a},{type:"User",id:$b},{type:"User",id:$c}]')"
-  if [[ "$DRY_RUN" != 1 ]] && ! jq -e 'length == 3 and (unique_by(.id) | length) == 3 and all(.[]; (.id | type == "number") and .id > 0)' \
+    --argjson id "$owner_id" \
+    '[{type:"User",id:$id}]')"
+  if [[ "$DRY_RUN" != 1 ]] && ! jq -e 'length == 1 and .[0].id > 0' \
     <<<"$reviewers" >/dev/null; then
-    warn "production requires three distinct valid human reviewer IDs"
+    warn "production requires a valid owner reviewer ID"
     return 1
   fi
   if ! jq -n --argjson r "$reviewers" '{
-      wait_timer: 0, prevent_self_review: true, can_admins_bypass: false, reviewers: $r,
+      wait_timer: 0, prevent_self_review: false, can_admins_bypass: false, reviewers: $r,
       deployment_branch_policy: {protected_branches: false, custom_branch_policies: true}}' \
     | api PUT "repos/$REPO/environments/production"; then
     warn "production reviewer configuration was rejected; setup stopped. Do not assume protection or upgrade/change visibility automatically."
@@ -279,7 +306,7 @@ environments() {
   fi
   verify_environment production "$reviewers"
   add_branch_policy production main branch
-  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: production reviewers/main-only planned; not verified"; else ok "verified production (main only, 1 of 3 reviewers, no self-review or admin bypass)"; fi
+  if [[ "$DRY_RUN" == 1 ]]; then ok "dry-run: owner-operated production approval/main-only planned; not verified"; else ok "verified production (main only, owner may approve a deployment, no admin bypass)"; fi
 }
 
 # ---------------------------------------------------------------- labels
@@ -389,21 +416,17 @@ manual_steps() {
   log "Manual steps (not automated on purpose)"
   cat <<EOF
    1. Environment secrets (values never go in the repo or this script):
-        for env in preview staging production; do
+        for env in preview staging; do
           gh secret set CLOUDFLARE_API_TOKEN   --env "\$env" -R $REPO
           gh secret set CLOUDFLARE_ACCOUNT_ID  --env "\$env" -R $REPO
-          gh secret set RAZORPAY_KEY_ID        --env "\$env" -R $REPO
-          gh secret set RAZORPAY_KEY_SECRET    --env "\$env" -R $REPO
-          gh secret set RAZORPAY_WEBHOOK_SECRET --env "\$env" -R $REPO
-          gh secret set JWT_SIGNING_KEY        --env "\$env" -R $REPO
-          gh secret set SENTRY_DSN             --env "\$env" -R $REPO
         done
-      Use Razorpay TEST keys for preview and staging; LIVE keys only in production.
-      Use a separate, least-privilege Cloudflare API token per environment.
+      Only provision a secret when its approved feature or workflow needs it.
+      Do not provision production credentials or LIVE payment keys before the separate launch decision.
+      Use a separate, least-privilege Cloudflare API token per active environment.
    2. Project UI: set Status options (Backlog, This Week, In Progress, In Review, Done),
       column limit 2 per person on In Progress, add a weekly Iteration field, and
       create Board + Roadmap views.
-   3. Each developer: enable SSH commit signing (see CONTRIBUTING.md) before their first PR.
+   3. Sole maintainer: enable SSH commit signing (see CONTRIBUTING.md) before the first protected PR.
    4. Cloudflare: budget alerts at 50 / 80 / 100% for Workers, D1, Durable Objects, R2.
 EOF
 }

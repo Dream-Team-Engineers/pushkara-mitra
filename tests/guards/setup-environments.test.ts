@@ -26,6 +26,29 @@ if (args[0] !== 'api') fail();
 if (path.startsWith('users/')) {
   const ids = {amruthamudunuru39:10,siddhu949:20,gkmraju:30};
   const id = ids[path.slice(6)]; if (!id) fail(); process.stdout.write(String(id));
+} else if (path === 'repos/Dream-Team-Engineers/pushkara-mitra/rulesets') {
+  if (method === 'GET') {
+    if (mode === 'ruleset-query-fail') fail();
+    if (args.includes('--jq')) {
+      const match=/name=="([^"]+)"/.exec(args[args.indexOf('--jq')+1]);
+      const found=state.rulesets.find(r=>r.name===match?.[1]);
+      if (found) process.stdout.write(String(found.id));
+    } else out(state.rulesets);
+  } else if (method === 'POST') {
+    state.rulesets.push({id:state.rulesets.length+1,...body}); save(); out(state.rulesets.at(-1));
+  } else fail();
+} else if (path.includes('/rulesets/')) {
+  const id=Number(path.split('/').at(-1));
+  const index=state.rulesets.findIndex(r=>r.id===id);
+  if(index<0)fail();
+  if(method==='GET')out(mode==='ruleset-disabled'?{...state.rulesets[index],enforcement:'disabled'}:state.rulesets[index]);
+  else if(method==='PUT'){state.rulesets[index]={id,...body};save();out(state.rulesets[index]);}
+  else fail();
+} else if (path === 'repos/Dream-Team-Engineers/pushkara-mitra/branches/main') {
+  const protectedBranch=mode!=='unprotected-main'&&state.rulesets.some(r=>r.name==='protect-main'&&r.enforcement==='active');
+  if(method!=='GET')fail();
+  if(args.includes('--jq'))process.stdout.write(String(protectedBranch));
+  else out({protected:protectedBranch});
 } else if (path.includes('/deployment-branch-policies')) {
   const env = /environments\\/([^/]+)/.exec(path)[1];
   if (method === 'GET') {
@@ -51,7 +74,7 @@ if (path.startsWith('users/')) {
     if (env === 'production') {
       observed.protection_rules=[{type:'required_reviewers',prevent_self_review:requested.prevent_self_review,reviewers:requested.reviewers.map(r=>({type:r.type,reviewer:{id:r.id}}))}];
       if(mode==='no-reviewers')observed.protection_rules=[];
-      if(mode==='self-review')observed.protection_rules[0].prevent_self_review=false;
+      if(mode==='self-review')observed.protection_rules[0].prevent_self_review=true;
       if(mode==='admin-bypass')observed.can_admins_bypass=true;
       if(mode==='wrong-reviewer')observed.protection_rules[0].reviewers[0].reviewer.id=999;
     }
@@ -85,6 +108,7 @@ function run(command: string, mode = 'ok', policies: unknown[] = [mainPolicy], d
       JSON.stringify({
         policies: { preview: policies, staging: policies, production: policies },
         environments: {},
+        rulesets: [],
       }),
     );
     writeFileSync(calls, '');
@@ -166,7 +190,7 @@ describe('deployment branch policy verification with mocked GitHub', () => {
 });
 
 describe('environment controls are verified, not assumed', () => {
-  it('requests and confirms main-only preview/staging/production plus independent production review', () => {
+  it('requests and confirms main-only environments plus owner-operated production review', () => {
     const result = run('environments');
     expect(result.status).toBe(0);
     const writes = result.calls.filter((call) => call.method === 'PUT');
@@ -179,13 +203,9 @@ describe('environment controls are verified, not assumed', () => {
     }
     const production = writes.find((call) => call.path.endsWith('/production'));
     expect(production?.body).toMatchObject({
-      prevent_self_review: true,
+      prevent_self_review: false,
       can_admins_bypass: false,
-      reviewers: [
-        { type: 'User', id: 10 },
-        { type: 'User', id: 20 },
-        { type: 'User', id: 30 },
-      ],
+      reviewers: [{ type: 'User', id: 30 }],
     });
     expect(result.stdout).toContain('verified production');
     expect(result.calls.every((call) => call.method !== 'DELETE')).toBe(true);
@@ -235,4 +255,37 @@ describe('repository auto-merge stays disabled', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).not.toContain('verified squash-only');
   });
+});
+
+describe('solo-maintainer ruleset with mocked GitHub', () => {
+  it('requires PR and current checks without an impossible human approval', () => {
+    const result = run('rulesets');
+    expect(result.status).toBe(0);
+    const main = result.calls.find(
+      (call) => call.method === 'POST' && call.body?.name === 'protect-main',
+    );
+    const rules = main?.body?.rules as Array<{
+      type: string;
+      parameters?: Record<string, unknown>;
+    }>;
+    expect(rules.find((rule) => rule.type === 'pull_request')?.parameters).toMatchObject({
+      required_approving_review_count: 0,
+      require_code_owner_review: false,
+      require_last_push_approval: false,
+      required_review_thread_resolution: true,
+    });
+    expect(rules.find((rule) => rule.type === 'required_status_checks')?.parameters).toMatchObject({
+      strict_required_status_checks_policy: true,
+    });
+    expect(main?.body?.bypass_actors).toEqual([]);
+    expect(result.stdout).toContain('verified active ruleset protect-main');
+  });
+
+  it.each(['ruleset-query-fail', 'ruleset-disabled', 'unprotected-main'])(
+    'does not claim protection when %s',
+    (mode) => {
+      const result = run('rulesets', mode);
+      expect(result.status).toBe(1);
+    },
+  );
 });

@@ -19,8 +19,8 @@ Tick every item. For a conditional item that does not apply, tick it and write "
 
 ## AI-assisted delivery safety gates
 
-- [ ] Human owner and independent reviewer identified
+- [ ] Sole maintainer and risk acceptance recorded
 - [ ] Privacy/security/child-safety impact and required approvals recorded
 - [ ] No unapproved production deployment, live payments, location persistence or public missing-person feature
 - [ ] CI and staging functional tests reviewed; rollback documented
-- [ ] Independent human review and required checks verified (CODEOWNERS alone is not enforcement)
+- [ ] Required CI checks verified before merge (a checked box alone is not evidence)

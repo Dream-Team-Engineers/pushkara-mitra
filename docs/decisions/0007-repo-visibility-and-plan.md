@@ -1,13 +1,21 @@
 # 0007. Repository visibility and GitHub plan
 
-Status: **Owner selected public for now; protection provisioning, independent review and verification PENDING.**
+Status: **Owner selected public and sole-maintainer operation for now; protection provisioning and verification PENDING.**
 Date: 2026-11-02
+
+## Owner update — sole maintainer, 2026-11-14 (IST)
+
+The requesting owner says `gkmraju` is now the sole available maintainer; the former LEAD and DEV2 moved to another project. This supersedes the independent-PR-review requirement for ordinary development while the team has one maintainer. The owner may still request outside review voluntarily. Do not claim an independent review occurred when it did not.
+
+The intended public-repository ruleset requires a pull request, strict current required checks, resolved review threads, linear history, signed commits and no bypass, force pushes or deletion. It requires **zero approving reviews** and no code-owner or last-push approval, so `gkmraju` can merge a fully checked PR alone. [GitHub documents zero-approval PR rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). A checked PR-body item is an owner attestation; GitHub's required checks are the enforceable gate. `CODEOWNERS` identifies `gkmraju` for ownership but does not require an impossible self-review. The production environment names `gkmraju` as its sole reviewer with self-review allowed; the production workflow remains fail-closed until a separate launch decision and implementation. The existing preview bootstrap still requires an independent reviewer; its owner-only adaptation is prepared separately and remains blocked until its public runbook can be published and reviewed.
+
+Apply the updated `scripts/setup-github.sh` only after its code is on `main`, then read back effective rules and environment settings. The public-visibility decision remains in effect; reconsider privacy after project completion. Historical selections and review requirements below describe earlier states, not this current operating choice. Legal, privacy, content and production-launch decisions remain separate gates.
 
 ## Owner update — 2026-11-14 (IST)
 
 The requesting owner explicitly selected **keep this repository public for now** and may reconsider private visibility after project completion. This supersedes the 5 Nov private selection below. The future private decision is open; do not change visibility without a new owner instruction. Public visibility does not itself enforce independent review or required checks.
 
-Use the public-repository path of `scripts/setup-github.sh` after review, then read back effective `main` and release-tag rules, required checks, merge settings and deployment-environment controls. Keep merges requiring independent review until enforcement is verified. The historical private-plan analysis below records the previous decision context; it is not the current operating choice.
+Use the public-repository path of `scripts/setup-github.sh` after the reviewed change is on `main`, then read back effective `main` and release-tag rules, required checks, merge settings and deployment-environment controls. The later sole-maintainer update above supersedes this paragraph's earlier review policy. The historical private-plan analysis below records the previous decision context; it is not the current operating choice.
 
 ## Superseded owner selection — 2026-11-05 (IST)
 
