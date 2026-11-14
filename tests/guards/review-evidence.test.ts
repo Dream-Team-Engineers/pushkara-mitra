@@ -1,9 +1,18 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 const checker = join(import.meta.dirname, '../../scripts/check-pr-checklist.mjs');
 const verifier = join(import.meta.dirname, '../../scripts/verify-pr-review.mjs');
+const completeChecklist = readFileSync(
+  join(import.meta.dirname, '../../.github/pull_request_template.md'),
+  'utf8',
+)
+  .split(/\r?\n/)
+  .filter((line) => /^- \[ \] /.test(line))
+  .map((line) => line.replace('- [ ] ', '- [x] '))
+  .join('\n');
 const runChecklist = (body: string) =>
   spawnSync(process.execPath, [checker], {
     env: { ...process.env, PR_BODY: body },
@@ -36,7 +45,12 @@ describe('approval evidence regression', () => {
     ])
       expect(runChecklist(body).status).toBe(1);
     expect(
-      runChecklist('- [x] Human owner and independent reviewer identified — review pending').status,
+      runChecklist(
+        completeChecklist.replace(
+          '- [x] Human owner and independent reviewer identified',
+          '- [x] Human owner and independent reviewer identified — review pending',
+        ),
+      ).status,
     ).toBe(0);
   });
   it('requires independent named human approval on the current head', () => {
