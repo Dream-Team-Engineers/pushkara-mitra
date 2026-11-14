@@ -1,0 +1,74 @@
+openapi: 3.1.0
+info:
+  title: Pushkara Mitra public content
+  version: 0.1.0
+  description: |
+    Read-only public listings (ghats, stays, travel, updates, helplines, help points) served from
+    repository content in src/content/publishedContent.ts. A dataset is served only when it has an
+    owner approval record and passes validation (src/content/publicContentSchema.ts); otherwise the
+    endpoint answers 404 CONTENT_UNAVAILABLE and the app shows its labelled samples.
+    No cookies, credentials, identity, query parameters or side effects. Always Cache-Control: no-store.
+x-review-status: PROPOSED
+paths:
+  /api/public/content/{kind}:
+    get:
+      operationId: getPublicContent
+      parameters:
+        - name: kind
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [ghats, stays, travel, updates, helplines, help-points]
+      responses:
+        '200':
+          description: Approved dataset. Item fields per kind are defined in publicContentSchema.ts.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [kind, revision, items]
+                properties:
+                  kind:
+                    type: string
+                  revision:
+                    type: string
+                    pattern: '^[a-zA-Z0-9._-]{1,64}$'
+                  items:
+                    type: array
+                    minItems: 1
+                    maxItems: 500
+                    items:
+                      type: object
+                      required: [source, sourceUrl, updatedAt, status, synthetic, id]
+        '400':
+          description: A query string was sent (none is accepted).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicError' }
+        '404':
+          description: Unknown kind (NOT_FOUND) or no approved dataset (CONTENT_UNAVAILABLE).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicError' }
+        '405':
+          description: Any method other than GET or HEAD.
+components:
+  schemas:
+    PublicError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [INVALID_QUERY, CONTENT_UNAVAILABLE, NOT_FOUND]
+            message:
+              type: string
+              minLength: 1

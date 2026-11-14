@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-**Do not open a public issue.** Use [GitHub private vulnerability reporting](https://github.com/Dream-Team-Engineers/pushkara-mitra/security/advisories/new). Email contact: `SECURITY_EMAIL` is not set yet (OQ-005) and will be added here.
+**Do not open a public issue.** Use [GitHub private vulnerability reporting](https://github.com/Dream-Team-Engineers/pushkara-mitra/security/advisories/new). Email contact: dreamteamtech@zohomail.in (maintainer: Krishna Murthy Raju G; OQ-005).
 
 Please do not include real personal data or locations in your report.
 

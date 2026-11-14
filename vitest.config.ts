@@ -27,6 +27,7 @@ export default defineConfig({
           name: 'web',
           environment: 'node',
           include: ['web/src/**/*.test.{ts,tsx}'],
+          setupFiles: ['web/src/shared/testing/setup.ts'],
         },
       },
       {

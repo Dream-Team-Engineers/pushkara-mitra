@@ -1,4 +1,5 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
+import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
 
@@ -67,6 +68,10 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   if (pathname === PUBLIC_INFORMATION_PATH) {
     return handlePublicInformation(new URL(request.url));
+  }
+
+  if (pathname.startsWith(PUBLIC_CONTENT_PREFIX)) {
+    return handlePublicContent(new URL(request.url));
   }
 
   // Unmatched API paths are answered here and never fall through to static-asset lookup.
