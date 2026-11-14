@@ -117,7 +117,7 @@ describe('caching and refetch limits', () => {
     expect(await lookup('forged-1')).toBeNull();
     expect(state.calls).toHaveLength(2);
     for (let index = 0; index < 20; index += 1)
-      expect(await lookup(`forged-${index + 2}`)).toBeNull();
+      expect(await lookup(`forged-${String(index + 2)}`)).toBeNull();
     expect(state.calls).toHaveLength(2);
     state.clock += 60_001;
     expect(await lookup('forged-late')).toBeNull();

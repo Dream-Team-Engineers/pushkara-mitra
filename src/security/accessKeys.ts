@@ -63,19 +63,25 @@ export function createAccessKeyLookup(options: KeySourceOptions): KeyLookup {
   let keys = new Map<string, JsonWebKey>();
   let fetchedAt = Number.NEGATIVE_INFINITY;
   let lastAttempt = Number.NEGATIVE_INFINITY;
+  let lastFailure = Number.NEGATIVE_INFINITY;
   let inFlight: Promise<void> | null = null;
 
   async function refresh(): Promise<void> {
     lastAttempt = now();
-    const response = await fetcher(url, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      redirect: 'error',
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!response.ok) throw new Error('keys endpoint status');
-    keys = parseKeys(await response.text());
-    fetchedAt = now();
+    try {
+      const response = await fetcher(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        redirect: 'error',
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (!response.ok) throw new Error('keys endpoint status');
+      keys = parseKeys(await response.text());
+      fetchedAt = now();
+    } catch (error) {
+      lastFailure = now();
+      throw error;
+    }
   }
 
   function refreshOnce(): Promise<void> {
@@ -91,7 +97,7 @@ export function createAccessKeyLookup(options: KeySourceOptions): KeyLookup {
       const known = keys.get(kid);
       if (known !== undefined) return known;
       if (now() - lastAttempt < minRefetchMs) return null;
-    } else if (now() - lastAttempt < minRefetchMs && inFlight === null) {
+    } else if (now() - lastFailure < minRefetchMs && inFlight === null) {
       throw new Error('keys unavailable');
     }
     await refreshOnce();
