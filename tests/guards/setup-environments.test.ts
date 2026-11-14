@@ -123,6 +123,7 @@ function run(command: string, mode = 'ok', policies: unknown[] = [mainPolicy], d
       },
     });
     if (result.error) throw result.error;
+    if (result.status === 127) throw new Error(`Setup command unavailable: ${result.stderr}`);
     return {
       status: result.status,
       stdout: result.stdout,
@@ -289,3 +290,4 @@ describe('solo-maintainer ruleset with mocked GitHub', () => {
     },
   );
 });
+
