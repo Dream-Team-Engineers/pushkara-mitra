@@ -66,28 +66,65 @@ const base = `http://127.0.0.1:${server.address().port}`;
 
 const profile = mkdtempSync(join(tmpdir(), 'pm-smoke-'));
 const chromeBin = process.env.CHROME_BIN ?? 'google-chrome';
-const chrome = spawn(
-  chromeBin,
-  [
-    '--headless=new',
-    '--no-sandbox',
-    '--disable-gpu',
-    '--remote-debugging-port=0',
-    `--user-data-dir=${profile}`,
-    'about:blank',
-  ],
-  { stdio: ['ignore', 'ignore', 'pipe'] },
-);
-const wsUrl = await new Promise((resolve, reject) => {
-  let buffer = '';
-  chrome.on('error', reject);
-  chrome.stderr.on('data', (chunk) => {
-    buffer += chunk;
-    const match = /DevTools listening on (ws:\/\/\S+)/.exec(buffer);
-    if (match) resolve(match[1]);
+/**
+ * Starting headless Chrome on a shared CI runner occasionally takes longer than expected. Retry a
+ * bounded number of times with a fresh process and a longer wait, and say which attempt failed.
+ * A persistent failure still fails the job: this never hides a real startup problem.
+ */
+const START_ATTEMPTS = 3;
+const START_TIMEOUT_MS = 30000;
+
+function launchChrome() {
+  const child = spawn(
+    chromeBin,
+    [
+      '--headless=new',
+      '--no-sandbox',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--remote-debugging-port=0',
+      `--user-data-dir=${profile}`,
+      'about:blank',
+    ],
+    { stdio: ['ignore', 'ignore', 'pipe'] },
+  );
+  const url = new Promise((resolve, reject) => {
+    let buffer = '';
+    const timer = setTimeout(() => reject(new Error('Chrome did not start')), START_TIMEOUT_MS);
+    child.on('error', (error) => {
+      globalThis.clearTimeout(timer);
+      reject(error);
+    });
+    child.on('exit', () => {
+      globalThis.clearTimeout(timer);
+      reject(new Error('Chrome exited before it was ready'));
+    });
+    child.stderr.on('data', (chunk) => {
+      buffer += chunk;
+      const match = /DevTools listening on (ws:\/\/\S+)/.exec(buffer);
+      if (match) {
+        globalThis.clearTimeout(timer);
+        resolve(match[1]);
+      }
+    });
   });
-  setTimeout(() => reject(new Error('Chrome did not start')), 20000);
-});
+  return { child, url };
+}
+
+let chrome;
+let wsUrl;
+for (let attempt = 1; attempt <= START_ATTEMPTS; attempt += 1) {
+  const launched = launchChrome();
+  try {
+    wsUrl = await launched.url;
+    chrome = launched.child;
+    break;
+  } catch (error) {
+    console.error(`Chrome start attempt ${attempt} of ${START_ATTEMPTS} failed: ${error.message}`);
+    launched.child.kill('SIGKILL');
+    if (attempt === START_ATTEMPTS) throw error;
+  }
+}
 
 const port = new URL(wsUrl).port;
 const targets = await (await globalThis.fetch(`http://127.0.0.1:${port}/json/list`)).json();

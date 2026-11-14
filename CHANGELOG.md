@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.1](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.9.0...v1.9.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* allow sole owner preview bootstrap ([#116](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/116)) ([42819af](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/42819af30ac26bceb505c13faa4938b7d68cfc12))
+* **governance:** require complete PR checklist and record public visibility ([dc4e3db](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/dc4e3db69f19c0bd6d191b9589ae5a3f2fc14d1d))
+* **governance:** require complete PR checklist and record public visibility ([4b662da](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/4b662da0b24fb181f7188a4dc1fa3818134ec0a4))
+* **governance:** support sole maintainer with required checks ([#114](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/114)) ([6ae35e7](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/6ae35e77b46cea04a6368eab6bf28c19f7a2a7a8))
+* make release tag rule compatible with Actions ([#115](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/115)) ([5351e5d](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5351e5d7e74ae84f74201fd152ae025b66548ddd))
+
 ## [1.9.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.8.0...v1.9.0) (2026-11-13)
 
 
