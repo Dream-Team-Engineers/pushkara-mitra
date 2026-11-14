@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.10.0...v1.11.0) (2026-11-14)
+
+
+### Features
+
+* **deploy:** add explicit staging and production scripts ([#125](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/125)) ([56a386a](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/56a386a1247634207027d50fe4a45b389af83699))
+
 ## [1.10.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.9.1...v1.10.0) (2026-11-14)
 
 
