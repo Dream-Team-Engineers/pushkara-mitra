@@ -2,6 +2,8 @@
 
 Status: **PROPOSED — a request for decisions, not a record of any.** Prepared 2026-11-12 (IST) against `main` at `d873eb7`. Nothing here is approved. Each answer must be recorded by its named human with a date and link in [FOUNDATION_APPROVAL_RECORD](../decisions/FOUNDATION_APPROVAL_RECORD.md) or the matching ADR.
 
+**Owner update, 2026-11-14:** Section 1 question 1 is deferred until before launch, at the owner's request. The legal entity and nodal/grievance contact are undecided; do not ask again during project completion or treat the question as answered. The deferral does not authorize live personal-data processing or remove the prelaunch gate. The repository is public for now under the updated ADR 0007; its protections still need live verification.
+
 ## 1. Questions for the owners (answer in one sitting)
 
 | #   | Question                                                                                                   | Why it blocks                                                                             | Recommendation                                                                       | Tracks       |
