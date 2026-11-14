@@ -1,9 +1,15 @@
 # 0007. Repository visibility and GitHub plan
 
-Status: **Owner selected private with enforced protections; provisioning, independent review and verification PENDING.**
+Status: **Owner selected public for now; protection provisioning, independent review and verification PENDING.**
 Date: 2026-11-02
 
-## Owner selection — 2026-11-05 (IST)
+## Owner update — 2026-11-14 (IST)
+
+The requesting owner explicitly selected **keep this repository public for now** and may reconsider private visibility after project completion. This supersedes the 5 Nov private selection below. The future private decision is open; do not change visibility without a new owner instruction. Public visibility does not itself enforce independent review or required checks.
+
+Use the public-repository path of `scripts/setup-github.sh` after review, then read back effective `main` and release-tag rules, required checks, merge settings and deployment-environment controls. Keep merges requiring independent review until enforcement is verified. The historical private-plan analysis below records the previous decision context; it is not the current operating choice.
+
+## Superseded owner selection — 2026-11-05 (IST)
 
 The requesting user, identifying as LEAD, selected: **keep private; the owner will arrange a plan that supports enforced protections.** This choice supersedes the earlier public-first recommendation as a selection; it does not claim a purchased plan, enabled control or final independent approval. Do not make the source public or purchase a plan on the owner's behalf.
 

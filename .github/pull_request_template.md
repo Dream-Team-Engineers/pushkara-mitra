@@ -23,4 +23,4 @@ Tick every item. For a conditional item that does not apply, tick it and write "
 - [ ] Privacy/security/child-safety impact and required approvals recorded
 - [ ] No unapproved production deployment, live payments, location persistence or public missing-person feature
 - [ ] CI and staging functional tests reviewed; rollback documented
-- [ ] GitHub private Free manual review verified (CODEOWNERS alone is not enforcement)
+- [ ] Independent human review and required checks verified (CODEOWNERS alone is not enforcement)
