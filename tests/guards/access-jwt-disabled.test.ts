@@ -18,8 +18,10 @@ function sourceFiles(directory: string): string[] {
 describe('Access token verifier stays disabled', () => {
   it('is not imported by any Worker source file', () => {
     for (const file of sourceFiles(join(root, 'src'))) {
-      if (file.endsWith('accessJwt.ts')) continue;
-      expect(readFileSync(file, 'utf8'), file).not.toMatch(/accessJwt/);
+      if (file.endsWith('accessJwt.ts') || file.endsWith('accessKeys.ts')) continue;
+      const text = readFileSync(file, 'utf8');
+      expect(text, file).not.toMatch(/accessJwt/);
+      expect(text, file).not.toMatch(/accessKeys/);
     }
   });
 
