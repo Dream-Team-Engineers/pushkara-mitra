@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.10.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.9.1...v1.10.0) (2026-11-14)
+
+
+### Features
+
+* **security:** add disabled fail-closed Access key source with tests ([#119](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/119)) ([fc47bef](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/fc47beff4b596c8cf2d426129cf2f4135c99fa18))
+
+
+### Bug Fixes
+
+* **ci:** make PR checklist independent of merge-time checks ([#124](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/124)) ([0fd3b57](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/0fd3b577bf873a7856afe81d1ca90962b400396b))
+* **ci:** retry headless Chrome start in the browser smoke test ([#118](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/118)) ([a467fc7](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/a467fc7093dd24ebbc3e8b2f2bc4947aa4f8f08c))
+
 ## [1.9.1](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.9.0...v1.9.1) (2026-11-14)
 
 
