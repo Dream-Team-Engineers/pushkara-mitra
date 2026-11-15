@@ -6,10 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
-## Fix: blank space below content in Desktop-site mode; staging deployed from `607718f` — 2026-11-15 16:50:00 IST
+## Fix: blank space below content in Desktop-site mode; staging deployed from `607718f` — 2026-11-15 16:47:00 IST
 
 - **Cause (found, not yet confirmed on the owner's phone):** the owner reported pages with a very large blank area below the content (screenshots 3 and 7, Chrome browser). The agent's earlier Desktop-site workaround zooms the page by about 2.5 on a phone whose browser lays the page out about 980 px wide; with `zoom`, `100dvh` is multiplied too, so the page became about 3.5 times as tall as its content (measured in emulation: 4,523 px for about 1,300 px of content, noticed in the earlier test and not followed up). Fix: the script also sets `--page-zoom` and the app's minimum height is `100dvh / --page-zoom`. Measured again in the same emulation: page 3,135 px for content ending at 2,934 px, Me page 1,880 px for content ending at 1,679 px; the remaining gap is the bottom-bar space.
-- **Deployed:** `npm run ship:staging` run by the agent through PowerShell (the owner asked to check in the browser and be told); gate passed (45 test files passed, 1 skipped; 601 tests passed, 24 skipped). Version `ebf3c998-c10c-4398-9deb-dce5bbe93919`, created about 16:50 IST. The live bundle contains the fix.
+- **Deployed:** `npm run ship:staging` run by the agent through PowerShell (the owner asked to check in the browser and be told); gate passed (45 test files passed, 1 skipped; 601 tests passed, 24 skipped). Version `ebf3c998-c10c-4398-9deb-dce5bbe93919`, created about 16:47 IST. The live bundle contains the fix.
 - **Open:** if the owner's Chrome is in normal (mobile) mode, this is not the cause and the blank screens remain unexplained; the owner is asked to check whether Chrome's "Desktop site" is ticked.
 - **Rollback:** `npx wrangler rollback eb4ab13e-e8d3-4141-bdb6-1e5bc16a22e9 --env staging` (the version from 16:35 IST).
 - **Not claimed:** production untouched; no legal sign-off. Independent reviewer: NONE.
