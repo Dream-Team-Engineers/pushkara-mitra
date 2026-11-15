@@ -328,7 +328,7 @@ const GHATS_ENTRY: ContentEntry = {
   review: {
     status: 'approved',
     reviewer: 'gkmraju',
-    reviewedRevision: 'd6d8940',
+    reviewedRevision: 'aaea9b5',
     reviewedOn: '2026-11-15',
     scope:
       "Items 1-15: English names and groupings compared by the owner with https://eastgodavari.ap.gov.in/ghats/ (2026-11-14). Telugu and Hindi names of all items, and items 16-30, come from an owner-supplied unofficial guide: shown as unverified by the owner's direction on 2026-11-15; Telugu spellings corrected by the owner as a native speaker.",
