@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Staging deployed from `e9bfea9` — 2026-11-15 12:18:39 IST
+
+- **Task / outcome:** `npm run ship:staging` run by the owner on this machine from commit `e9bfea9` (pushed to `origin/main` at 12:10 IST). Check gate, web build and `wrangler deploy --env staging` all succeeded; one changed asset (`/sw.js`) uploaded. Staging worker `pushkara-mitra-staging`, version `f66dc434-ec2d-4309-b312-607b7fb7dd65`, created 12:18:38 IST (06:48:38 UTC per Cloudflare).
+- **Evidence:** gate output in the owner's terminal: 43 test files passed, 1 skipped; 590 tests passed, 24 skipped; prettier clean. Agent verification at 12:19 IST: `GET /healthz` returned 200 `{"status":"ok"}`; `GET /` returned 200 `text/html`. Not viewed on a device.
+- **Flaky tests:** the agent's earlier `ship:staging` attempt at 12:15 IST failed in the gate (37 of 44 test files failed to start, "Vitest failed to find the current suite") and uploaded nothing; reruns of the default pool were inconsistent on Node 24.15 (project requires Node 22), while `--pool=vmThreads` passed 590 tests. The owner's later run passed with the default pool. Fix is Node 22, not yet installed.
+- **Rollback:** `npx wrangler rollback c691215c-bc01-4daf-abc5-5938280dae02 --env staging` (previous staging version, created 12:15:30 IST).
+- **Not claimed:** production not touched; no legal sign-off. Independent reviewer: NONE.
+- **Next action / owner:** owner checks the staging site on a phone; owner installs Node 22.
+
 ## Dependencies reinstalled, full check passed on Node 24; timestamp correction — 2026-11-15 12:05:00 IST (local only, not deployed)
 
 - **Timestamp correction:** the four 2026-11-15 entries below carried UTC clock times labelled IST (5 h 30 min early). Corrected to IST: 04:25:39 → 09:55:39, 05:07:02 → 10:37:02, 05:17:40 → 10:47:40, 05:33:45 → 11:03:45. Git commit times (+0530) for the same work are 10:06:56, 10:37:06, 10:47:40 and 11:03:56. Going forward, headings use the machine's IST clock (`date` shows IST), never UTC.
