@@ -6,12 +6,12 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
-## Cause found: the CI staging deploy overwrote the staging build — 2026-11-15 21:00:00 IST
+## Cause found: the CI staging deploy overwrote the staging build — 2026-11-15 20:57:00 IST
 
 - **Finding:** the owner's Incognito window (no cached copy) showed "Build b7b73d5" with no "staging" label and the old "Sign-in is not switched on yet" text. `b7b73d5` is a docs-only commit the agent pushed after deploying staging itself. `.github/workflows/deploy-staging.yml` deploys staging automatically on every push to `main`, and it built with `npm run build:web` (no client ID), replacing the agent's staging build. This also explains the extra staging versions listed before and after the agent's own deploys all session. So the earlier "cached copy" explanation was wrong for this case (a cached copy may still exist, but the served build itself had sign-in off).
 - **Fix:** the workflow now runs `npm run build:web:staging`, and a guard test (`tests/guards/google-signin-config.test.ts`) fails if it does not. Because every push to `main` redeploys staging, a push now produces a staging build with the client ID. Production still has none.
 - **Lesson recorded:** the agent's manual `ship:staging` is redundant while that workflow is on, and a later push replaces it; after pushing, wait for the workflow, then check the Build line.
-- **Evidence:** the 4 configuration guard tests pass; the live result is checked in the next entry or the session reply.
+- **Evidence:** the 4 configuration guard tests pass. The CI run "Deploy staging" for `5f18dfc` completed with success (1 min 29 s); the staging bundle then served (`index-CX74vgAg.js`) contains `5f18dfc` and the full client ID literal, so staging runs a build with sign-in enabled. Not verified by the agent: a real sign-in.
 
 ## Build id shown on the Me tab; owner still on a cached copy — 2026-11-15 20:41:00 IST
 
