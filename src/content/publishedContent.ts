@@ -336,10 +336,9 @@ const GHATS_ENTRY: ContentEntry = {
 };
 
 /**
- * DRAFT, NOT APPROVED (review stays `draft`, so the endpoint still answers 404 and the app shows
- * "not yet available" tiles). Candidate numbers with the official page that states each one;
- * 2026-11-15. Police (100), ambulance (108), women (181) and tourist (1363) still need an official
- * source page before they are added. Owner: check each, then set `review` to approved.
+ * Helplines. 112 and 1098 cite the official page that states them. Police, ambulance, tourist (1363)
+ * and women (1091) are numbers supplied by the owner on 2026-11-15 and are shown as unverified until
+ * an official page is found; the owner will recheck every number on the last day before the event.
  */
 const HELPLINES_CANDIDATE = {
   updatedAt: '2026-11-15T10:00:00+05:30',
@@ -347,10 +346,21 @@ const HELPLINES_CANDIDATE = {
   synthetic: false,
 } as const;
 
+const ownerLine = (id: string, kind: string, number: string) => ({
+  updatedAt: '2026-11-15T12:30:00+05:30',
+  status: 'unverified',
+  synthetic: false,
+  id,
+  kind,
+  number,
+  source: 'Number supplied by the owner (2026-11-15); not yet checked against an official page',
+  sourceUrl: null,
+});
+
 const HELPLINES_ENTRY: ContentEntry = {
   dataset: {
     kind: 'helplines',
-    revision: 'helplines-draft-1',
+    revision: 'helplines-1',
     items: [
       {
         ...HELPLINES_CANDIDATE,
@@ -369,6 +379,10 @@ const HELPLINES_ENTRY: ContentEntry = {
         source: 'Ministry of Women and Child Development: Child Helpline 1098',
         sourceUrl: 'https://www.spniwcd.wcd.gov.in/child-helpline',
       },
+      ownerLine('police-112', 'police', '112'),
+      ownerLine('ambulance-108', 'ambulance', '108'),
+      ownerLine('tourist-1363', 'tourist', '1363'),
+      ownerLine('women-1091', 'women', '1091'),
     ],
   },
   review: { status: 'draft' },
