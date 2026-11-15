@@ -39,6 +39,9 @@ const draft = (kind: ContentKind): ContentEntry => ({
  * (page last updated 28.11.2025; checked 2026-11-14). The page states no facilities, mandals,
  * access or opening status, so `facilities` is empty and the app shows them as not stated.
  * Rajamahendravaram and Kovvur groups are filed under East Godavari, as the page header says.
+ * `nameTe` (Telugu names) comes from the owner's trilingual guide (Ghats.pdf, 2026-11-15), an unofficial
+ * compilation, used as the primary Telugu name until the government publishes an official list. The
+ * owner reads Telugu natively; spellings of Dowleswaram and Seethanagaram follow that guide as supplied.
  * The page groups the last four as "Other Nearby Ghats" without a district, so they use `other`.
  */
 const EAST_GODAVARI_GHATS_SOURCE = {
@@ -50,11 +53,18 @@ const EAST_GODAVARI_GHATS_SOURCE = {
   crowd: 'noData',
 } as const;
 
-const ghat = (id: string, name: string, district: 'east' | 'other', town: string) => ({
+const ghat = (
+  id: string,
+  name: string,
+  nameTe: string,
+  district: 'east' | 'other',
+  town: string,
+) => ({
   ...EAST_GODAVARI_GHATS_SOURCE,
   facilities: [],
   id,
   name,
+  nameTe,
   district,
   town,
 });
@@ -64,21 +74,69 @@ const GHATS_ENTRY: ContentEntry = {
     kind: 'ghats',
     revision: 'eg-ghats-2025-11-28',
     items: [
-      ghat('kotilingala-revu', 'Kotilingala Revu', 'east', 'Rajamahendravaram'),
-      ghat('pushkar-ghat', 'Pushkar Ghat', 'east', 'Rajamahendravaram'),
-      ghat('saraswati-ghat', 'Saraswati Ghat', 'east', 'Rajamahendravaram'),
-      ghat('gowthami-ghat', 'Gowthami Ghat', 'east', 'Rajamahendravaram'),
-      ghat('tummalapalli-vari-revu', 'Tummalapalli Vari Revu', 'east', 'Rajamahendravaram'),
-      ghat('sri-narasimha-nagar-ghat', 'Sri Narasimha Nagar Ghat', 'east', 'Rajamahendravaram'),
-      ghat('dowleswaram-barrage-ghat', 'Dowleswaram Barrage Ghat', 'east', 'Rajamahendravaram'),
-      ghat('venkateswara-ghat', 'Venkateswara Ghat', 'east', 'Rajamahendravaram'),
-      ghat('goshpada-kshetram', 'Goshpada Kshetram (Main Kovvur Ghat)', 'east', 'Kovvur'),
-      ghat('subrahmanyeswara-ghat', 'Subrahmanyeswara Ghat', 'east', 'Kovvur'),
-      ghat('nagareswaram-ghat', 'Nagareswaram Ghat', 'east', 'Kovvur'),
-      ghat('purushottapatnam-ghat', 'Purushottapatnam Ghat', 'other', 'Other nearby ghats'),
-      ghat('seethanagaram-ghat', 'Seethanagaram Ghat', 'other', 'Other nearby ghats'),
-      ghat('pattiseema-ghat', 'Pattiseema Ghat', 'other', 'Other nearby ghats'),
-      ghat('vangalapudi-ghat', 'Vangalapudi Ghat', 'other', 'Other nearby ghats'),
+      ghat('kotilingala-revu', 'Kotilingala Revu', 'కోటిలింగాల రేవు', 'east', 'Rajamahendravaram'),
+      ghat('pushkar-ghat', 'Pushkar Ghat', 'పుష్కర్ ఘాట్', 'east', 'Rajamahendravaram'),
+      ghat('saraswati-ghat', 'Saraswati Ghat', 'సరస్వతీ ఘాట్', 'east', 'Rajamahendravaram'),
+      ghat('gowthami-ghat', 'Gowthami Ghat', 'గౌతమీ ఘాట్', 'east', 'Rajamahendravaram'),
+      ghat(
+        'tummalapalli-vari-revu',
+        'Tummalapalli Vari Revu',
+        'తుమ్మలపల్లి వారి రేవు',
+        'east',
+        'Rajamahendravaram',
+      ),
+      ghat(
+        'sri-narasimha-nagar-ghat',
+        'Sri Narasimha Nagar Ghat',
+        'శ్రీ నరసింహ నగర్ ఘాట్',
+        'east',
+        'Rajamahendravaram',
+      ),
+      ghat(
+        'dowleswaram-barrage-ghat',
+        'Dowleswaram Barrage Ghat',
+        'డౌలెస్వరం బ్యారేజీ ఘాట్',
+        'east',
+        'Rajamahendravaram',
+      ),
+      ghat(
+        'venkateswara-ghat',
+        'Venkateswara Ghat',
+        'వేంకటేశ్వర ఘాట్',
+        'east',
+        'Rajamahendravaram',
+      ),
+      ghat(
+        'goshpada-kshetram',
+        'Goshpada Kshetram (Main Kovvur Ghat)',
+        'గోష్పాద క్షేత్ర ఘాట్',
+        'east',
+        'Kovvur',
+      ),
+      ghat(
+        'subrahmanyeswara-ghat',
+        'Subrahmanyeswara Ghat',
+        'సుబ్రహ్మణ్యేశ్వర ఘాట్',
+        'east',
+        'Kovvur',
+      ),
+      ghat('nagareswaram-ghat', 'Nagareswaram Ghat', 'నాగరేశ్వరం ఘాట్', 'east', 'Kovvur'),
+      ghat(
+        'purushottapatnam-ghat',
+        'Purushottapatnam Ghat',
+        'పురుషోత్తపట్నం ఘాట్',
+        'other',
+        'Other nearby ghats',
+      ),
+      ghat(
+        'seethanagaram-ghat',
+        'Seethanagaram Ghat',
+        'సీతనగరం ఘాట్',
+        'other',
+        'Other nearby ghats',
+      ),
+      ghat('pattiseema-ghat', 'Pattiseema Ghat', 'పట్టిసీమ ఘాట్', 'other', 'Other nearby ghats'),
+      ghat('vangalapudi-ghat', 'Vangalapudi Ghat', 'వంగలపూడి ఘాట్', 'other', 'Other nearby ghats'),
     ],
   },
   review: {

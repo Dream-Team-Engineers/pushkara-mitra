@@ -21,6 +21,7 @@ export function isContentKind(value: string): value is ContentKind {
 
 type Field =
   | { readonly type: 'text'; readonly max: number }
+  | { readonly type: 'textOrNull'; readonly max: number }
   | { readonly type: 'enum'; readonly values: readonly string[] }
   | { readonly type: 'enumList'; readonly values: readonly string[] }
   | { readonly type: 'number'; readonly min: number; readonly max: number }
@@ -30,6 +31,7 @@ type Field =
   | { readonly type: 'isoDateTime' };
 
 const text = (max: number): Field => ({ type: 'text', max });
+const textOrNull = (max: number): Field => ({ type: 'textOrNull', max });
 const oneOf = (...values: string[]): Field => ({ type: 'enum', values });
 
 const META: Readonly<Record<string, Field>> = {
@@ -47,6 +49,8 @@ export const CONTENT_FIELDS: Readonly<Record<ContentKind, Readonly<Record<string
     ...META,
     id: ID,
     name: text(120),
+    /** Telugu name, or null when none has been approved. English `name` is always present. */
+    nameTe: textOrNull(120),
     district: oneOf('east', 'west', 'other'),
     town: text(80),
     crowd: oneOf('low', 'moderate', 'high', 'noData'),
@@ -100,6 +104,11 @@ function fieldOk(field: Field, value: unknown): boolean {
   switch (field.type) {
     case 'text':
       return typeof value === 'string' && value.trim().length > 0 && value.length <= field.max;
+    case 'textOrNull':
+      return (
+        value === null ||
+        (typeof value === 'string' && value.trim().length > 0 && value.length <= field.max)
+      );
     case 'enum':
       return typeof value === 'string' && field.values.includes(value);
     case 'enumList':

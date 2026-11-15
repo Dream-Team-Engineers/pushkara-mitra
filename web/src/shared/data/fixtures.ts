@@ -20,6 +20,8 @@ export type Facility = 'water' | 'toilets' | 'firstAid' | 'ramp' | 'parking';
 export interface GhatFixture extends PublicMeta {
   readonly id: string;
   readonly name: string;
+  /** Telugu name when an approved one exists; shown first in Telugu mode. */
+  readonly nameTe: string | null;
   readonly district: District;
   readonly town: string;
   readonly crowd: CrowdLevel;
@@ -31,6 +33,7 @@ export const GHATS: readonly GhatFixture[] = [
     ...SYNTHETIC,
     id: 'g1',
     name: '[Sample ghat 1]',
+    nameTe: null,
     district: 'east',
     town: '[Town]',
     crowd: 'low',
@@ -40,6 +43,7 @@ export const GHATS: readonly GhatFixture[] = [
     ...SYNTHETIC,
     id: 'g2',
     name: '[Sample ghat 2]',
+    nameTe: null,
     district: 'west',
     town: '[Town]',
     crowd: 'moderate',
@@ -49,6 +53,7 @@ export const GHATS: readonly GhatFixture[] = [
     ...SYNTHETIC,
     id: 'g3',
     name: '[Sample ghat 3]',
+    nameTe: null,
     district: 'other',
     town: '[Town]',
     crowd: 'high',
@@ -58,6 +63,7 @@ export const GHATS: readonly GhatFixture[] = [
     ...SYNTHETIC,
     id: 'g4',
     name: '[Sample ghat 4]',
+    nameTe: null,
     district: 'east',
     town: '[Town]',
     crowd: 'noData',

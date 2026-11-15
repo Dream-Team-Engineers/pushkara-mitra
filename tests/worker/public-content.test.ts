@@ -22,6 +22,7 @@ const GHAT = {
   ...META,
   id: 'kotilingala',
   name: 'Kotilingala Ghat',
+  nameTe: null,
   district: 'east',
   town: 'Rajamahendravaram',
   crowd: 'noData',

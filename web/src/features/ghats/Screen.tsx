@@ -2,7 +2,7 @@ import { useSignal } from '@preact/signals';
 import { hrefFor } from '../../app/router';
 import type { District, Facility, GhatFixture } from '../../shared/data/fixtures';
 import { ghatsResource } from '../../shared/data/resources';
-import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, CrowdChip, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
@@ -39,7 +39,18 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
   return (
     <li class="card">
       <div class="card__head">
-        <h2 class="card__title">{ghat.name}</h2>
+        <h2 class="card__title">
+          {ghat.nameTe !== null && locale.value === 'te' ? (
+            <span class="bi bi--stacked">
+              <span lang="te">{ghat.nameTe}</span>
+              <span class="bi__sec" lang="en">
+                {ghat.name}
+              </span>
+            </span>
+          ) : (
+            ghat.name
+          )}
+        </h2>
         <CrowdChip level={ghat.crowd} />
       </div>
       <p class="card__meta">
