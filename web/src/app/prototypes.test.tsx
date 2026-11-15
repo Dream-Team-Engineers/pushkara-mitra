@@ -129,16 +129,27 @@ describe('Emergency / Help', () => {
     expect(html).toContain(t('module.help.noDispatch'));
   });
 
-  it('shows no helpline numbers until officially verified, and no way to dial', async () => {
+  it('shows the approved numbers, marks owner-supplied ones unverified, and never dials by itself', async () => {
     await load();
     const html = render(<HelpScreen />);
-    expect(html).toContain(t('help.numbers.pending'));
+    for (const number of ['112', '108', '1098', '1363', '1091']) expect(html).toContain(number);
+    expect(html).toContain(t('state.unverified'));
+    expect(html).not.toContain('tel:');
+    expect(html).not.toContain('call-confirm');
+    const calls = html.match(/<button[^>]*helpline__call[^>]*>/g) ?? [];
+    expect(calls).toHaveLength(6);
+    for (const call of calls) expect(call).toContain('aria-haspopup="dialog"');
+    expect(html).toContain(t('help.kin.note'));
+  });
+
+  it('a line without a number says so and its button is disabled', () => {
+    const html = render(<HelplineList lines={HELPLINES} />);
+    expect(html).toContain(t('help.numbers.unavailable'));
     expect(html).not.toMatch(/\b(?:100|108|112|181|1091|1098|1363)\b/);
     expect(html).not.toContain('tel:');
     const calls = html.match(/<button[^>]*helpline__call[^>]*>/g) ?? [];
     expect(calls.length).toBeGreaterThan(0);
     for (const call of calls) expect(call).toContain('disabled');
-    expect(html).toContain(t('help.kin.note'));
   });
 
   it('a verified number needs a confirmation tap: no dial link until then', () => {

@@ -385,7 +385,14 @@ const HELPLINES_ENTRY: ContentEntry = {
       ownerLine('women-1091', 'women', '1091'),
     ],
   },
-  review: { status: 'draft' },
+  review: {
+    status: 'approved',
+    reviewer: 'gkmraju',
+    reviewedRevision: 'd02551c',
+    reviewedOn: '2026-11-15',
+    scope:
+      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages. Police 112, ambulance 108, tourist 1363 and women 1091 were supplied by the owner and are shown as unverified; the owner will recheck all numbers on the last day before the event.',
+  },
 };
 
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {

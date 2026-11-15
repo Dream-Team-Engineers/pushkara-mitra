@@ -51,7 +51,7 @@ function approvedGhats(items: readonly Record<string, unknown>[] = [GHAT]): Cont
 const get = (path: string) => handlePublicContent(new URL(`https://app.test${path}`), entries());
 
 /** Kinds the owner has approved. Adding one here must match an approval record in the registry. */
-const APPROVED_KINDS: readonly ContentKind[] = ['ghats'];
+const APPROVED_KINDS: readonly ContentKind[] = ['ghats', 'helplines'];
 const DRAFT_KINDS = CONTENT_KINDS.filter((kind) => !APPROVED_KINDS.includes(kind));
 
 describe('shipped registry', () => {
