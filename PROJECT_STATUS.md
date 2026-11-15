@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Stale copy on the owner's browser; updates now apply automatically — 2026-11-15 20:04:00 IST
+
+- **Report:** the owner could not sign in; their screenshot of the Me tab still showed "Prototype · no data is sent" and "Sign-in is not switched on yet", which is the old build. The live site was checked at the same time: the served bundle `index-CPOikPxx.js` contains the staging client ID, so sign-in was enabled on the server; the owner's browser was running a cached copy kept by the offline service worker, which by design waited for the person to tap "Update".
+- **Change:** an update found within 15 seconds of the page opening (before anything is typed) is now applied automatically with one reload (`web/src/shared/pwa/register.ts`). Staging version `32f5ab75-1d47-4e80-a7e7-73aa5046e283`, commit `5af22e7`; gate passed (47 test files passed, 1 skipped; 624 tests passed, 24 skipped). The owner's browser still has the old worker, so it needs a one-time manual refresh (steps given in the session); later versions then arrive on their own.
+- **Not verified:** the agent has not seen the owner's browser after the fix; the update path was not exercised against a real older worker.
+- **Rollback:** `npx wrangler rollback feccd7c6-ed51-4944-84df-04c8662efe1e --env staging`.
+
 ## Google sign-in built and live on staging only — 2026-11-15 19:17:00 IST
 
 - **Task / outcome:** at the owner's request (client ID supplied 2026-11-15: `433695131529-igclhmojpijekd1nq65m2jnue5rno8tr.apps.googleusercontent.com`, a public identifier, not a secret) Google sign-in is built and deployed to **staging only**. Staging version `feccd7c6-ed51-4944-84df-04c8662efe1e` from commit `987c017` (earlier staging versions `5232680e` and `9b3181e5` this session). **Production has no client ID: the Worker route answers 404, the app flag is off and the security headers are unchanged** (guarded by `tests/guards/google-signin-config.test.ts`).
