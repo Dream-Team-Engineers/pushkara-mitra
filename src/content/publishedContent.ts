@@ -336,9 +336,10 @@ const GHATS_ENTRY: ContentEntry = {
 };
 
 /**
- * Helplines. 112 and 1098 cite the official page that states them. Police, ambulance, tourist (1363)
- * and women (1091) are numbers supplied by the owner on 2026-11-15 and are shown as unverified until
- * an official page is found; the owner will recheck every number on the last day before the event.
+ * Helplines. 112 and 1098 cite the official page that states them. Every other number was supplied
+ * by the owner on 2026-11-15 and is shown as unverified until an official page is found; the two
+ * Pushkaralu control-room numbers are provisional. The owner will recheck every number on the last
+ * day before the event.
  */
 const HELPLINES_CANDIDATE = {
   updatedAt: '2026-11-15T10:00:00+05:30',
@@ -346,14 +347,20 @@ const HELPLINES_CANDIDATE = {
   synthetic: false,
 } as const;
 
-const ownerLine = (id: string, kind: string, number: string) => ({
+const OWNER_SOURCE =
+  'Number supplied by the owner (2026-11-15); not yet checked against an official page';
+
+const PROVISIONAL =
+  'Number supplied by the owner (2026-11-15) from a Pushkaralu 2027 portal; provisional: verify with the district administration before the festival';
+
+const ownerLine = (id: string, kind: string, number: string, source = OWNER_SOURCE) => ({
   updatedAt: '2026-11-15T12:30:00+05:30',
   status: 'unverified',
   synthetic: false,
   id,
   kind,
   number,
-  source: 'Number supplied by the owner (2026-11-15); not yet checked against an official page',
+  source,
   sourceUrl: null,
 });
 
@@ -379,20 +386,21 @@ const HELPLINES_ENTRY: ContentEntry = {
         source: 'Ministry of Women and Child Development: Child Helpline 1098',
         sourceUrl: 'https://www.spniwcd.wcd.gov.in/child-helpline',
       },
-      ownerLine('police-112', 'police', '112'),
-      ownerLine('ambulance-108', 'ambulance', '108'),
+      ownerLine('police-100', 'police', '100'),
+      ownerLine('fire-101', 'fire', '101'),
+      ownerLine('ambulance-102', 'ambulance', '102'),
+      ownerLine('medical-108', 'medical', '108'),
+      ownerLine('road-1073', 'road', '1073'),
+      ownerLine('disaster-108', 'disaster', '108'),
+      ownerLine('ndrf-delhi', 'ndrf', '011-24363260'),
+      ownerLine('women-181', 'women', '181'),
+      ownerLine('distress-1091', 'distress', '1091'),
       ownerLine('tourist-1363', 'tourist', '1363'),
-      ownerLine('women-1091', 'women', '1091'),
+      ownerLine('seva-control-1800', 'control', '1800-123-2027', PROVISIONAL),
+      ownerLine('rjy-control-0883', 'localControl', '0883-1234567', PROVISIONAL),
     ],
   },
-  review: {
-    status: 'approved',
-    reviewer: 'gkmraju',
-    reviewedRevision: 'd02551c',
-    reviewedOn: '2026-11-15',
-    scope:
-      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages. Police 112, ambulance 108, tourist 1363 and women 1091 were supplied by the owner and are shown as unverified; the owner will recheck all numbers on the last day before the event.',
-  },
+  review: { status: 'draft' },
 };
 
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {

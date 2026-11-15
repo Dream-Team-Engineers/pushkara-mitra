@@ -21,6 +21,13 @@ const LINES: Readonly<Record<HelplineKind, { label: MessageKey; urgent: boolean 
   child: { label: 'help.line.child', urgent: false },
   women: { label: 'help.line.women', urgent: false },
   tourist: { label: 'help.line.tourist', urgent: false },
+  fire: { label: 'help.line.fire', urgent: true },
+  medical: { label: 'help.line.medical', urgent: true },
+  road: { label: 'help.line.road', urgent: false },
+  disaster: { label: 'help.line.disaster', urgent: false },
+  ndrf: { label: 'help.line.ndrf', urgent: false },
+  distress: { label: 'help.line.distress', urgent: false },
+  localControl: { label: 'help.line.localControl', urgent: false },
 };
 
 /** Digits and a leading + only, so the dial link cannot carry anything else. */
