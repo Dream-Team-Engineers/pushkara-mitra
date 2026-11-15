@@ -209,9 +209,12 @@ describe('POST /api/auth/google', () => {
   });
 
   it('keeps the Google policy narrow: no inline or eval scripts, only the gsi paths', () => {
-    // Only style attributes may be inline (Google's button); never scripts or <style> elements.
+    // Only styles may be inline (Google's button); never scripts.
     expect(CONTENT_SECURITY_POLICY_GOOGLE.match(/unsafe-inline/g)).toHaveLength(1);
-    expect(CONTENT_SECURITY_POLICY_GOOGLE).toContain("style-src-attr 'unsafe-inline'");
+    expect(CONTENT_SECURITY_POLICY_GOOGLE).toContain(
+      "style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style",
+    );
+    expect(CONTENT_SECURITY_POLICY_GOOGLE).not.toMatch(/script-src[^;]*unsafe/);
     expect(CONTENT_SECURITY_POLICY_GOOGLE).not.toContain('unsafe-eval');
     expect(CONTENT_SECURITY_POLICY_GOOGLE).toContain(
       "script-src 'self' https://accounts.google.com/gsi/client",

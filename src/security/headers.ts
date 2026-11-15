@@ -25,10 +25,9 @@ export const CONTENT_SECURITY_POLICY = [
 export const CONTENT_SECURITY_POLICY_GOOGLE = [
   "default-src 'none'",
   "script-src 'self' https://accounts.google.com/gsi/client",
-  "style-src 'self' https://accounts.google.com/gsi/style",
-  // Google's button sets inline style attributes on its own elements; without this it renders unsized.
-  // Attribute styles only: <style> elements and scripts stay blocked.
-  "style-src-attr 'unsafe-inline'",
+  // Google's sign-in button injects an inline <style> block into the page; without 'unsafe-inline' it
+  // renders as a giant logo (checked on staging 2026-11-15). Styles only: scripts stay strict.
+  "style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style",
   "img-src 'self' data:",
   "font-src 'self'",
   "connect-src 'self' https://accounts.google.com/gsi/",
