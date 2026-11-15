@@ -151,6 +151,29 @@ describe('POST /api/auth/google', () => {
     expect(viaWorker.status).toBe(404);
   });
 
+  it('sets a signed session cookie only when a session secret is configured', async () => {
+    const token = await sign(pair, GOOD);
+    const without = await handleGoogleAuth(post({ credential: token }), CLIENT_ID, keys, now);
+    expect(without.headers.get('Set-Cookie')).toBeNull();
+    expect(await without.json()).toEqual({
+      name: 'Lakshmi Devi',
+      email: 'pilgrim@example.com',
+      remembered: false,
+    });
+    const withSecret = await handleGoogleAuth(
+      post({ credential: token }),
+      CLIENT_ID,
+      keys,
+      now,
+      'a-long-enough-secret-for-the-test-0123456789',
+    );
+    const cookie = withSecret.headers.get('Set-Cookie') ?? '';
+    expect(cookie).toContain('__Host-pm_session=');
+    expect(cookie).toContain('HttpOnly');
+    expect(cookie).toContain('SameSite=Strict');
+    expect(await withSecret.json()).toMatchObject({ remembered: true });
+  });
+
   it('answers 200 with name and email for a valid token, never cached', async () => {
     const res = await handleGoogleAuth(
       post({ credential: await sign(pair, GOOD) }),
@@ -161,7 +184,11 @@ describe('POST /api/auth/google', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('Cache-Control')).toBe('no-store');
     expect(res.headers.get('Set-Cookie')).toBeNull();
-    expect(await res.json()).toEqual({ name: 'Lakshmi Devi', email: 'pilgrim@example.com' });
+    expect(await res.json()).toEqual({
+      name: 'Lakshmi Devi',
+      email: 'pilgrim@example.com',
+      remembered: false,
+    });
   });
 
   it('answers 401 with no detail for a bad token', async () => {

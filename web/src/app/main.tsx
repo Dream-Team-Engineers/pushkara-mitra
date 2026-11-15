@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import { startClock, watchOnline } from '../shared/data/time';
 import { DEFAULT_LOCALE, setLocale } from '../shared/i18n/i18n';
+import { restoreSession } from '../shared/auth/google';
 import { listenForInstall } from '../shared/pwa/install';
 import { registerServiceWorker } from '../shared/pwa/register';
 import { browserStore, readPreferences } from '../shared/prefs/preferences';
@@ -29,6 +30,7 @@ async function boot(): Promise<void> {
     setLocale(DEFAULT_LOCALE).catch(() => undefined);
   }
   startRouter();
+  void restoreSession();
   startClock();
   watchOnline();
   const root = document.getElementById('app');

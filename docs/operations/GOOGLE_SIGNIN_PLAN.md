@@ -1,6 +1,8 @@
 # Google sign-in for v1: plan and what the owner must do
 
-**Status: DRAFT plan, NEEDS REVIEW (OQ-030).** Written 2026-11-15 by Claude Code (agent) after the owner decided that v1 includes sign-in with a Google account (the account used for the Play Store), with no OTP and no password. Nothing here is legal advice or a compliance certificate. The sign-in button exists in the app but is **switched off** (flag `googleSignIn`).
+**Status: BUILT on staging only (2026-11-15), NEEDS REVIEW (OQ-030).** What is built, and what is still open, is at the end of this file under "Built so far". The rest is the original plan.
+
+**Original status line: DRAFT plan, NEEDS REVIEW (OQ-030).** Written 2026-11-15 by Claude Code (agent) after the owner decided that v1 includes sign-in with a Google account (the account used for the Play Store), with no OTP and no password. Nothing here is legal advice or a compliance certificate. The sign-in button exists in the app but is **switched off** (flag `googleSignIn`).
 
 ## How it works, and what is and is not stored
 
@@ -34,3 +36,11 @@ On the web (the PWA), sign-in uses Google Identity Services with a web client ID
 - Header and Me tab showing the signed-in person, with sign-out.
 - Tests that forged, expired and wrong-audience tokens are rejected, and that the token is never logged.
 - Flag `googleSignIn` switched on in a reviewed change, with the owner's approval recorded.
+
+## Built so far (staging only; production has no client ID)
+
+- **Sign-in:** Google's button after an age choice and an agreement; the Worker verifies the ID token (signature, issuer, audience, expiry, verified email) and returns name and email. Routes: `POST /api/auth/google`, `GET /api/auth/me`, `POST /api/auth/logout`.
+- **Staying signed in:** when the Worker secret `SESSION_SECRET` is set, the Worker also sets a signed HttpOnly cookie (`__Host-pm_session`, Secure, SameSite=Strict, 7 days) holding the name and email. No database, no session table, no logging. Without the secret the person is signed in for one page view only. Sign out clears the cookie on that device; a copied cookie remains valid until it expires, because nothing is kept server-side to revoke.
+- **Delete my account and data:** the screen at `#/delete-account` (also linked from the Me tab) explains that nothing is held on our servers, signs the person out and clears the cookie, and says how to remove the app's access in the Google Account.
+- **Privacy notice:** the in-app draft at `#/privacy` in Telugu, Hindi and English (agent-written, not reviewed). The older `docs/legal/privacy-notice-v1-draft.md` is superseded for sign-in by the in-app text.
+- **Not built, needs decisions or review:** a consent record (needs a place to store it: OQ-026), verified parental consent or blocking under-18s, consent wording, counsel review of the notice, Google's app verification for users outside the test list, a nonce and server-side revocation, a security review of the staging CSP (inline styles).

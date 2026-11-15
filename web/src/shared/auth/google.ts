@@ -15,6 +15,8 @@ export interface SignedInUser {
 
 export const user = signal<SignedInUser | null>(null);
 export const signInError = signal(false);
+/** True when the Worker also set a cookie, so the person stays signed in on this device. */
+export const remembered = signal(false);
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
@@ -70,17 +72,37 @@ async function exchange(credential: string): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ credential }),
       cache: 'no-store',
-      credentials: 'omit',
+      credentials: 'same-origin',
     });
     const body: unknown = await response.json();
     if (response.ok && isRealUser(body)) {
       user.value = { name: body.name, email: body.email };
+      remembered.value = (body as { remembered?: unknown }).remembered === true;
       signInError.value = false;
     } else {
       signInError.value = true;
     }
   } catch {
     signInError.value = true;
+  }
+}
+
+/** On page load: if this device still holds a valid sign-in cookie, show the person as signed in. */
+export async function restoreSession(): Promise<void> {
+  if (GOOGLE_CLIENT_ID === undefined) return;
+  try {
+    const response = await fetch('/api/auth/me', {
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
+    if (!response.ok) return;
+    const body: unknown = await response.json();
+    if (isRealUser(body)) {
+      user.value = { name: body.name, email: body.email };
+      remembered.value = true;
+    }
+  } catch {
+    // Offline or not configured: the person simply starts signed out.
   }
 }
 
@@ -107,8 +129,19 @@ export async function renderGoogleButton(parent: HTMLElement): Promise<void> {
   });
 }
 
-export function signOut(): void {
+/** Signs out here and asks the Worker to clear the cookie on this device. */
+export async function signOut(): Promise<void> {
   user.value = null;
+  remembered.value = false;
   signInError.value = false;
   window.google?.accounts.id.disableAutoSelect();
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
+  } catch {
+    // Offline: the cookie expires on its own; the screen is already signed out.
+  }
 }

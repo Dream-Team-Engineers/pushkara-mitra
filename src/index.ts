@@ -1,5 +1,5 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
-import { GOOGLE_AUTH_PATH, handleGoogleAuth } from './routes/googleAuth';
+import { AUTH_PREFIX, handleAuth } from './routes/googleAuth';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
@@ -12,11 +12,16 @@ export interface Env {
   LOCAL_SYNTHETIC_DEMO?: string;
   /** Public Google OAuth client ID. Set only where Google sign-in is switched on (staging first). */
   GOOGLE_CLIENT_ID?: string;
+  /** Worker secret that signs the sign-in cookie. Without it the person is signed in for one page view only. */
+  SESSION_SECRET?: string;
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
-  if (new URL(request.url).pathname === GOOGLE_AUTH_PATH) {
-    return handleGoogleAuth(request, env.GOOGLE_CLIENT_ID);
+  if (new URL(request.url).pathname.startsWith(AUTH_PREFIX)) {
+    return handleAuth(request, {
+      clientId: env.GOOGLE_CLIENT_ID,
+      sessionSecret: env.SESSION_SECRET,
+    });
   }
 
   if (request.method !== 'GET' && request.method !== 'HEAD') {

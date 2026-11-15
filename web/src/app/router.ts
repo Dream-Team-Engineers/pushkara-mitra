@@ -15,6 +15,8 @@ export const ROUTE_IDS = [
   'conditions',
   'partners',
   'settings',
+  'privacy',
+  'deleteAccount',
 ] as const;
 export type RouteId = (typeof ROUTE_IDS)[number];
 export type RouteState = RouteId | 'notFound';
@@ -38,6 +40,8 @@ export const ROUTES: readonly RouteInfo[] = [
   { id: 'conditions', path: '/conditions', titleKey: 'module.conditions.title' },
   { id: 'partners', path: '/partners', titleKey: 'module.partners.title' },
   { id: 'settings', path: '/settings', titleKey: 'settings.title' },
+  { id: 'privacy', path: '/privacy', titleKey: 'privacy.title' },
+  { id: 'deleteAccount', path: '/delete-account', titleKey: 'delete.title' },
 ];
 
 export function hrefFor(id: RouteId): string {
