@@ -1,4 +1,5 @@
 import { formatDate, formatNumber, t } from '../i18n/i18n';
+import { Bi } from './Bi';
 import { minutesSince, now } from '../data/time';
 import type { PublicMeta } from '../data/contracts';
 
@@ -22,7 +23,7 @@ export function ErrorState({ onRetry }: { readonly onRetry: () => void }) {
     <div class="state state--error" role="alert">
       <p>{t('state.error')}</p>
       <button type="button" class="button" onClick={onRetry}>
-        {t('state.retry')}
+        <Bi k="state.retry" />
       </button>
     </div>
   );

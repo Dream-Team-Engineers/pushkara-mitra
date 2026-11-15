@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { GHATS } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
@@ -55,7 +56,9 @@ export function PartnerPanel() {
         }}
       />
       <div class="field">
-        <label for="partner-phone">{t('pass.phone.label')}</label>
+        <label for="partner-phone">
+          <Bi k="pass.phone.label" />
+        </label>
         <input
           id="partner-phone"
           type="tel"
@@ -74,7 +77,9 @@ export function PartnerPanel() {
         </p>
       </div>
       <div class="field">
-        <label for="partner-name">{t('partners.name.label')}</label>
+        <label for="partner-name">
+          <Bi k="partners.name.label" />
+        </label>
         <input
           id="partner-name"
           type="text"
@@ -101,7 +106,7 @@ export function PartnerPanel() {
       {signedIn.value ? (
         <section class="section" aria-labelledby="verify-title">
           <h2 id="verify-title" class="section__title">
-            {t('partners.verify.title')}
+            <Bi k="partners.verify.title" />
           </h2>
           <ol class="steps">
             {VERIFY_STEPS.map((key) => (
@@ -124,10 +129,12 @@ export function VolunteerPanel() {
     <>
       <section class="section" aria-labelledby="report-title">
         <h2 id="report-title" class="section__title">
-          {t('partners.report.title')}
+          <Bi k="partners.report.title" />
         </h2>
         <div class="field field--flush">
-          <label for="report-ghat">{t('partners.report.ghat')}</label>
+          <label for="report-ghat">
+            <Bi k="partners.report.ghat" />
+          </label>
           <select
             id="report-ghat"
             value={ghat.value}
@@ -151,7 +158,9 @@ export function VolunteerPanel() {
           }}
         />
         <div class="field field--flush">
-          <label for="report-note">{t('partners.report.note.label')}</label>
+          <label for="report-note">
+            <Bi k="partners.report.note.label" />
+          </label>
           <textarea
             id="report-note"
             rows={3}
@@ -182,11 +191,11 @@ export function VolunteerPanel() {
       </section>
       <section class="section" aria-labelledby="shift-title">
         <h2 id="shift-title" class="section__title">
-          {t('partners.shift.title')}
+          <Bi k="partners.shift.title" />
         </h2>
         <p class="card__meta">{t('partners.shift.sample')}</p>
         <a class="button button--secondary" href={hrefFor('help')}>
-          {t('partners.emergency')}
+          <Bi k="partners.emergency" />
         </a>
       </section>
     </>

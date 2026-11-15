@@ -97,7 +97,7 @@ function CountdownCard() {
   return (
     <section class="countdown" aria-labelledby="countdown-title">
       <h2 id="countdown-title" class="countdown__title">
-        {t('home.countdown.title')}
+        <Bi k="home.countdown.title" />
       </h2>
       {state.phase === 'before' ? (
         <ul class="countdown__tiles">
@@ -130,7 +130,7 @@ function WeatherStrip() {
       <Icon name="cloud" />
       <div>
         <h2 id="weather-title" class="weather__city">
-          {t('home.city')}
+          <Bi k="home.city" />
         </h2>
         <p class="weather__status">{t('home.weather.unavailable')}</p>
       </div>

@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { t } from '../../shared/i18n/i18n';
 import { validateName, validatePhone } from '../../shared/privacy/validation';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
@@ -52,7 +53,9 @@ export default function PassScreen() {
       {step.value === 1 ? (
         <>
           <div class="field">
-            <label for="pass-phone">{t('pass.phone.label')}</label>
+            <label for="pass-phone">
+              <Bi k="pass.phone.label" />
+            </label>
             <input
               id="pass-phone"
               type="tel"
@@ -91,7 +94,9 @@ export default function PassScreen() {
       {step.value === 2 ? (
         <>
           <div class="field">
-            <label for="pass-name">{t('pass.name.label')}</label>
+            <label for="pass-name">
+              <Bi k="pass.name.label" />
+            </label>
             <input
               id="pass-name"
               type="text"
@@ -120,7 +125,9 @@ export default function PassScreen() {
                 consent.value = event.currentTarget.checked;
               }}
             />
-            <label for="pass-consent">{t('pass.consent')}</label>
+            <label for="pass-consent">
+              <Bi k="pass.consent" />
+            </label>
           </div>
           <p class="field__error" role="alert">
             {tried.value && !consent.value ? t('pass.consent.error') : ''}
@@ -147,7 +154,7 @@ export default function PassScreen() {
         <>
           <section class="pass-card" aria-labelledby="pass-card-title">
             <h2 id="pass-card-title" class="pass-card__title">
-              {t('pass.card.title')}
+              <Bi k="pass.card.title" />
             </h2>
             <dl class="pass-card__rows">
               <div>
@@ -176,7 +183,7 @@ export default function PassScreen() {
               {t('action.edit')}
             </button>
             <button type="button" class="button button--danger" onClick={reset}>
-              {t('action.delete')}
+              <Bi k="action.delete" />
             </button>
           </div>
         </>

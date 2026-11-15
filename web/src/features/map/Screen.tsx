@@ -1,4 +1,5 @@
 import { hrefFor } from '../../app/router';
+import { Bi } from '../../shared/ui/Bi';
 import { t } from '../../shared/i18n/i18n';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 
@@ -43,7 +44,7 @@ export default function MapScreen() {
       </ul>
       <section class="section" aria-labelledby="map-members-title">
         <h2 id="map-members-title" class="section__title">
-          {t('map.members')}
+          <Bi k="map.members" />
         </h2>
         <ul class="card-list card-list--flush">
           <li class="card">
@@ -62,13 +63,15 @@ export default function MapScreen() {
       </section>
       <div class="field field--check">
         <input id="map-only-group" type="checkbox" checked disabled />
-        <label for="map-only-group">{t('map.onlyGroup')}</label>
+        <label for="map-only-group">
+          <Bi k="map.onlyGroup" />
+        </label>
       </div>
       <p class="note">{t('map.noHistory')}</p>
       <p class="note">{t('map.attribution')}</p>
       <div class="actions">
         <a class="button button--secondary" href={hrefFor('group')}>
-          {t('map.manage')}
+          <Bi k="map.manage" />
         </a>
       </div>
     </>

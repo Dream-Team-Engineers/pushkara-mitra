@@ -1,4 +1,5 @@
 import { t, type MessageKey } from '../i18n/i18n';
+import { Bi } from './Bi';
 
 export interface ChipOption<V extends string> {
   readonly value: V;
@@ -30,7 +31,7 @@ export function ChipGroup<V extends string>({
             onSelect(option.value);
           }}
         >
-          {t(option.label)}
+          <Bi k={option.label} />
         </button>
       ))}
     </fieldset>
@@ -46,5 +47,9 @@ const CROWD_LABELS = {
 
 /** Crowd level as text plus a shape class, never colour alone. Always an estimate. */
 export function CrowdChip({ level }: { readonly level: keyof typeof CROWD_LABELS }) {
-  return <span class={`crowd crowd--${level}`}>{t(CROWD_LABELS[level])}</span>;
+  return (
+    <span class={`crowd crowd--${level}`}>
+      <Bi k={CROWD_LABELS[level]} />
+    </span>
+  );
 }

@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import type { StayFixture, StayKind } from '../../shared/data/fixtures';
 import { stayResource } from '../../shared/data/resources';
 import { formatNumber, t, type MessageKey } from '../../shared/i18n/i18n';
@@ -53,7 +54,9 @@ export default function StayScreen() {
       <ScreenHeader titleKey="module.stay.title" subtitleKey="module.stay.subtitle" />
       <p class="note">{t('stay.note')}</p>
       <details class="note">
-        <summary>{t('stay.rank.title')}</summary>
+        <summary>
+          <Bi k="stay.rank.title" />
+        </summary>
         <p>{t('stay.rank.body')}</p>
       </details>
       <ChipGroup

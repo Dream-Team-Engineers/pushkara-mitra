@@ -1,4 +1,5 @@
 import { crowdResource } from '../../shared/data/resources';
+import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
 import { CrowdChip } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -22,7 +23,7 @@ export default function ConditionsScreen() {
       <ScreenHeader titleKey="module.conditions.title" subtitleKey="module.conditions.subtitle" />
       <section class="section" aria-labelledby="crowd-title">
         <h2 id="crowd-title" class="section__title">
-          {t('conditions.crowd')}
+          <Bi k="conditions.crowd" />
         </h2>
         <p class="note note--flush">{t('conditions.crowdNote')}</p>
         <ResourceView
@@ -52,7 +53,7 @@ export default function ConditionsScreen() {
       </ul>
       <section class="section" aria-labelledby="safety-title">
         <h2 id="safety-title" class="section__title">
-          {t('conditions.safety')}
+          <Bi k="conditions.safety" />
         </h2>
         <p class="note note--flush">{t('conditions.noneVerified')}</p>
         <p class="note note--flush">{t('conditions.safetyNote')}</p>

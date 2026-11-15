@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { District, Facility, GhatFixture } from '../../shared/data/fixtures';
 import { ghatsResource } from '../../shared/data/resources';
@@ -81,7 +82,7 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
       <p class="card__meta">{t('ghats.snanamPending')}</p>
       <SourceStamp meta={ghat} />
       <a class="button button--secondary" href={hrefFor('map')}>
-        {t('action.directions')}
+        <Bi k="action.directions" />
       </a>
     </li>
   );

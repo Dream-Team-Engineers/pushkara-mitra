@@ -23,7 +23,9 @@ function NoticeList({ items }: { readonly items: readonly Notice[] }) {
             {item.name} · {item.licence}
           </span>
           {item.licenceTextPath === undefined ? null : (
-            <a href={item.licenceTextPath}>{t('settings.about.licenceText')}</a>
+            <a href={item.licenceTextPath}>
+              <Bi k="settings.about.licenceText" />
+            </a>
           )}
         </li>
       ))}
@@ -79,11 +81,17 @@ export default function SettingsScreen() {
         ))}
       </fieldset>
       <section class="about" aria-labelledby="about-title">
-        <h2 id="about-title">{t('settings.about.title')}</h2>
+        <h2 id="about-title">
+          <Bi k="settings.about.title" />
+        </h2>
         <p>{t('settings.about.intro')}</p>
-        <h3>{t('settings.about.fonts')}</h3>
+        <h3>
+          <Bi k="settings.about.fonts" />
+        </h3>
         <NoticeList items={FONT_NOTICES} />
-        <h3>{t('settings.about.software')}</h3>
+        <h3>
+          <Bi k="settings.about.software" />
+        </h3>
         <NoticeList items={SOFTWARE_NOTICES} />
         <PublishedInformation />
         <p class="notice" role="note">

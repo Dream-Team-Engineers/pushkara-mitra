@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { Bi } from './Bi';
 import { current, hrefFor, type RouteId } from '../../app/router';
 import { pair, t, type MessageKey } from '../i18n/i18n';
 import { BrandMark, Icon, type IconName } from './Icon';
@@ -93,7 +94,9 @@ export function Section({
 }) {
   return (
     <section class="section">
-      <h2 class="section__title">{t(titleKey)}</h2>
+      <h2 class="section__title">
+        <Bi k={titleKey} />
+      </h2>
       {children}
     </section>
   );

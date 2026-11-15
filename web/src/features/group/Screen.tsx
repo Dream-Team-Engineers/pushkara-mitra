@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { formatNumber, t } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
@@ -65,7 +66,9 @@ export default function GroupScreen() {
       {tab.value === 'create' ? (
         <>
           <div class="field">
-            <label for="group-name">{t('group.name.label')}</label>
+            <label for="group-name">
+              <Bi k="group.name.label" />
+            </label>
             <input
               id="group-name"
               type="text"
@@ -91,7 +94,7 @@ export default function GroupScreen() {
           {created.value ? (
             <section class="card code-card" aria-labelledby="group-code-title">
               <h2 id="group-code-title" class="card__title">
-                {t('group.code.title')}
+                <Bi k="group.code.title" />
               </h2>
               <p class="code">PM-SAMPLE</p>
               <p class="card__meta">{t('group.code.note')}</p>
@@ -102,7 +105,9 @@ export default function GroupScreen() {
       ) : (
         <>
           <div class="field">
-            <label for="group-code">{t('group.code.label')}</label>
+            <label for="group-code">
+              <Bi k="group.code.label" />
+            </label>
             <input
               id="group-code"
               type="text"
@@ -174,7 +179,7 @@ export default function GroupScreen() {
       </section>
       <section class="section" aria-labelledby="share-title">
         <h2 id="share-title" class="section__title">
-          {t('group.share.title')}
+          <Bi k="group.share.title" />
         </h2>
         <button
           type="button"
@@ -193,7 +198,7 @@ export default function GroupScreen() {
       </section>
       <div class="actions">
         <a class="button button--secondary" href={hrefFor('map')}>
-          {t('group.seeOnMap')}
+          <Bi k="group.seeOnMap" />
         </a>
         <button
           type="button"

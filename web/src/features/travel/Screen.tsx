@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { TravelFixture, TravelMode } from '../../shared/data/fixtures';
 import { travelResource } from '../../shared/data/resources';
@@ -40,7 +41,9 @@ export default function TravelScreen() {
         }}
       />
       <div class="field">
-        <label for="travel-from">{t('travel.from')}</label>
+        <label for="travel-from">
+          <Bi k="travel.from" />
+        </label>
         <input
           id="travel-from"
           type="text"
@@ -79,7 +82,7 @@ export default function TravelScreen() {
       />
       <section class="section" aria-labelledby="reach-title">
         <h2 id="reach-title" class="section__title">
-          {t('travel.reach.title')}
+          <Bi k="travel.reach.title" />
         </h2>
         <ol class="steps">
           <li>
@@ -93,7 +96,7 @@ export default function TravelScreen() {
           </li>
         </ol>
         <a class="button button--secondary" href={hrefFor('map')}>
-          {t('travel.routeOnMap')}
+          <Bi k="travel.routeOnMap" />
         </a>
       </section>
     </>

@@ -29,7 +29,7 @@ export default function HelpScreen() {
           SOS
         </h2>
         <button type="button" class="sos__button" disabled aria-describedby="sos-note">
-          {t('help.sos.button')}
+          <Bi k="help.sos.button" />
         </button>
         <p id="sos-note" class="note note--flush">
           {t('help.sos.inactive')}
@@ -53,13 +53,13 @@ export default function HelpScreen() {
       </section>
       <section class="section" aria-labelledby="kin-title">
         <h2 id="kin-title" class="section__title">
-          {t('help.kin.title')}
+          <Bi k="help.kin.title" />
         </h2>
         <p class="note note--flush">{t('help.kin.note')}</p>
       </section>
       <section class="section" aria-labelledby="points-title">
         <h2 id="points-title" class="section__title">
-          {t('help.points.title')}
+          <Bi k="help.points.title" />
         </h2>
         <ResourceView
           resource={helpPointsResource}

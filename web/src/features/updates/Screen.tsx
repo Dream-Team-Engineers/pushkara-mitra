@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { UpdateFixture, UpdateKind } from '../../shared/data/fixtures';
 import { updatesResource } from '../../shared/data/resources';
@@ -70,7 +71,9 @@ export default function UpdatesScreen() {
       />
       {tab.value === 'rituals' || tab.value === 'today' ? (
         <p class="note">
-          <a href={hrefFor('partners')}>{t('updates.findPandits')}</a>
+          <a href={hrefFor('partners')}>
+            <Bi k="updates.findPandits" />
+          </a>
         </p>
       ) : null}
       <p class="note">{t('updates.footer')}</p>
