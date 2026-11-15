@@ -6,6 +6,12 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Telugu ghat names — 2026-11-15 05:17:40 IST (committed locally, not deployed)
+
+- **Task / outcome:** the 15 approved ghats now carry `nameTe` (new optional-null field in the content schema), taken from the owner's trilingual guide (`Ghats.pdf`, an unofficial compilation) as the primary Telugu name until an official list exists. Telugu mode shows the Telugu name first with the English name beneath; Hindi and English modes show the English name. The approval record's scope and revision were updated to `e297725` and say the Telugu names are owner-supplied and not official. Ghats 16 to 30 of the guide (Telangana and others) are not added: no official source yet.
+- **To check by the owner:** spellings of Dowleswaram (డౌలెస్వరం, usual Telugu spelling is ధవళేశ్వరం) and Seethanagaram (సీతనగరం, usual: సీతానగరం) follow the guide as supplied.
+- **Evidence:** eslint, tsc, prettier passed; web and guard tests 493 passed, 24 skipped (`--pool=vmThreads`); worker 96 passed. Not viewed on a device; not deployed. Independent reviewer: NONE.
+
 ## Dual-language display, phase 1 — 2026-11-15 05:07:02 IST (committed locally, not deployed)
 
 - **Task / outcome:** at the owner's direction (decisions 2026-11-15: English-only stays an option; disclaimer shows both languages; ghat names stay English until sourced Telugu names are approved), Telugu and Hindi now show English beside them. English-only is the third setting. New `pair()` helper and `<Bi>` component (each part carries its own `lang`; the repeated English is `aria-hidden`). Applied to Home (hero, quick-access cards, heading, disclaimer), screen headers, Help (helpline names, section title, no-dispatch note) and Settings (language labels "తెలుగు + English", "हिन्दी + English", "English", plus a hint). English loads together with the chosen language; at boot Telugu shows at once and English appears when loaded.

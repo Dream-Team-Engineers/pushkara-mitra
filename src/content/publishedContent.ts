@@ -142,9 +142,10 @@ const GHATS_ENTRY: ContentEntry = {
   review: {
     status: 'approved',
     reviewer: 'gkmraju',
-    reviewedRevision: '8dd68a5',
+    reviewedRevision: 'e297725',
     reviewedOn: '2026-11-14',
-    scope: 'Owner compared all 15 names and groupings with https://eastgodavari.ap.gov.in/ghats/',
+    scope:
+      'English names and groupings: owner compared all 15 with https://eastgodavari.ap.gov.in/ghats/ (2026-11-14). Telugu names (nameTe): owner-supplied trilingual guide, native-speaker review stated by owner 2026-11-15; not an official source.',
   },
 };
 
