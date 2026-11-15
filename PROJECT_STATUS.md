@@ -6,7 +6,7 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
-## Owner confirmed staging checks — 2026-11-15 17:00:00 IST
+## Owner confirmed staging checks — 2026-11-15 18:34:00 IST
 
 - **Owner statement (2026-11-15, Krishna Murthy Raju G / `gkmraju`), after trying staging version `ebf3c998` in Chrome on the phone:** the blank space below content is gone ("Yes"), the install banner appears ("Yes"), and the new Home logo and dot-ring countdown look right ("Yes"). Recorded from the owner's message; the agent did not see the phone. This closes the blank-space question in the previous entry for the owner's device.
 - **Next:** Google sign-in needs the owner's Google OAuth client ID; steps were given in the session (`docs/operations/GOOGLE_SIGNIN_PLAN.md`). Deferred by the owner: the app-wide glass style.
