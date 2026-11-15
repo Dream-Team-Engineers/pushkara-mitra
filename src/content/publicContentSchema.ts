@@ -51,7 +51,9 @@ export const CONTENT_FIELDS: Readonly<Record<ContentKind, Readonly<Record<string
     name: text(120),
     /** Telugu name, or null when none has been approved. English `name` is always present. */
     nameTe: textOrNull(120),
-    district: oneOf('east', 'west', 'other'),
+    /** Hindi name, or null when none has been approved. */
+    nameHi: textOrNull(120),
+    district: oneOf('east', 'west', 'other', 'telangana'),
     town: text(80),
     crowd: oneOf('low', 'moderate', 'high', 'noData'),
     facilities: { type: 'enumList', values: ['water', 'toilets', 'firstAid', 'ramp', 'parking'] },
@@ -168,7 +170,7 @@ export interface PublishedDataset {
 
 /**
  * Rules for a dataset that may be served as real information, on top of the item shape:
- * no synthetic items, every item cites an https source, ids are unique, and ghats carry no
+ * no synthetic items, every item cites an https source (or is marked `unverified`), ids are unique, and ghats carry no
  * crowd level (a repository file cannot know live crowds, so it must say `noData`).
  */
 export function publishableProblems(dataset: PublishedDataset): string[] {
@@ -182,7 +184,9 @@ export function publishableProblems(dataset: PublishedDataset): string[] {
     if (!isContentItem(dataset.kind, item))
       problems.push(`${at} does not match the ${dataset.kind} shape`);
     if (item['synthetic'] !== false) problems.push(`${at} is synthetic`);
-    if (typeof item['sourceUrl'] !== 'string') problems.push(`${at} has no https source URL`);
+    // An unofficial item may have no URL, but only if it says so with `unverified`.
+    if (typeof item['sourceUrl'] !== 'string' && item['status'] !== 'unverified')
+      problems.push(`${at} has no https source URL`);
     if (ids.has(item['id'])) problems.push(`${at} repeats id ${String(item['id'])}`);
     ids.add(item['id']);
     if (dataset.kind === 'ghats' && item['crowd'] !== 'noData') {

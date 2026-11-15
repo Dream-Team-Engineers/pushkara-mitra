@@ -14,12 +14,14 @@ const FILTERS: readonly ChipOption<Filter>[] = [
   { value: 'all', label: 'action.all' },
   { value: 'east', label: 'ghats.district.east' },
   { value: 'west', label: 'ghats.district.west' },
+  { value: 'telangana', label: 'ghats.district.telangana' },
   { value: 'other', label: 'ghats.district.other' },
 ];
 
 const DISTRICT_LABELS = {
   east: 'ghats.district.east',
   west: 'ghats.district.west',
+  telangana: 'ghats.district.telangana',
   other: 'ghats.district.other',
 } as const satisfies Record<District, MessageKey>;
 
@@ -35,20 +37,28 @@ export function filterGhats(items: readonly GhatFixture[], filter: Filter): read
   return filter === 'all' ? items : items.filter((item) => item.district === filter);
 }
 
+/** The name in the chosen language, when the data has one; English is shown beneath it. */
+function localName(ghat: GhatFixture): string | null {
+  if (locale.value === 'te') return ghat.nameTe;
+  if (locale.value === 'hi') return ghat.nameHi;
+  return null;
+}
+
 function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
+  const local = localName(ghat);
   return (
     <li class="card">
       <div class="card__head">
         <h2 class="card__title">
-          {ghat.nameTe !== null && locale.value === 'te' ? (
+          {local === null ? (
+            ghat.name
+          ) : (
             <span class="bi bi--stacked">
-              <span lang="te">{ghat.nameTe}</span>
+              <span lang={locale.value}>{local}</span>
               <span class="bi__sec" lang="en">
                 {ghat.name}
               </span>
             </span>
-          ) : (
-            ghat.name
           )}
         </h2>
         <CrowdChip level={ghat.crowd} />
@@ -99,6 +109,9 @@ export default function GhatsScreen() {
           return (
             <>
               <p class="note">{t(note)}</p>
+              {items.some((item) => item.nameTe !== null || item.nameHi !== null) ? (
+                <p class="note">{t('ghats.namesUnverified')}</p>
+              ) : null}
               {visible.length === 0 ? (
                 <p class="note">{t('state.empty')}</p>
               ) : (

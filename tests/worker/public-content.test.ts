@@ -23,6 +23,7 @@ const GHAT = {
   id: 'kotilingala',
   name: 'Kotilingala Ghat',
   nameTe: null,
+  nameHi: null,
   district: 'east',
   town: 'Rajamahendravaram',
   crowd: 'noData',
@@ -68,7 +69,7 @@ describe('shipped registry', () => {
     expect(response.status).toBe(200);
     const body: unknown = await response.json();
     expect(isPublishedDataset(body, 'ghats')).toBe(true);
-    expect((body as { items: unknown[] }).items).toHaveLength(15);
+    expect((body as { items: unknown[] }).items).toHaveLength(30);
   });
 
   it.each(DRAFT_KINDS)(

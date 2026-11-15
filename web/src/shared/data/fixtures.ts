@@ -14,7 +14,7 @@ const SYNTHETIC: PublicMeta = {
 };
 
 export type CrowdLevel = 'low' | 'moderate' | 'high' | 'noData';
-export type District = 'east' | 'west' | 'other';
+export type District = 'east' | 'west' | 'other' | 'telangana';
 export type Facility = 'water' | 'toilets' | 'firstAid' | 'ramp' | 'parking';
 
 export interface GhatFixture extends PublicMeta {
@@ -22,6 +22,8 @@ export interface GhatFixture extends PublicMeta {
   readonly name: string;
   /** Telugu name when an approved one exists; shown first in Telugu mode. */
   readonly nameTe: string | null;
+  /** Hindi name when one exists; shown first in Hindi mode. */
+  readonly nameHi: string | null;
   readonly district: District;
   readonly town: string;
   readonly crowd: CrowdLevel;
@@ -34,6 +36,7 @@ export const GHATS: readonly GhatFixture[] = [
     id: 'g1',
     name: '[Sample ghat 1]',
     nameTe: null,
+    nameHi: null,
     district: 'east',
     town: '[Town]',
     crowd: 'low',
@@ -44,6 +47,7 @@ export const GHATS: readonly GhatFixture[] = [
     id: 'g2',
     name: '[Sample ghat 2]',
     nameTe: null,
+    nameHi: null,
     district: 'west',
     town: '[Town]',
     crowd: 'moderate',
@@ -54,6 +58,7 @@ export const GHATS: readonly GhatFixture[] = [
     id: 'g3',
     name: '[Sample ghat 3]',
     nameTe: null,
+    nameHi: null,
     district: 'other',
     town: '[Town]',
     crowd: 'high',
@@ -64,6 +69,7 @@ export const GHATS: readonly GhatFixture[] = [
     id: 'g4',
     name: '[Sample ghat 4]',
     nameTe: null,
+    nameHi: null,
     district: 'east',
     town: '[Town]',
     crowd: 'noData',
