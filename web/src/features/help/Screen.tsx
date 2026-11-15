@@ -1,22 +1,17 @@
 import { helplinesResource, helpPointsResource } from '../../shared/data/resources';
-import type { HelplineKind, HelpPointKind } from '../../shared/data/fixtures';
+import type { HelpPointKind } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { HelplineList } from './HelplineList';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
 import { SourceStamp } from '../../shared/ui/Status';
 
 /**
- * Emergency / Help prototype (flag `sosDispatch` is off). The SOS control is inert, no number is
- * dialled and nothing is dispatched. Helpline numbers are not shown until an officially verified
- * source is supplied. The app never replaces police, ambulance or any government service.
+ * Emergency / Help (flag `sosDispatch` is off). The SOS control is inert and nothing is dispatched.
+ * Helpline numbers appear only from owner-approved, officially sourced data; each can be called
+ * only after an explicit confirmation (HelplineList). The app never replaces police, ambulance or
+ * any government service.
  */
-const LINE_LABELS = {
-  emergency: 'help.line.emergency',
-  ambulance: 'help.line.ambulance',
-  police: 'help.line.police',
-  control: 'help.line.control',
-} as const satisfies Record<HelplineKind, MessageKey>;
-
 const POINT_LABELS = {
   firstAid: 'help.point.firstAid',
   police: 'help.point.police',
@@ -46,15 +41,12 @@ export default function HelpScreen() {
         <ResourceView
           resource={helplinesResource}
           render={(lines) => (
-            <ul class="card-list card-list--flush">
-              {lines.map((line) => (
-                <li key={line.id} class="card">
-                  <p class="card__title">{t(LINE_LABELS[line.kind])}</p>
-                  <p class="card__meta">{line.number ?? t('help.numbers.pending')}</p>
-                  <SourceStamp meta={line} />
-                </li>
-              ))}
-            </ul>
+            <>
+              {lines.some((line) => line.number === null) ? (
+                <p class="note note--flush">{t('help.numbers.pending')}</p>
+              ) : null}
+              <HelplineList lines={lines} />
+            </>
           )}
         />
       </section>

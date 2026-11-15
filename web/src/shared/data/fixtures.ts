@@ -216,7 +216,8 @@ export const UPDATES: readonly UpdateFixture[] = [
   },
 ];
 
-export type HelplineKind = 'emergency' | 'ambulance' | 'police' | 'control';
+export type HelplineKind =
+  'emergency' | 'ambulance' | 'police' | 'control' | 'child' | 'women' | 'tourist';
 
 /**
  * Helplines are listed WITHOUT numbers until an owner-supplied, officially verified source
@@ -233,6 +234,9 @@ export const HELPLINES: readonly HelplineFixture[] = [
   { ...SYNTHETIC, id: 'h2', kind: 'ambulance', number: null },
   { ...SYNTHETIC, id: 'h3', kind: 'police', number: null },
   { ...SYNTHETIC, id: 'h4', kind: 'control', number: null },
+  { ...SYNTHETIC, id: 'h5', kind: 'child', number: null },
+  { ...SYNTHETIC, id: 'h6', kind: 'women', number: null },
+  { ...SYNTHETIC, id: 'h7', kind: 'tourist', number: null },
 ];
 
 export type HelpPointKind = 'firstAid' | 'police' | 'lost';

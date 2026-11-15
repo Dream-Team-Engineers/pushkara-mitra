@@ -24,6 +24,12 @@ const ROOT = join(import.meta.dirname, '..', '..', 'web', 'src');
 const STORAGE_ALLOW_LIST: readonly string[] = ['shared/prefs/preferences.ts'];
 /** Files allowed to use the network. Public read-only content client, once it exists. */
 const NETWORK_ALLOW_LIST: readonly string[] = [];
+/**
+ * Files allowed to build a tel: link. Owner decision 2026-11-15: helpline numbers may be called,
+ * but only from the confirmation dialog in HelplineList after an explicit tap. No other file may
+ * dial, text or mail, and the dialled number comes only from approved, officially sourced data.
+ */
+const DIAL_ALLOW_LIST: readonly string[] = ['features/help/HelplineList.tsx'];
 
 const files = readCode(ROOT, listCodeFiles(ROOT));
 const features = files.filter((file) => file.path.startsWith('features/'));
@@ -51,6 +57,11 @@ describe('frontend privacy guard: real sources', () => {
     const offenders = files
       .filter((file) => !/\.test\.tsx?$/.test(file.path))
       .filter((file) => findDeviceCapture(file.source).length > 0)
+      .filter(
+        (file) =>
+          !DIAL_ALLOW_LIST.includes(file.path) ||
+          findDeviceCapture(file.source).some((hit) => hit !== 'dial, sms or mail link'),
+      )
       .map((file) => file.path);
     expect(offenders).toEqual([]);
   });

@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Helpline rows with call confirmation; Telugu review recorded — 2026-11-15 04:25:39 IST (uncommitted)
+
+- **Task / outcome:** Help screen lists helplines as in the owner's UI workflow design (number chip, name, red Call button). A tap opens a confirmation; only "Call now" dials. Helpline kinds extended (child, women, tourist). Candidate numbers 112 and 1098 are in `src/content/publishedContent.ts` as **draft** with official source pages; the dataset is not approved, so the app still shows "Not yet available". 100, 108, 181 and 1363 have no official source yet. The privacy guard allows `tel:` only in `HelplineList.tsx`. Owner guide: `docs/operations/OWNER_NEXT_STEPS.md`.
+- **Telugu review:** owner `gkmraju` stated on 2026-11-15 that Telugu was reviewed by GKM Raju; recorded in `te.json` meta from that statement. Hindi remains draft. Counsel review of the disclaimer (OQ-019) is separate and still open.
+- **Actors:** Claude Code (agent) implemented; independent reviewer NONE.
+- **Evidence:** `eslint`, `tsc` (both projects) and `prettier --check` passed; worker project 96 tests passed; web and guard projects 484 passed, 24 skipped, run with `--pool=vmThreads` because the default pool fails every web test on this machine's Node 24.15, also on the untouched baseline. Not run as a single `npm run check`; not viewed on a real device; not committed or deployed.
+- **Next action / owner:** owner confirms 112 and 1098 against their pages, supplies sources for the rest, and decides on release-please (see the guide).
+
 ## Session summary and handover for next session — 2026-11-14 23:31:09 IST
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation and deployments by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.

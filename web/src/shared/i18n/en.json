@@ -205,7 +205,7 @@
     "help.sos.button": "SOS (prototype · inactive)",
     "help.sos.inactive": "SOS does not work in this prototype. No alert is sent and no location is used.",
     "help.numbers.title": "Helplines",
-    "help.numbers.pending": "Number is shown after official verification",
+    "help.numbers.pending": "Some numbers are shown only after official verification",
     "help.line.emergency": "Emergency service",
     "help.line.ambulance": "Ambulance",
     "help.line.police": "Police",
@@ -247,6 +247,16 @@
     "settings.about.software": "Software",
     "settings.about.licenceText": "Licence text",
     "settings.about.reviewPending": "This list has not had legal review yet.",
-    "settings.about.published": "Published information"
+    "settings.about.published": "Published information",
+    "help.line.child": "Child helpline",
+    "help.line.women": "Women helpline",
+    "help.line.tourist": "Tourist helpline",
+    "help.numbers.unavailable": "Not yet available",
+    "help.call.title": "Call {name}?",
+    "help.call.go": "Call {number} now",
+    "help.call.cancel": "Cancel",
+    "help.call.note": "This opens your phone's dialler. The call is made by your phone, not by this app, and nothing is sent to us.",
+    "help.call.aria": "{name}, {number}. Opens a confirmation before calling.",
+    "help.call.button": "Call"
   }
 }

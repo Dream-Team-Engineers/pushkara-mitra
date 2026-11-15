@@ -205,7 +205,7 @@
     "help.sos.button": "SOS (नमूना · निष्क्रिय)",
     "help.sos.inactive": "इस नमूने में SOS काम नहीं करता। कोई अलर्ट नहीं भेजा जाता और स्थान का उपयोग नहीं होता।",
     "help.numbers.title": "हेल्पलाइन",
-    "help.numbers.pending": "आधिकारिक सत्यापन के बाद नंबर दिखाया जाएगा",
+    "help.numbers.pending": "कुछ नंबर आधिकारिक सत्यापन के बाद ही दिखाए जाएँगे",
     "help.line.emergency": "आपातकालीन सेवा",
     "help.line.ambulance": "एम्बुलेंस",
     "help.line.police": "पुलिस",
@@ -247,6 +247,16 @@
     "settings.about.software": "सॉफ़्टवेयर",
     "settings.about.licenceText": "लाइसेंस का पाठ",
     "settings.about.reviewPending": "इस सूची की कानूनी समीक्षा अभी नहीं हुई है।",
-    "settings.about.published": "प्रकाशित जानकारी"
+    "settings.about.published": "प्रकाशित जानकारी",
+    "help.line.child": "बाल हेल्पलाइन",
+    "help.line.women": "महिला हेल्पलाइन",
+    "help.line.tourist": "पर्यटक हेल्पलाइन",
+    "help.numbers.unavailable": "अभी उपलब्ध नहीं",
+    "help.call.title": "{name} को कॉल करें?",
+    "help.call.go": "अभी {number} पर कॉल करें",
+    "help.call.cancel": "रद्द करें",
+    "help.call.note": "यह आपके फ़ोन का डायलर खोलता है। कॉल आपके फ़ोन से होती है, इस ऐप से नहीं, और हमें कुछ नहीं भेजा जाता।",
+    "help.call.aria": "{name}, {number}। कॉल से पहले पुष्टि खुलेगी।",
+    "help.call.button": "कॉल"
   }
 }

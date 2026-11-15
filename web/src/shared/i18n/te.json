@@ -2,9 +2,9 @@
   "meta": {
     "locale": "te",
     "name": "తెలుగు",
-    "needsNativeReview": true,
-    "reviewedBy": null,
-    "status": "draft"
+    "needsNativeReview": false,
+    "reviewedBy": "Krishna Murthy Raju G (gkmraju), native Telugu speaker; owner statement 2026-11-15",
+    "status": "reviewed"
   },
   "messages": {
     "app.name": "పుష్కర మిత్ర",
@@ -205,7 +205,7 @@
     "help.sos.button": "SOS (నమూనా · పని చేయదు)",
     "help.sos.inactive": "ఈ నమూనాలో SOS పనిచేయదు. ఏ హెచ్చరికా పంపబడదు మరియు లొకేషన్ ఉపయోగించబడదు.",
     "help.numbers.title": "అత్యవసర నంబర్లు",
-    "help.numbers.pending": "అధికారిక ధృవీకరణ తర్వాత నంబర్ చూపబడుతుంది",
+    "help.numbers.pending": "కొన్ని నంబర్లు అధికారిక ధృవీకరణ తర్వాత మాత్రమే చూపబడతాయి",
     "help.line.emergency": "అత్యవసర సేవ",
     "help.line.ambulance": "అంబులెన్స్",
     "help.line.police": "పోలీస్",
@@ -247,6 +247,16 @@
     "settings.about.software": "సాఫ్ట్‌వేర్",
     "settings.about.licenceText": "లైసెన్స్ పాఠం",
     "settings.about.reviewPending": "ఈ జాబితా న్యాయ సమీక్షకు ఇంకా పంపలేదు.",
-    "settings.about.published": "ప్రచురించిన సమాచారం"
+    "settings.about.published": "ప్రచురించిన సమాచారం",
+    "help.line.child": "చైల్డ్ హెల్ప్‌లైన్",
+    "help.line.women": "మహిళా హెల్ప్‌లైన్",
+    "help.line.tourist": "పర్యాటక హెల్ప్‌లైన్",
+    "help.numbers.unavailable": "ఇంకా అందుబాటులో లేదు",
+    "help.call.title": "{name}కు కాల్ చేయాలా?",
+    "help.call.go": "ఇప్పుడే {number}కు కాల్ చేయండి",
+    "help.call.cancel": "రద్దు చేయి",
+    "help.call.note": "ఇది మీ ఫోన్ డయలర్‌ను తెరుస్తుంది. కాల్ మీ ఫోన్ నుంచి వెళ్తుంది, ఈ యాప్ నుంచి కాదు; మాకు ఏమీ పంపబడదు.",
+    "help.call.aria": "{name}, {number}. కాల్ చేయడానికి ముందు నిర్ధారణ తెరుచుకుంటుంది.",
+    "help.call.button": "కాల్"
   }
 }

@@ -7,6 +7,8 @@ import PartnersScreen, { PartnerPanel, VolunteerPanel } from '../features/partne
 import PassScreen from '../features/pass/Screen';
 import ComingSoonScreen from '../features/status/ComingSoonScreen';
 import { FLAGS, isEnabled, type FlagName } from '../shared/flags/flags';
+import { HELPLINES, type HelplineFixture } from '../shared/data/fixtures';
+import { HelplineList, dialTarget } from '../features/help/HelplineList';
 import { helplinesResource, helpPointsResource } from '../shared/data/resources';
 import { LOCALES, setLocale, t } from '../shared/i18n/i18n';
 import { validateName, validatePhone } from '../shared/privacy/validation';
@@ -131,9 +133,24 @@ describe('Emergency / Help', () => {
     await load();
     const html = render(<HelpScreen />);
     expect(html).toContain(t('help.numbers.pending'));
-    expect(html).not.toMatch(/\b(?:100|108|112|1091|1098)\b/);
+    expect(html).not.toMatch(/\b(?:100|108|112|181|1091|1098|1363)\b/);
     expect(html).not.toContain('tel:');
+    const calls = html.match(/<button[^>]*helpline__call[^>]*>/g) ?? [];
+    expect(calls.length).toBeGreaterThan(0);
+    for (const call of calls) expect(call).toContain('disabled');
     expect(html).toContain(t('help.kin.note'));
+  });
+
+  it('a verified number needs a confirmation tap: no dial link until then', () => {
+    const line = { ...HELPLINES[0], number: '112' } as HelplineFixture;
+    const html = render(<HelplineList lines={[line]} />);
+    expect(html).toContain('<button');
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).toContain('112');
+    expect(html).not.toContain('tel:');
+    expect(html).not.toContain('call-confirm');
+    expect(dialTarget('+91 112-3')).toBe('+911123');
+    expect(dialTarget('tel:1;x')).toBe('1');
   });
 });
 

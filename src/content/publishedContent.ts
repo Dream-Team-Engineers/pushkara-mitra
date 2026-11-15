@@ -90,11 +90,50 @@ const GHATS_ENTRY: ContentEntry = {
   },
 };
 
+/**
+ * DRAFT, NOT APPROVED (review stays `draft`, so the endpoint still answers 404 and the app shows
+ * "not yet available" tiles). Candidate numbers with the official page that states each one;
+ * 2026-11-15. Police (100), ambulance (108), women (181) and tourist (1363) still need an official
+ * source page before they are added. Owner: check each, then set `review` to approved.
+ */
+const HELPLINES_CANDIDATE = {
+  updatedAt: '2026-11-15T10:00:00+05:30',
+  status: 'verified',
+  synthetic: false,
+} as const;
+
+const HELPLINES_ENTRY: ContentEntry = {
+  dataset: {
+    kind: 'helplines',
+    revision: 'helplines-draft-1',
+    items: [
+      {
+        ...HELPLINES_CANDIDATE,
+        id: 'emergency-112',
+        kind: 'emergency',
+        number: '112',
+        source:
+          'Government of India: National Portal, Helpline directory (112, integrated emergency number)',
+        sourceUrl: 'https://www.india.gov.in/directory/helpline',
+      },
+      {
+        ...HELPLINES_CANDIDATE,
+        id: 'child-1098',
+        kind: 'child',
+        number: '1098',
+        source: 'Ministry of Women and Child Development: Child Helpline 1098',
+        sourceUrl: 'https://www.spniwcd.wcd.gov.in/child-helpline',
+      },
+    ],
+  },
+  review: { status: 'draft' },
+};
+
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {
   ghats: GHATS_ENTRY,
   stays: draft('stays'),
   travel: draft('travel'),
   updates: draft('updates'),
-  helplines: draft('helplines'),
+  helplines: HELPLINES_ENTRY,
   'help-points': draft('help-points'),
 };

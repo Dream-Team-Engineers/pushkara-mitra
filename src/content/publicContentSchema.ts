@@ -81,7 +81,7 @@ export const CONTENT_FIELDS: Readonly<Record<ContentKind, Readonly<Record<string
   helplines: {
     ...META,
     id: ID,
-    kind: oneOf('emergency', 'ambulance', 'police', 'control'),
+    kind: oneOf('emergency', 'ambulance', 'police', 'control', 'child', 'women', 'tourist'),
     number: { type: 'phoneOrNull' },
   },
   'help-points': {

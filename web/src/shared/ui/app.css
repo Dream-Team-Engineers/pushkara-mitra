@@ -1121,3 +1121,132 @@ details.note summary {
   padding-block: var(--space-3);
   border-bottom: 1px solid var(--line);
 }
+
+/* Helpline rows and call confirmation (Emergency / Help), per the UI workflow's Emergency screen */
+.helpline-list {
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-1) var(--space-4);
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.helpline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.helpline:first-child {
+  border-top: 0;
+}
+
+.helpline__chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  height: 2.75rem;
+  padding-inline: var(--space-2);
+  border-radius: 12px;
+  background: var(--primary-soft);
+  color: var(--text);
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.helpline__chip--urgent {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.helpline__chip--off {
+  background: var(--ground);
+  color: var(--text-muted);
+}
+
+.helpline__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.helpline__name {
+  font-weight: 600;
+}
+
+.helpline__meta {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.helpline__call {
+  flex: none;
+  min-width: 4.5rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--danger-fill);
+  color: var(--on-danger);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.helpline__call:disabled {
+  background: var(--line-strong);
+  color: var(--surface);
+  cursor: not-allowed;
+}
+
+.call-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgb(0 0 0 / 0.55);
+}
+
+.call-confirm__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--space-6) var(--space-4);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--danger);
+  border-radius: var(--radius-feature);
+}
+
+.call-confirm__title {
+  font-size: var(--text-card-title);
+}
+
+.call-confirm__number {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--danger);
+}
+
+.call-confirm__actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-3);
+}
+
+.call-confirm__actions .button--danger {
+  background: var(--danger-fill);
+  color: var(--on-danger);
+}
