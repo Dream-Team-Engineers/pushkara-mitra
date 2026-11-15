@@ -65,7 +65,7 @@ a {
   flex-direction: column;
   width: 100%;
   max-width: 32rem;
-  min-height: 100dvh;
+  min-height: calc(100dvh / var(--page-zoom, 1));
   margin-inline: auto;
   background: var(--ground);
   box-shadow: 0 0 0 1px var(--line);

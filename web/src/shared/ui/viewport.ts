@@ -24,8 +24,13 @@ export function fitMobileViewport(win: Window = window): () => void {
   const apply = (): void => {
     // Measure without our own zoom so a rotation or a mode change is judged on the browser's layout.
     root.style.removeProperty('zoom');
+    root.style.removeProperty('--page-zoom');
     const zoom = desktopModeZoom(win.innerWidth, win.screen.width, win.navigator.maxTouchPoints);
-    if (zoom !== 1) root.style.setProperty('zoom', String(zoom));
+    if (zoom !== 1) {
+      root.style.setProperty('zoom', String(zoom));
+      // Viewport units are multiplied by the zoom too; CSS divides them back (see `.app`).
+      root.style.setProperty('--page-zoom', String(zoom));
+    }
   };
   apply();
   win.addEventListener('orientationchange', apply);
