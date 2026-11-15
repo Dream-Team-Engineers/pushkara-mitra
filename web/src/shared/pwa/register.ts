@@ -3,6 +3,9 @@ import { signal } from '@preact/signals';
 /** True when a new version is installed and waiting for the person to accept it. */
 export const updateReady = signal(false);
 
+/** An update found within this long of the page opening is applied automatically (one reload). */
+const AUTO_APPLY_WITHIN_MS = 15_000;
+
 let waiting: ServiceWorker | null = null;
 let updateRequested = false;
 
@@ -11,6 +14,9 @@ function watch(registration: ServiceWorkerRegistration): void {
     if (worker !== null && navigator.serviceWorker.controller !== null) {
       waiting = worker;
       updateReady.value = true;
+      // Just after the page opened nothing has been typed yet, so take the new version at once
+      // instead of leaving people on an old copy until they notice the banner.
+      if (performance.now() < AUTO_APPLY_WITHIN_MS) applyUpdate();
     }
   };
   flag(registration.waiting);
