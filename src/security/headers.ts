@@ -26,6 +26,9 @@ export const CONTENT_SECURITY_POLICY_GOOGLE = [
   "default-src 'none'",
   "script-src 'self' https://accounts.google.com/gsi/client",
   "style-src 'self' https://accounts.google.com/gsi/style",
+  // Google's button sets inline style attributes on its own elements; without this it renders unsized.
+  // Attribute styles only: <style> elements and scripts stay blocked.
+  "style-src-attr 'unsafe-inline'",
   "img-src 'self' data:",
   "font-src 'self'",
   "connect-src 'self' https://accounts.google.com/gsi/",
