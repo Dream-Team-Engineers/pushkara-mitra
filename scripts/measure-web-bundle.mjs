@@ -3,7 +3,7 @@
 // Sizes are gzip -9 of text assets and raw bytes of already-compressed assets (fonts, images).
 // This is a lab measurement of build output, not a field or device measurement.
 import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { extname, join } from 'node:path';
+import { extname, join, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const KB = 1024;
@@ -34,7 +34,12 @@ const files = listFiles(DIST).map((path) => {
   const ext = extname(path);
   const text = ['.js', '.css', '.html', '.json', '.svg', '.webmanifest', '.mjs'].includes(ext);
   return {
-    path: path.slice(DIST.length + 1),
+    // Forward slashes on every platform: the paths in index.html use them, and on Windows the
+    // backslash keys made every lookup miss (initial JS and CSS measured as 0 KB).
+    path: path
+      .slice(DIST.length + 1)
+      .split(sep)
+      .join('/'),
     ext,
     size: text ? gzipSync(bytes, { level: 9 }).length : bytes.length,
     raw: bytes.length,
@@ -71,6 +76,14 @@ const pick = (paths) => [...paths].map((path) => byPath.get(path)).filter(Boolea
 
 const initialJs = pick(initialJsPaths);
 const initialCss = pick(initialCssPaths);
+// Every file index.html references must be found in the build; otherwise the measurement is wrong.
+const missing = [...initialJsPaths, ...initialCssPaths].filter((path) => !byPath.has(path));
+if (initialJs.length === 0 || missing.length > 0) {
+  console.error(
+    `Bundle measurement is not trustworthy: index.html references ${[...initialJsPaths, ...initialCssPaths].length} initial file(s), missing from the build: ${missing.join(', ') || 'all of the JavaScript'}.`,
+  );
+  process.exit(2);
+}
 const allCss = files.filter((file) => file.ext === '.css');
 const routeChunks = files.filter(
   (file) => file.ext === '.js' && file.path !== 'sw.js' && !initialJsPaths.has(file.path),

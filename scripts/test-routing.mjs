@@ -26,9 +26,20 @@ const headerSource = readFileSync(new URL('../src/security/headers.ts', import.m
 const headerModule = ts.transpileModule(headerSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText;
-const { SECURITY_HEADERS } = await import(
+const { SECURITY_HEADERS, CONTENT_SECURITY_POLICY_GOOGLE } = await import(
   `data:text/javascript;base64,${Buffer.from(headerModule).toString('base64')}`
 );
+
+// Google sign-in loosens the CSP and COOP only where wrangler.toml sets GOOGLE_CLIENT_ID for that
+// environment (src/index.ts). Derive the expectation from the same file so the test cannot drift.
+const wranglerToml = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
+const GOOGLE_ID = /^\s*GOOGLE_CLIENT_ID\s*=\s*"[^"]+"/m;
+function googleSignInEnabled(environment) {
+  const tables = wranglerToml.split(/^(?=\[)/m);
+  const header = environment ? `[env.${environment}.vars]` : '[vars]';
+  const table = tables.find((part) => part.startsWith(header));
+  return table !== undefined && GOOGLE_ID.test(table);
+}
 
 async function availablePort() {
   const server = createServer();
@@ -187,7 +198,12 @@ async function checkEnvironment(environment, mock = false) {
       const response = await request(path, method);
       const body = await response.text();
       assert.equal(response.status, status, `${context}: status`);
-      for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+      const expectedHeaders = { ...SECURITY_HEADERS };
+      if (googleSignInEnabled(environment)) {
+        expectedHeaders['Content-Security-Policy'] = CONTENT_SECURITY_POLICY_GOOGLE;
+        expectedHeaders['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups';
+      }
+      for (const [name, value] of Object.entries(expectedHeaders)) {
         assert.equal(response.headers.get(name), value, `${context}: ${name}`);
       }
       if (method === 'HEAD') assert.equal(body, '', `${context}: HEAD body`);

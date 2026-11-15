@@ -26,7 +26,11 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run check
+      # Same gates as ci.yml (lint, types, tests, format, build, size budgets, routing) so a build
+      # that fails CI can never reach staging. Run it before any deploy step.
+      - run: npm run gate
+      - name: Browser smoke test of the built frontend
+        run: npm run smoke:web
 
   deploy:
     name: deploy-staging

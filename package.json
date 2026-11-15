@@ -11,8 +11,8 @@
   },
   "scripts": {
     "ship": "npm run ship:staging",
-    "ship:staging": "npm run check && npm run build:web:staging && npx wrangler deploy --env staging",
-    "ship:production": "npm run check && npm run build:web && npx wrangler deploy --env production",
+    "ship:staging": "npm run gate && npm run build:web:staging && npx wrangler deploy --env staging",
+    "ship:production": "npm run gate && npm run build:web && npx wrangler deploy --env production",
     "dev": "vite build && wrangler dev",
     "dev:web": "vite",
     "build:web": "vite build",
@@ -28,6 +28,7 @@
     "licence-check": "node scripts/licence-check.mjs",
     "sbom": "npm sbom --sbom-format cyclonedx --sbom-type application > sbom.cdx.json",
     "check": "npm run lint && npm run typecheck && npm run test && npm run format:check",
+    "gate": "npm run check && npm run build:web && npm run budget:web && npm run test:routing",
     "test:routing": "node scripts/test-routing.mjs",
     "review:official": "node scripts/build-official-review.mjs",
     "review:ghats-draft": "node scripts/build-ghats-draft.mjs"
