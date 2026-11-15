@@ -1,8 +1,9 @@
 import { ADS, HEADLINES } from '../../shared/data/fixtures-home';
 import { countdown, EVENT, now } from '../../shared/data/time';
-import { formatNumber, t, type MessageKey } from '../../shared/i18n/i18n';
+import { formatNumber, pair, t, type MessageKey } from '../../shared/i18n/i18n';
 import { hrefFor, type RouteId } from '../../app/router';
 import { BrandMark, Icon, type IconName } from '../../shared/ui/Icon';
+import { Bi } from '../../shared/ui/Bi';
 import { Marquee } from '../../shared/ui/Marquee';
 
 interface QuickCard {
@@ -151,14 +152,16 @@ export default function HomeScreen() {
       <section class="hero">
         <BrandMark size={72} />
         <h1 id="screen-title" tabIndex={-1} class="hero__title">
-          {t('app.name')}
+          <Bi k="app.name" stacked />
         </h1>
-        <p class="hero__tagline">{t('app.tagline')}</p>
+        <p class="hero__tagline">
+          <Bi k="app.tagline" stacked />
+        </p>
       </section>
       <CountdownCard />
       <section class="section" aria-labelledby="quick-title">
         <h2 id="quick-title" class="section__title">
-          {t('home.quickAccess')}
+          <Bi k="home.quickAccess" />
         </h2>
         <ul class="quick-grid">
           {QUICK_CARDS.map((card) => (
@@ -168,13 +171,15 @@ export default function HomeScreen() {
                   <Icon name={card.icon} />
                 </span>
                 <span class="qcard__title">{t(card.title)}</span>
-                <span class="qcard__sub">{t(card.subtitle)}</span>
+                <span class="qcard__sub">{pair(card.title).secondary ?? t(card.subtitle)}</span>
               </a>
             </li>
           ))}
         </ul>
       </section>
-      <p class="disclaimer">{t('app.disclaimer')}</p>
+      <p class="disclaimer">
+        <Bi k="app.disclaimer" stacked />
+      </p>
     </>
   );
 }

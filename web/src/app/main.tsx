@@ -13,12 +13,16 @@ import { startRouter } from './router';
 async function boot(): Promise<void> {
   initTheme();
   const { locale } = readPreferences(browserStore());
-  if (locale !== null && locale !== DEFAULT_LOCALE) {
+  const wanted = locale ?? DEFAULT_LOCALE;
+  if (wanted !== DEFAULT_LOCALE) {
     try {
-      await setLocale(locale);
+      await setLocale(wanted);
     } catch {
       // Keep the bundled Telugu catalogue; the person can choose again in Settings.
     }
+  } else {
+    // Telugu is bundled and shows at once; English loads in the background and then appears beside it.
+    setLocale(DEFAULT_LOCALE).catch(() => undefined);
   }
   startRouter();
   startClock();

@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { current, hrefFor, type RouteId } from '../../app/router';
-import { t, type MessageKey } from '../i18n/i18n';
+import { pair, t, type MessageKey } from '../i18n/i18n';
 import { BrandMark, Icon, type IconName } from './Icon';
 
 export function AppHeader() {
@@ -67,7 +67,9 @@ export function ScreenHeader({
       <h1 id="screen-title" tabIndex={-1}>
         {t(titleKey)}
       </h1>
-      {subtitleKey === undefined ? null : <p class="screen-header__sub">{t(subtitleKey)}</p>}
+      {subtitleKey === undefined ? null : (
+        <p class="screen-header__sub">{pair(titleKey).secondary ?? t(subtitleKey)}</p>
+      )}
     </div>
   );
 }

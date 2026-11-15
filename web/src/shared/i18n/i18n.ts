@@ -36,6 +36,11 @@ const INTL_TAGS: Readonly<Record<Locale, string>> = {
 
 export const locale = signal<Locale>(DEFAULT_LOCALE);
 const catalogue = signal<Messages>(te.messages);
+/**
+ * English shown beside Telugu or Hindi ("dual" display). Null until it has loaded, and always null
+ * when English is itself the chosen language, so nothing is ever repeated.
+ */
+const secondary = signal<Messages | null>(null);
 
 export function isLocale(value: unknown): value is Locale {
   return typeof value === 'string' && (LOCALES as readonly string[]).includes(value);
@@ -46,6 +51,26 @@ export function interpolate(template: string, params: MessageParams): string {
     const value = params[name];
     return value === undefined ? match : String(value);
   });
+}
+
+/** True when English is shown beside the chosen language. */
+export function isDual(): boolean {
+  return secondary.value !== null;
+}
+
+/**
+ * The chosen language's text and, in dual mode, the English text beside it. `secondary` is null in
+ * English-only mode, before English has loaded, or when both texts are identical.
+ */
+export function pair(
+  key: MessageKey,
+  params?: MessageParams,
+): { readonly primary: string; readonly secondary: string | null } {
+  const primary = t(key, params);
+  const english = secondary.value?.[key];
+  if (english === undefined) return { primary, secondary: null };
+  const text = params === undefined ? english : interpolate(english, params);
+  return { primary, secondary: text === primary ? null : text };
 }
 
 /** Reads the catalogue signal, so a component that calls t() re-renders on a language change. */
@@ -64,10 +89,15 @@ let latestRequest = 0;
 export async function setLocale(next: Locale): Promise<boolean> {
   latestRequest += 1;
   const request = latestRequest;
-  const messages = await LOADERS[next]();
+  // English is loaded together with Telugu or Hindi, so both switch in one step.
+  const [messages, english] = await Promise.all([
+    LOADERS[next](),
+    next === 'en' ? Promise.resolve(null) : LOADERS.en(),
+  ]);
   if (request !== latestRequest) return false;
   batch(() => {
     catalogue.value = messages;
+    secondary.value = english;
     locale.value = next;
   });
   if (typeof document !== 'undefined') document.documentElement.lang = next;

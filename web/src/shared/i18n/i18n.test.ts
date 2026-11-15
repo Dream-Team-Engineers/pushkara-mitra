@@ -8,6 +8,7 @@ import {
   isLocale,
   LOCALES,
   locale,
+  pair,
   setLocale,
   t,
 } from './i18n';
@@ -76,5 +77,25 @@ describe('locale helpers', () => {
       // 2027-06-26T00:00:00+05:30 is 18:30 UTC the day before; the clock must show IST.
       expect(formatClock(Date.parse('2027-06-25T18:30:00Z'))).toMatch(/12:00|00:00/);
     }
+  });
+});
+
+describe('dual display (chosen language plus English)', () => {
+  it('pairs Telugu and Hindi with English, and shows English alone once', async () => {
+    await setLocale('te');
+    expect(pair('nav.home')).toEqual({
+      primary: te.messages['nav.home'],
+      secondary: en.messages['nav.home'],
+    });
+    await setLocale('hi');
+    expect(pair('nav.home').secondary).toBe(en.messages['nav.home']);
+    await setLocale('en');
+    expect(pair('nav.home')).toEqual({ primary: en.messages['nav.home'], secondary: null });
+  });
+
+  it('fills placeholders in both languages', async () => {
+    await setLocale('te');
+    const both = pair('state.updatedMinutes', { minutes: 7 });
+    expect(both.secondary).toBe('Updated 7 min ago');
   });
 });

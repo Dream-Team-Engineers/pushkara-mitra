@@ -257,6 +257,7 @@
     "help.call.cancel": "Cancel",
     "help.call.note": "This opens your phone's dialler. The call is made by your phone, not by this app, and nothing is sent to us.",
     "help.call.aria": "{name}, {number}. Opens a confirmation before calling.",
-    "help.call.button": "Call"
+    "help.call.button": "Call",
+    "settings.language.hint": "Telugu and Hindi show English beside them. Choose English to show English only."
   }
 }

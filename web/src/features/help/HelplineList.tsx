@@ -2,6 +2,7 @@ import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import type { HelplineFixture, HelplineKind } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { Bi } from '../../shared/ui/Bi';
 import { Icon } from '../../shared/ui/Icon';
 import { SourceStamp } from '../../shared/ui/Status';
 
@@ -94,7 +95,9 @@ export function HelplineList({ lines }: { readonly lines: readonly HelplineFixtu
                 {number ?? '—'}
               </span>
               <span class="helpline__body">
-                <span class="helpline__name">{t(spec.label)}</span>
+                <span class="helpline__name">
+                  <Bi k={spec.label} stacked />
+                </span>
                 {number === null ? (
                   <span class="helpline__meta">{t('help.numbers.unavailable')}</span>
                 ) : (

@@ -1250,3 +1250,22 @@ details.note summary {
   background: var(--danger-fill);
   color: var(--on-danger);
 }
+
+/* Dual-language text (chosen language plus English) */
+.bi__sec {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.bi:not(.bi--stacked) .bi__sec::before {
+  content: ' · ';
+}
+
+.bi--stacked {
+  display: flex;
+  flex-direction: column;
+}
+
+.bi--stacked .bi__sec {
+  font-size: var(--text-caption);
+}

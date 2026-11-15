@@ -1,5 +1,6 @@
 import { useSignal } from '@preact/signals';
 import { locale, LOCALE_NAMES, LOCALES, t } from '../../shared/i18n/i18n';
+import { Bi } from '../../shared/ui/Bi';
 import { selectLocale } from '../../shared/i18n/select';
 import { THEMES, type Theme } from '../../shared/prefs/preferences';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -51,10 +52,11 @@ export default function SettingsScreen() {
               });
             }}
           >
-            {LOCALE_NAMES[option]}
+            {option === 'en' ? LOCALE_NAMES.en : `${LOCALE_NAMES[option]} + English`}
           </button>
         ))}
       </fieldset>
+      <p class="note note--flush">{t('settings.language.hint')}</p>
       {loadFailed.value ? (
         <p class="notice notice--warn" role="alert">
           {t('state.error')}
@@ -88,7 +90,9 @@ export default function SettingsScreen() {
           {t('settings.about.reviewPending')}
         </p>
       </section>
-      <p class="disclaimer">{t('app.disclaimer')}</p>
+      <p class="disclaimer">
+        <Bi k="app.disclaimer" stacked />
+      </p>
     </>
   );
 }

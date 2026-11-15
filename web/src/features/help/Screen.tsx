@@ -1,6 +1,7 @@
 import { helplinesResource, helpPointsResource } from '../../shared/data/resources';
 import type { HelpPointKind } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { Bi } from '../../shared/ui/Bi';
 import { HelplineList } from './HelplineList';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
@@ -36,7 +37,7 @@ export default function HelpScreen() {
       </section>
       <section class="section" aria-labelledby="lines-title">
         <h2 id="lines-title" class="section__title">
-          {t('help.numbers.title')}
+          <Bi k="help.numbers.title" />
         </h2>
         <ResourceView
           resource={helplinesResource}
@@ -77,7 +78,9 @@ export default function HelpScreen() {
           )}
         />
       </section>
-      <p class="disclaimer">{t('module.help.noDispatch')}</p>
+      <p class="disclaimer">
+        <Bi k="module.help.noDispatch" stacked />
+      </p>
     </>
   );
 }
