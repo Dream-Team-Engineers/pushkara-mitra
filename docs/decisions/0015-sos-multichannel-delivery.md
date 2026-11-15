@@ -12,7 +12,7 @@ Channels, in escalation order:
 4. **SMS** as alternative notification (to staff and, if approved, to a configured contact). Provider, DLT registration and cost unverified.
 5. **Staff call** as manual escalation: the staff console shows an unacknowledged-SOS timer and the on-duty contact list; a human phones the pilgrim or responders.
 
-## Conflict that needs an owner decision (OQ-033)
+## Conflict that needs an owner decision (OQ-035)
 
 A useful SOS conveys where the person is. Hard Rule 1 and ADR 0004 forbid persisting or logging location. Proposed handling, not approved: the SOS payload carries location only to the staff view in memory and in the SMS text; the Postgres SOS record stores no coordinates (time, status, acknowledgement, free-text category only). Whether even an SMS body containing coordinates violates the rule's intent, and what retention applies to the SMS provider's own logs, needs a written owner and counsel decision and an ADR 0004 amendment before any implementation.
 

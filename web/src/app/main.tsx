@@ -1,16 +1,21 @@
 import { render } from 'preact';
 import { startClock, watchOnline } from '../shared/data/time';
 import { DEFAULT_LOCALE, setLocale } from '../shared/i18n/i18n';
+import { restoreSession } from '../shared/auth/google';
+import { listenForInstall } from '../shared/pwa/install';
 import { registerServiceWorker } from '../shared/pwa/register';
 import { browserStore, readPreferences } from '../shared/prefs/preferences';
 import '../shared/ui/tokens.css';
 import '../shared/ui/fonts.css';
 import '../shared/ui/app.css';
 import { initTheme } from '../shared/ui/theme';
+import { fitMobileViewport } from '../shared/ui/viewport';
 import { App } from './App';
 import { startRouter } from './router';
 
 async function boot(): Promise<void> {
+  fitMobileViewport();
+  listenForInstall();
   initTheme();
   const { locale } = readPreferences(browserStore());
   const wanted = locale ?? DEFAULT_LOCALE;
@@ -25,6 +30,7 @@ async function boot(): Promise<void> {
     setLocale(DEFAULT_LOCALE).catch(() => undefined);
   }
   startRouter();
+  void restoreSession();
   startClock();
   watchOnline();
   const root = document.getElementById('app');

@@ -336,10 +336,10 @@ const GHATS_ENTRY: ContentEntry = {
 };
 
 /**
- * DRAFT, NOT APPROVED (review stays `draft`, so the endpoint still answers 404 and the app shows
- * "not yet available" tiles). Candidate numbers with the official page that states each one;
- * 2026-11-15. Police (100), ambulance (108), women (181) and tourist (1363) still need an official
- * source page before they are added. Owner: check each, then set `review` to approved.
+ * Helplines. 112 and 1098 cite the official page that states them. Every other number was supplied
+ * by the owner on 2026-11-15 and is shown as unverified until an official page is found; the two
+ * Pushkaralu control-room numbers are provisional. The owner will recheck every number on the last
+ * day before the event.
  */
 const HELPLINES_CANDIDATE = {
   updatedAt: '2026-11-15T10:00:00+05:30',
@@ -347,10 +347,27 @@ const HELPLINES_CANDIDATE = {
   synthetic: false,
 } as const;
 
+const OWNER_SOURCE =
+  'Number supplied by the owner (2026-11-15); not yet checked against an official page';
+
+const PROVISIONAL =
+  'Number supplied by the owner (2026-11-15) from a Pushkaralu 2027 portal; provisional: verify with the district administration before the festival';
+
+const ownerLine = (id: string, kind: string, number: string, source = OWNER_SOURCE) => ({
+  updatedAt: '2026-11-15T12:30:00+05:30',
+  status: 'unverified',
+  synthetic: false,
+  id,
+  kind,
+  number,
+  source,
+  sourceUrl: null,
+});
+
 const HELPLINES_ENTRY: ContentEntry = {
   dataset: {
     kind: 'helplines',
-    revision: 'helplines-draft-1',
+    revision: 'helplines-1',
     items: [
       {
         ...HELPLINES_CANDIDATE,
@@ -369,9 +386,28 @@ const HELPLINES_ENTRY: ContentEntry = {
         source: 'Ministry of Women and Child Development: Child Helpline 1098',
         sourceUrl: 'https://www.spniwcd.wcd.gov.in/child-helpline',
       },
+      ownerLine('police-100', 'police', '100'),
+      ownerLine('fire-101', 'fire', '101'),
+      ownerLine('ambulance-102', 'ambulance', '102'),
+      ownerLine('medical-108', 'medical', '108'),
+      ownerLine('road-1073', 'road', '1073'),
+      ownerLine('disaster-108', 'disaster', '108'),
+      ownerLine('ndrf-delhi', 'ndrf', '011-24363260'),
+      ownerLine('women-181', 'women', '181'),
+      ownerLine('distress-1091', 'distress', '1091'),
+      ownerLine('tourist-1363', 'tourist', '1363'),
+      ownerLine('seva-control-1800', 'control', '1800-123-2027', PROVISIONAL),
+      ownerLine('rjy-control-0883', 'localControl', '0883-1234567', PROVISIONAL),
     ],
   },
-  review: { status: 'draft' },
+  review: {
+    status: 'approved',
+    reviewer: 'gkmraju',
+    reviewedRevision: '92a74c4',
+    reviewedOn: '2026-11-15',
+    scope:
+      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages; every other number was supplied by the owner and is shown as unverified. The two Pushkaralu control-room numbers come from a 2027 portal and are provisional. The owner will recheck all numbers on the last day before the event.',
+  },
 };
 
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {

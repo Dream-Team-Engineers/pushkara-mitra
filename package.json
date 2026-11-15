@@ -11,11 +11,12 @@
   },
   "scripts": {
     "ship": "npm run ship:staging",
-    "ship:staging": "npm run check && npm run build:web && npx wrangler deploy --env staging",
+    "ship:staging": "npm run check && npm run build:web:staging && npx wrangler deploy --env staging",
     "ship:production": "npm run check && npm run build:web && npx wrangler deploy --env production",
     "dev": "vite build && wrangler dev",
     "dev:web": "vite",
     "build:web": "vite build",
+    "build:web:staging": "vite build --mode staging",
     "budget:web": "node scripts/measure-web-bundle.mjs",
     "smoke:web": "node scripts/smoke-web.mjs dist/web",
     "lint": "eslint .",

@@ -1,6 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { online } from '../shared/data/time';
 import { t } from '../shared/i18n/i18n';
+import { InstallBanner } from '../shared/pwa/InstallBanner';
 import { UpdateBanner } from '../shared/pwa/UpdateBanner';
 import { AppHeader, BottomBar } from '../shared/ui/Layout';
 import { RouteView } from './RouteView';
@@ -33,6 +34,7 @@ export function App() {
         </p>
       )}
       <UpdateBanner />
+      <InstallBanner />
       <main id="main" tabIndex={-1}>
         <RouteView />
       </main>

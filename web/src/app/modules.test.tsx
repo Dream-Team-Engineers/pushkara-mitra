@@ -97,7 +97,7 @@ describe('public module screens', () => {
     expect(html).toContain('Kotilingala Revu');
     expect(html).toContain(t('ghats.noteVerified'));
     expect(html).not.toContain(t('ghats.note'));
-    expect(html).toContain(t('ghats.facilitiesNotStated'));
+    expect(html).not.toContain('class="tags"');
   });
 
   it('labels sponsored stays and discloses the ranking criteria', async () => {

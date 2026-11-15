@@ -21,7 +21,8 @@ export type IconName =
   | 'phone'
   | 'check'
   | 'lock'
-  | 'external';
+  | 'external'
+  | 'close';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -60,6 +61,7 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   ],
   check: ['M5 12l5 5 9-10'],
   lock: ['M6 11h12v9H6z', 'M8 11V8a4 4 0 0 1 8 0v3'],
+  close: ['M6 6l12 12', 'M18 6L6 18'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'],
 };
 
@@ -85,12 +87,16 @@ export function Icon({ name, size = 24 }: { readonly name: IconName; readonly si
 }
 
 export function BrandMark({ size = 32 }: { readonly size?: number }) {
+  // Temporary logo (owner-supplied artwork, see docs/design/brand/README.md).
   return (
-    <svg class="brand-mark" width={size} height={size} viewBox="0 0 72 72" aria-hidden="true">
-      <circle cx="36" cy="36" r="34" class="brand-mark__disc" />
-      <circle cx="48" cy="22" r="7" class="brand-mark__sun" />
-      <path d="M12 44c6-5 12-5 18 0s12 5 18 0 10-4 12-3" class="brand-mark__wave" />
-      <path d="M12 54c6-5 12-5 18 0s12 5 18 0 10-4 12-3" class="brand-mark__wave" />
-    </svg>
+    <img
+      class="brand-mark"
+      src="/logo-96.png"
+      width={size}
+      height={size}
+      alt="Pushkara Mitra"
+      aria-hidden="true"
+      decoding="async"
+    />
   );
 }

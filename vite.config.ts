@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import preact from '@preact/preset-vite';
 import { defineConfig } from 'vite';
@@ -8,8 +9,33 @@ import { serviceWorkerPlugin } from './web/build/sw';
  * The public shell in public/ keeps serving until the cut-over PR changes wrangler.toml.
  * CSP is `script-src 'self'; style-src 'self'`, so nothing may be inlined into the HTML.
  */
-export default defineConfig({
+/**
+ * Public Google OAuth client ID (not a secret) for the STAGING build only: `vite build --mode staging`.
+ * Production builds get no ID, so Google sign-in stays off there. Keep it equal to GOOGLE_CLIENT_ID in
+ * wrangler.toml [env.staging.vars] (tests/guards/google-signin-config.test.ts checks this).
+ */
+const STAGING_GOOGLE_CLIENT_ID =
+  '433695131529-igclhmojpijekd1nq65m2jnue5rno8tr.apps.googleusercontent.com';
+
+/** Short commit of the source being built, shown in the app so a stale copy is easy to spot. */
+function buildId(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+  } catch {
+    return 'unknown';
+  }
+}
+
+export default defineConfig(({ mode }) => ({
   root: 'web',
+  define: {
+    'import.meta.env.VITE_BUILD_ID': JSON.stringify(
+      `${buildId()}${mode === 'staging' ? ' staging' : ''}`,
+    ),
+    'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(
+      mode === 'staging' ? STAGING_GOOGLE_CLIENT_ID : '',
+    ),
+  },
   plugins: [
     preact(),
     serviceWorkerPlugin(resolve(import.meta.dirname, 'web/build/sw.template.js')),
@@ -23,4 +49,4 @@ export default defineConfig({
     assetsInlineLimit: 0,
     modulePreload: { polyfill: false },
   },
-});
+}));

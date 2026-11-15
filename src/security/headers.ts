@@ -17,6 +17,29 @@ export const CONTENT_SECURITY_POLICY = [
   'upgrade-insecure-requests',
 ].join('; ');
 
+/**
+ * Where Google sign-in is switched on, the page may load Google's sign-in script and button frame
+ * (https://accounts.google.com/gsi/), and the sign-in popup must keep its link to the page
+ * (same-origin-allow-popups). Nothing else is loosened, and this applies only when GOOGLE_CLIENT_ID is set.
+ */
+export const CONTENT_SECURITY_POLICY_GOOGLE = [
+  "default-src 'none'",
+  "script-src 'self' https://accounts.google.com/gsi/client",
+  // Google's sign-in button injects an inline <style> block into the page; without 'unsafe-inline' it
+  // renders as a giant logo (checked on staging 2026-11-15). Styles only: scripts stay strict.
+  "style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self' https://accounts.google.com/gsi/",
+  'frame-src https://accounts.google.com/gsi/',
+  "manifest-src 'self'",
+  "worker-src 'self'",
+  "base-uri 'none'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  'upgrade-insecure-requests',
+].join('; ');
+
 export const PERMISSIONS_POLICY = [
   'geolocation=()',
   'camera=()',
@@ -36,10 +59,14 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   'Cross-Origin-Resource-Policy': 'same-origin',
 };
 
-export function withSecurityHeaders(response: Response): Response {
+export function withSecurityHeaders(response: Response, googleSignIn = false): Response {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     headers.set(name, value);
+  }
+  if (googleSignIn) {
+    headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY_GOOGLE);
+    headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   }
   return new Response(response.body, {
     status: response.status,

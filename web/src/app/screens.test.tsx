@@ -43,9 +43,9 @@ describe('Home screen', () => {
     expect([...positions].sort((a, b) => a - b)).toEqual(positions);
   });
 
-  it('links to all ten agreed modules', () => {
+  it('links to all nine agreed modules', () => {
     const html = render(<HomeScreen />);
-    expect(QUICK_CARDS).toHaveLength(10);
+    expect(QUICK_CARDS).toHaveLength(9);
     for (const card of QUICK_CARDS) expect(html).toContain(`href="${hrefFor(card.id)}"`);
     expect(countTag(html, 'ul')).toBeGreaterThanOrEqual(3);
   });

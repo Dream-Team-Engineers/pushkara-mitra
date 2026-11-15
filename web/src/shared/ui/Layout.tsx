@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { Bi } from './Bi';
 import { current, hrefFor, type RouteId } from '../../app/router';
+import { user } from '../auth/google';
 import { pair, t, type MessageKey } from '../i18n/i18n';
 import { BrandMark, Icon, type IconName } from './Icon';
 
@@ -11,9 +12,26 @@ export function AppHeader() {
         <BrandMark size={28} />
         <span>{t('app.name')}</span>
       </a>
-      <a class="icon-link" href={hrefFor('settings')} aria-label={t('settings.language')}>
-        <Icon name="globe" />
-      </a>
+      <div class="app-header__actions">
+        <a class="account-link" href={hrefFor('pass')}>
+          {user.value === null ? (
+            <>
+              <Icon name="group" size={20} />
+              <span>{t('account.header')}</span>
+            </>
+          ) : (
+            <>
+              <span class="account-link__avatar" aria-hidden="true">
+                {user.value.name.slice(0, 1).toUpperCase()}
+              </span>
+              <span class="account-link__name">{user.value.name}</span>
+            </>
+          )}
+        </a>
+        <a class="icon-link" href={hrefFor('settings')} aria-label={t('settings.language')}>
+          <Icon name="globe" />
+        </a>
+      </div>
     </header>
   );
 }

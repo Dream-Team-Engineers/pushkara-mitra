@@ -63,7 +63,12 @@ a {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  width: 100%;
+  max-width: 32rem;
+  min-height: calc(100dvh / var(--page-zoom, 1));
+  margin-inline: auto;
+  background: var(--ground);
+  box-shadow: 0 0 0 1px var(--line);
 }
 
 .skip-link {
@@ -85,7 +90,7 @@ a {
 main {
   flex: 1;
   width: 100%;
-  max-width: 40rem;
+  max-width: 32rem;
   margin-inline: auto;
   padding-block-end: calc(5rem + env(safe-area-inset-bottom));
 }
@@ -123,19 +128,9 @@ main:focus {
   color: var(--header-text);
 }
 
-.brand-mark__disc {
-  fill: var(--primary-fill);
-}
-
-.brand-mark__sun {
-  fill: var(--accent);
-}
-
-.brand-mark__wave {
-  fill: none;
-  stroke: var(--on-primary);
-  stroke-width: 4;
-  stroke-linecap: round;
+.brand-mark {
+  border-radius: 22%;
+  object-fit: cover;
 }
 
 .offline-banner {
@@ -161,6 +156,8 @@ main:focus {
 .bottom-bar {
   position: fixed;
   inset-inline: 0;
+  max-width: 32rem;
+  margin-inline: auto;
   inset-block-end: 0;
   z-index: 20;
   display: flex;
@@ -404,7 +401,7 @@ main:focus {
 
 .countdown__tiles {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
@@ -1123,88 +1120,6 @@ details.note summary {
 }
 
 /* Helpline rows and call confirmation (Emergency / Help), per the UI workflow's Emergency screen */
-.helpline-list {
-  margin: var(--space-3) var(--space-4) 0;
-  padding: var(--space-1) var(--space-4);
-  list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-}
-
-.helpline {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding-block: var(--space-3);
-  border-top: 1px solid var(--line);
-}
-
-.helpline:first-child {
-  border-top: 0;
-}
-
-.helpline__chip {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  min-width: 3.5rem;
-  height: 2.75rem;
-  padding-inline: var(--space-2);
-  border-radius: 12px;
-  background: var(--primary-soft);
-  color: var(--text);
-  font-size: 1.0625rem;
-  font-weight: 700;
-}
-
-.helpline__chip--urgent {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-
-.helpline__chip--off {
-  background: var(--ground);
-  color: var(--text-muted);
-}
-
-.helpline__body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.helpline__name {
-  font-weight: 600;
-}
-
-.helpline__meta {
-  color: var(--text-muted);
-  font-size: var(--text-caption);
-}
-
-.helpline__call {
-  flex: none;
-  min-width: 4.5rem;
-  min-height: 2.75rem;
-  border: 0;
-  border-radius: 12px;
-  background: var(--danger-fill);
-  color: var(--on-danger);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.helpline__call:disabled {
-  background: var(--line-strong);
-  color: var(--surface);
-  cursor: not-allowed;
-}
-
 .call-confirm {
   position: fixed;
   inset: 0;
@@ -1267,5 +1182,422 @@ details.note summary {
 }
 
 .bi--stacked .bi__sec {
+  font-size: var(--text-caption);
+}
+
+/* Helplines: compact two-column tiles; the whole tile is the call button (48px minimum height). */
+.helpline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.helpline--wide {
+  grid-column: 1 / -1;
+}
+
+.helpline--wide .helpline__call {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.helpline__call {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--target-min);
+  height: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.helpline__call--urgent {
+  border-color: var(--danger);
+}
+
+.helpline__call:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.helpline__chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--text);
+  font-size: var(--text-body);
+  font-weight: 700;
+}
+
+.helpline__call--urgent .helpline__chip {
+  background: var(--danger-fill);
+  color: var(--on-danger);
+}
+
+.helpline__name {
+  min-width: 0;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.helpline__flag {
+  position: absolute;
+  inset-block-start: 0.125rem;
+  inset-inline-end: 0.375rem;
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.helpline__legend,
+.helpline__sources {
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.helpline__sources summary {
+  min-height: var(--target-min);
+  padding-block: var(--space-3);
+  cursor: pointer;
+}
+
+.helpline__sources ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-4);
+}
+
+/* Compact density (owner request, 2026-11-15): small icons and cards, more on one screen. */
+.hero {
+  gap: 0;
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+.hero-logo {
+  width: 176px;
+  height: auto;
+  padding: var(--space-2);
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.hero__title {
+  font-size: 1.5rem;
+}
+
+.countdown {
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+  padding: var(--space-3);
+}
+
+.countdown__tiles li {
+  padding: var(--space-2) var(--space-1);
+}
+
+.countdown__value {
+  font-size: 1.25rem;
+}
+
+.quick-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.qcard {
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 5.25rem;
+  padding: var(--space-2) var(--space-1);
+  text-align: center;
+}
+
+.qcard__icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.qcard__icon svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.qcard__title {
+  font-size: var(--text-caption);
+  line-height: 1.25;
+}
+
+.qcard__sub {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card-list {
+  gap: var(--space-2);
+  padding-block-start: var(--space-2);
+}
+
+.card {
+  gap: var(--space-1);
+  padding: var(--space-3);
+}
+
+.card__title {
+  font-size: var(--text-body);
+}
+
+.card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.card__link {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding-inline: var(--space-2);
+  color: var(--primary);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--target-min);
+  padding-inline: var(--space-2);
+  color: var(--header-text);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Hero: the full logo, no text below it (the name and tagline are in the image). */
+.hero {
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+.hero-logo {
+  display: block;
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+  padding: var(--space-2);
+  background: #fff;
+  border-radius: var(--radius-feature);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+/* Countdown: glossy teal-to-navy panel with a ring of dots per unit. */
+.countdown {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a4a4c 0%, #12304a 58%, #1b5f6b 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+.countdown::before {
+  position: absolute;
+  inset-block-start: -40%;
+  inset-inline-start: -20%;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.14), transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.countdown__rings {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ring {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ring__face {
+  position: relative;
+  width: 100%;
+  max-width: 5rem;
+}
+
+.ring__dots {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ring__dot {
+  fill: rgb(255 255 255 / 0.2);
+}
+
+.ring__dot--lit {
+  fill: #fff;
+}
+
+.ring__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ring__label {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-caption);
+}
+
+/* Install prompt for people who opened the site in a browser tab. */
+.install-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(135deg, #0a4a4c 0%, #12304a 100%);
+  color: #fff;
+}
+
+.install-banner img {
+  flex: none;
+  border-radius: 22%;
+}
+
+.install-banner__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--text-caption);
+  line-height: 1.3;
+}
+
+.install-banner__go {
+  flex: none;
+  min-height: var(--target-min);
+  padding-inline: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: #12304a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.install-banner__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.account-link__avatar,
+.account-card__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #12304a;
+  font-weight: 700;
+}
+
+.account-link__name {
+  max-width: 6.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+}
+
+.account-card__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.125rem;
+}
+
+.account-card__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.google-slot {
+  min-height: var(--target-min);
+}
+
+.build-id {
+  margin: var(--space-4) var(--space-4) 0;
+  color: var(--text-muted);
   font-size: var(--text-caption);
 }

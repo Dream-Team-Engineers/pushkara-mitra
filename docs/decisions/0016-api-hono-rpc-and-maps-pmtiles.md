@@ -12,7 +12,7 @@ Status: **PROPOSED — owner direction recorded 2026-11-15; approval PENDING.**
 ## Maps
 
 1. **MapLibre GL JS** renders the map. Data from **OpenStreetMap**, packaged as a **PMTiles** archive stored in **Cloudflare R2** and fetched by HTTP range requests. No tile server, works with a service worker for offline regions.
-2. **OSM attribution is mandatory** on the map. ODbL licence obligations apply to the data we publish; licence-check and attribution review pending (NEEDS REVIEW, OQ-034).
+2. **OSM attribution is mandatory** on the map. ODbL licence obligations apply to the data we publish; licence-check and attribution review pending (NEEDS REVIEW, OQ-036).
 3. Do not use the public OSM tile servers for production traffic.
 4. Fonts and sprites for MapLibre labels must cover Telugu and Hindi glyphs; this relates to the open missing-font-characters fix.
 5. Size: a Godavari-region extract must fit R2 and the offline cache budget; extract size and bundle impact unmeasured. MapLibre itself is large and may need lazy loading to respect the web budget.

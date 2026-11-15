@@ -229,7 +229,20 @@ export const UPDATES: readonly UpdateFixture[] = [
 ];
 
 export type HelplineKind =
-  'emergency' | 'ambulance' | 'police' | 'control' | 'child' | 'women' | 'tourist';
+  | 'emergency'
+  | 'ambulance'
+  | 'police'
+  | 'control'
+  | 'child'
+  | 'women'
+  | 'tourist'
+  | 'fire'
+  | 'medical'
+  | 'road'
+  | 'disaster'
+  | 'ndrf'
+  | 'distress'
+  | 'localControl';
 
 /**
  * Helplines are listed WITHOUT numbers until an owner-supplied, officially verified source

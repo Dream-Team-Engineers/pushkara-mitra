@@ -12,7 +12,7 @@ ADR 0012 recommended D1 (its option A) and said to re-open option B (external ma
 
 1. **System of record for stored data is Supabase Postgres**, reached from the Worker through **Cloudflare Hyperdrive**. D1 is not used for personal data. It may remain only for nothing at all; no D1 database is created by this ADR.
 2. **Drizzle ORM** defines the schema in TypeScript and generates forward-only SQL migrations, committed to the repo. Drizzle migrations are applied by the ship script to staging after `npm run check` passes.
-3. **Project region must be India (Mumbai) if available.** Whether Supabase offers it on our plan, and its contractual terms, are NOT VERIFIED and are tracked as OQ-029.
+3. **Project region must be India (Mumbai) if available.** Whether Supabase offers it on our plan, and its contractual terms, are NOT VERIFIED and are tracked as OQ-031.
 4. **Location is never stored in Postgres** (ADR 0004, CLAUDE.md rule 1). No coordinate column may exist. A schema guard test must fail the build if a column name matches a location pattern.
 5. The Worker talks to the database only through a repository module. Routes never contain SQL.
 6. Access: Worker connects with a least-privilege role (no superuser, no DDL at runtime). Migrations use a separate role held only by the deploy process. Row-level security is enabled as defence in depth, with deny-by-default policies. Authorisation remains enforced in the Worker.

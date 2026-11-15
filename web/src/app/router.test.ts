@@ -30,7 +30,9 @@ describe('route table', () => {
   });
 
   it('covers Home plus the ten agreed modules', () => {
-    const modules = ROUTE_IDS.filter((id) => id !== 'home' && id !== 'settings');
+    const modules = ROUTE_IDS.filter(
+      (id) => id !== 'home' && id !== 'settings' && id !== 'privacy' && id !== 'deleteAccount',
+    );
     expect(modules).toHaveLength(10);
   });
 

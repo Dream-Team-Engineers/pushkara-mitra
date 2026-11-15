@@ -7,6 +7,21 @@
  * or the network, so a user or a stale cache cannot switch a risky feature on.
  * Turning one on is a reviewed code change guarded by tests/guards/frontend-flags.test.ts.
  */
+/**
+ * Public Google OAuth client ID, present only in the staging build (`vite build --mode staging`
+ * reads web/.env.staging). Production builds have none, so Google sign-in stays off there.
+ * It is a build-time constant: not read from the URL, storage or the network.
+ */
+interface BuildEnv {
+  readonly VITE_GOOGLE_CLIENT_ID?: string;
+}
+const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
+const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
+export const GOOGLE_CLIENT_ID: string | undefined =
+  typeof CLIENT_ID === 'string' && CLIENT_ID.endsWith('.apps.googleusercontent.com')
+    ? CLIENT_ID
+    : undefined;
+
 export const FLAGS = {
   /** Reads device location (foreground only). Needs ADR 0004 accepted and M2 authorised. */
   geolocation: false,
@@ -31,6 +46,8 @@ export const FLAGS = {
    * route and approved copy (docs/proposals/BACKEND_CONTRACT_ACCEPTANCE.md); until then it is off.
    */
   publishedInformation: false,
+  /** Google sign-in (Me tab and header). Needs the Google client set up, consent wording and counsel review. */
+  googleSignIn: GOOGLE_CLIENT_ID !== undefined,
   /** Donation collection. Blocked until counsel approves recipient, FCRA and tax treatment. */
   donations: false,
 } as const;

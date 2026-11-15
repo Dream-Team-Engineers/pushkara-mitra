@@ -1,0 +1,8 @@
+# Temporary logo and app icon
+
+**Status: TEMPORARY, NEEDS REVIEW.** Used until final brand work is done (owner decision, 2026-11-15).
+
+- **Home logo:** `logo-lockup-source.jpg` (owner file `pmlogo.jpeg`: pilgrim, ghat, sun and river emblem with the "Pushkara Mitra" wordmark). The Home screen shows the **emblem only** (`web/public/hero-logo.png`, cropped from the top of the file) on a white card, because the app already prints its own name and tagline in Telugu, Hindi and English. The full lockup stays available for the Play Store listing or a splash screen.
+- **App icon and header mark:** `icon-lotus-source.jpg` (owner file `pmappicon.jpeg`: golden lotus over blue river waves on navy; replaces an earlier deity artwork the owner decided not to use). The artwork area (without the rounded outer corners and the small "Grok" mark in the source's corner) is centred on a navy square, giving `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` (180 px), `logo-96.png` (header mark) and `icon-maskable-512.png` (artwork at 78% so Android masks do not cut it). Colours reduced to 96 to keep the offline cache small.
+- **Provenance:** the files were supplied by the owner on 2026-11-15 and look AI-generated (the icon source carries a "Grok" mark). The tool, prompts, terms of use and rights holder are **not recorded and not reviewed**. Not cleared for the store listing, advertising or a trademark filing (OQ-016, `docs/legal/trademark-review.md`).
+- **Replacing:** crop a square, write the five icon files above, run `npm run build:web`. Do not put sources in `dist/`, which is rebuilt and not tracked.
