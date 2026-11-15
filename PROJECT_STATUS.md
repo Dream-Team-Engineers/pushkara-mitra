@@ -6,6 +6,11 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Owner confirmed staging checks — 2026-11-15 17:00:00 IST
+
+- **Owner statement (2026-11-15, Krishna Murthy Raju G / `gkmraju`), after trying staging version `ebf3c998` in Chrome on the phone:** the blank space below content is gone ("Yes"), the install banner appears ("Yes"), and the new Home logo and dot-ring countdown look right ("Yes"). Recorded from the owner's message; the agent did not see the phone. This closes the blank-space question in the previous entry for the owner's device.
+- **Next:** Google sign-in needs the owner's Google OAuth client ID; steps were given in the session (`docs/operations/GOOGLE_SIGNIN_PLAN.md`). Deferred by the owner: the app-wide glass style.
+
 ## Fix: blank space below content in Desktop-site mode; staging deployed from `607718f` — 2026-11-15 16:47:00 IST
 
 - **Cause (found, not yet confirmed on the owner's phone):** the owner reported pages with a very large blank area below the content (screenshots 3 and 7, Chrome browser). The agent's earlier Desktop-site workaround zooms the page by about 2.5 on a phone whose browser lays the page out about 980 px wide; with `zoom`, `100dvh` is multiplied too, so the page became about 3.5 times as tall as its content (measured in emulation: 4,523 px for about 1,300 px of content, noticed in the earlier test and not followed up). Fix: the script also sets `--page-zoom` and the app's minimum height is `100dvh / --page-zoom`. Measured again in the same emulation: page 3,135 px for content ending at 2,934 px, Me page 1,880 px for content ending at 1,679 px; the remaining gap is the bottom-bar space.
