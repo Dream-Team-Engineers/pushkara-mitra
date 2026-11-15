@@ -1286,9 +1286,13 @@ details.note summary {
   padding: var(--space-2) var(--space-4) 0;
 }
 
-.hero .brand-mark {
-  width: 56px;
-  height: 56px;
+.hero-logo {
+  width: 176px;
+  height: auto;
+  padding: var(--space-2);
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: 0 0 0 1px var(--line);
 }
 
 .hero__title {

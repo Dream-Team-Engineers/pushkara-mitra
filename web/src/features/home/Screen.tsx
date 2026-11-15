@@ -2,7 +2,7 @@ import { ADS, HEADLINES } from '../../shared/data/fixtures-home';
 import { countdown, EVENT, now } from '../../shared/data/time';
 import { formatNumber, pair, t, type MessageKey } from '../../shared/i18n/i18n';
 import { hrefFor, type RouteId } from '../../app/router';
-import { BrandMark, Icon, type IconName } from '../../shared/ui/Icon';
+import { Icon, type IconName } from '../../shared/ui/Icon';
 import { Bi } from '../../shared/ui/Bi';
 import { Marquee } from '../../shared/ui/Marquee';
 
@@ -147,7 +147,14 @@ export default function HomeScreen() {
       />
       <Marquee tone="ad" badge={t('home.sponsored')} label={t('home.sponsored')} items={ADS} />
       <section class="hero">
-        <BrandMark size={72} />
+        <img
+          class="hero-logo"
+          src="/hero-logo.png"
+          width={176}
+          height={156}
+          alt="Pushkara Mitra"
+          decoding="async"
+        />
         <h1 id="screen-title" tabIndex={-1} class="hero__title">
           <Bi k="app.name" stacked />
         </h1>
