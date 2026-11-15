@@ -21,7 +21,8 @@ export type IconName =
   | 'phone'
   | 'check'
   | 'lock'
-  | 'external';
+  | 'external'
+  | 'close';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -60,6 +61,7 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   ],
   check: ['M5 12l5 5 9-10'],
   lock: ['M6 11h12v9H6z', 'M8 11V8a4 4 0 0 1 8 0v3'],
+  close: ['M6 6l12 12', 'M18 6L6 18'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'],
 };
 

@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import { startClock, watchOnline } from '../shared/data/time';
 import { DEFAULT_LOCALE, setLocale } from '../shared/i18n/i18n';
+import { listenForInstall } from '../shared/pwa/install';
 import { registerServiceWorker } from '../shared/pwa/register';
 import { browserStore, readPreferences } from '../shared/prefs/preferences';
 import '../shared/ui/tokens.css';
@@ -13,6 +14,7 @@ import { startRouter } from './router';
 
 async function boot(): Promise<void> {
   fitMobileViewport();
+  listenForInstall();
   initTheme();
   const { locale } = readPreferences(browserStore());
   const wanted = locale ?? DEFAULT_LOCALE;
