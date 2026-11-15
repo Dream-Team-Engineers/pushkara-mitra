@@ -7,10 +7,12 @@ import '../shared/ui/tokens.css';
 import '../shared/ui/fonts.css';
 import '../shared/ui/app.css';
 import { initTheme } from '../shared/ui/theme';
+import { fitMobileViewport } from '../shared/ui/viewport';
 import { App } from './App';
 import { startRouter } from './router';
 
 async function boot(): Promise<void> {
+  fitMobileViewport();
   initTheme();
   const { locale } = readPreferences(browserStore());
   const wanted = locale ?? DEFAULT_LOCALE;
