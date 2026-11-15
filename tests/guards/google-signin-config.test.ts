@@ -24,6 +24,12 @@ describe('Google sign-in configuration', () => {
     expect(pkg).toMatch(/"ship:production":[^\n]*build:web &&/);
   });
 
+  it('builds staging with the staging mode in CI, so a push cannot remove the client ID', () => {
+    const workflow = read('.github/workflows/deploy-staging.yml');
+    expect(workflow).toMatch(/run:\s*npm run build:web:staging/);
+    expect(workflow).not.toMatch(/run:\s*npm run build:web\s*$/m);
+  });
+
   it('holds no client secret anywhere in the repository config', () => {
     for (const file of ['vite.config.ts', 'wrangler.toml', 'package.json']) {
       expect(read(file)).not.toMatch(/GOCSPX-|client_secret/i);
