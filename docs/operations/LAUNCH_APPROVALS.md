@@ -47,7 +47,7 @@ Strongly recommended even for v1. Book one consultation with an Indian technolog
 
 ## Step 3 — Scope decision for v1 (item 3)
 
-- [ ] Decide: "v1 is read-only. No accounts, no personal data, all personal-data features stay off. G1 decisions are deferred to v2."
+- [x] Decided 2026-11-15 by the owner: "v1 is read-only. No accounts, no personal data, all personal-data features stay off. G1 decisions are deferred to v2."
 - **Record it:** tell Claude "record the v1 read-only scope decision". It goes into `OPEN_QUESTIONS.md` (OQ-021) and `PROJECT_STATUS.md` with your name and the date.
 
 If you want accounts or groups in v1 instead, the G1 decisions in `docs/proposals/OWNER_DECISION_PACK.md` (sign-in method, roles, retention, consent wording) must be made first, and the lawyer questions in step 2, item 7 become mandatory.
@@ -69,7 +69,7 @@ Before launch, also decide whether screens with no approved data should keep sho
 - [x] Contact email (step 1).
 - [ ] **Cloudflare plan.** Workers Free allows 100,000 requests a day, then returns errors. Every page and file request counts (OQ-028), so one busy event day will go over. Upgrade the account to **Workers Paid** before launch (Cloudflare dashboard → Workers & Pages → Plans; check the current price there). Then tell Claude "Workers Paid is active" so OQ-020/OQ-028 are updated.
 - [ ] **Custom domain (optional).** Without one the address stays `pushkara-mitra-production.<subdomain>.workers.dev`. If you buy a domain, add it to the Cloudflare account and Claude will route it.
-- [ ] **Logs and residency for v1:** record the decision "v1 stores no personal data and keeps no request logs of its own; India log sink and D1 residency are deferred until a personal-data feature is switched on" (OQ-017, OQ-026, OQ-027).
+- [x] **Logs and residency for v1** (decided 2026-11-15, owner delegated the wording; counsel review NEEDS REVIEW): record the decision "v1 stores no personal data and keeps no request logs of its own; India log sink and D1 residency are deferred until a personal-data feature is switched on" (OQ-017, OQ-026, OQ-027).
 - [ ] **Who watches the site on event days:** you. Bookmark `/healthz` on the production URL and the Cloudflare dashboard's Workers metrics. Keep the rollback command from `PROJECT_STATUS.md` somewhere you can reach from your phone.
 
 ## Step 6 — Testing and review (item 6)
