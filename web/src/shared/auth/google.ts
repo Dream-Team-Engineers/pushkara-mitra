@@ -1,0 +1,114 @@
+import { signal } from '@preact/signals';
+import { GOOGLE_CLIENT_ID } from '../flags/flags';
+
+/**
+ * Google sign-in for the Me tab (ADR 0008, OQ-030). The person signs in with the Google account on
+ * their phone. Google's own script is loaded only when they have agreed and are ready to sign in, the
+ * ID token is sent once to our Worker, which verifies it, and only the name and email come back.
+ * Nothing is stored in the browser or on the server: the signed-in person lives in memory and is gone
+ * when the page is closed or they sign out.
+ */
+export interface SignedInUser {
+  readonly name: string;
+  readonly email: string;
+}
+
+export const user = signal<SignedInUser | null>(null);
+export const signInError = signal(false);
+
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
+
+interface GoogleId {
+  initialize(config: {
+    client_id: string;
+    callback: (response: { credential?: string }) => void;
+    use_fedcm_for_prompt?: boolean;
+  }): void;
+  renderButton(parent: HTMLElement, options: Record<string, string | number>): void;
+  disableAutoSelect(): void;
+}
+
+declare global {
+  interface Window {
+    google?: { accounts: { id: GoogleId } };
+  }
+}
+
+let loading: Promise<void> | null = null;
+
+function loadScript(): Promise<void> {
+  if (window.google !== undefined) return Promise.resolve();
+  loading ??= new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = GSI_SRC;
+    script.async = true;
+    script.onload = () => {
+      resolve();
+    };
+    script.onerror = () => {
+      loading = null;
+      reject(new Error('Google sign-in could not load'));
+    };
+    document.head.append(script);
+  });
+  return loading;
+}
+
+export function isRealUser(value: unknown): value is SignedInUser {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as SignedInUser).name === 'string' &&
+    typeof (value as SignedInUser).email === 'string'
+  );
+}
+
+async function exchange(credential: string): Promise<void> {
+  try {
+    const response = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+      cache: 'no-store',
+      credentials: 'omit',
+    });
+    const body: unknown = await response.json();
+    if (response.ok && isRealUser(body)) {
+      user.value = { name: body.name, email: body.email };
+      signInError.value = false;
+    } else {
+      signInError.value = true;
+    }
+  } catch {
+    signInError.value = true;
+  }
+}
+
+/** Draws Google's own sign-in button into `parent`. Rejects when the script cannot load. */
+export async function renderGoogleButton(parent: HTMLElement): Promise<void> {
+  if (GOOGLE_CLIENT_ID === undefined) return;
+  await loadScript();
+  const id = window.google?.accounts.id;
+  if (id === undefined) throw new Error('Google sign-in is unavailable');
+  id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: (response) => {
+      if (typeof response.credential === 'string') void exchange(response.credential);
+      else signInError.value = true;
+    },
+  });
+  id.renderButton(parent, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'signin_with',
+    shape: 'pill',
+    width: 280,
+  });
+}
+
+export function signOut(): void {
+  user.value = null;
+  signInError.value = false;
+  window.google?.accounts.id.disableAutoSelect();
+}

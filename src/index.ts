@@ -1,4 +1,5 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
+import { GOOGLE_AUTH_PATH, handleGoogleAuth } from './routes/googleAuth';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
@@ -9,9 +10,15 @@ export interface Env {
   ASSETS?: Fetcher;
   GROUP_LOCATION?: DurableObjectNamespace;
   LOCAL_SYNTHETIC_DEMO?: string;
+  /** Public Google OAuth client ID. Set only where Google sign-in is switched on (staging first). */
+  GOOGLE_CLIENT_ID?: string;
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
+  if (new URL(request.url).pathname === GOOGLE_AUTH_PATH) {
+    return handleGoogleAuth(request, env.GOOGLE_CLIENT_ID);
+  }
+
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
   }
@@ -87,6 +94,7 @@ async function route(request: Request, env: Env): Promise<Response> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    return withSecurityHeaders(await route(request, env));
+    const googleSignIn = env.GOOGLE_CLIENT_ID !== undefined && env.GOOGLE_CLIENT_ID !== '';
+    return withSecurityHeaders(await route(request, env), googleSignIn);
   },
 } satisfies ExportedHandler<Env>;

@@ -24,11 +24,32 @@ describe('frontend content guard', () => {
     expect(offenders).toEqual([]);
   });
 
+  /**
+   * Owner decision 2026-11-15 (ADR 0008, OQ-030): Google sign-in. This file may name Google's sign-in
+   * script and nothing else; the Worker's Content-Security-Policy allows only that origin path, and only
+   * where GOOGLE_CLIENT_ID is configured (staging first).
+   */
+  const EXTERNAL_URL_ALLOW_LIST: Readonly<Record<string, readonly string[]>> = {
+    'shared/auth/google.ts': ['https://accounts.google.com/gsi/client'],
+  };
+
   it('hard-codes no external URLs in application code', () => {
     const offenders = production
       .filter((file) => /https?:\/\//.test(stripComments(file.source)))
+      .filter((file) => !(file.path in EXTERNAL_URL_ALLOW_LIST))
       .map((file) => file.path);
     expect(offenders).toEqual([]);
+  });
+
+  it('lets the allow-listed files name only the URLs they are approved for', () => {
+    for (const [path, allowed] of Object.entries(EXTERNAL_URL_ALLOW_LIST)) {
+      const file = production.find((candidate) => candidate.path === path);
+      const urls = [...stripComments(file?.source ?? '').matchAll(/https?:\/\/[^'"`\s)]+/g)].map(
+        (match) => match[0],
+      );
+      expect(urls.length).toBeGreaterThan(0);
+      for (const url of urls) expect(allowed).toContain(url);
+    }
   });
 
   it('keeps the scanner honest', () => {
