@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process';
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const DIST = process.argv[2] ?? 'dist/web';
@@ -33,6 +33,7 @@ const TYPES = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
   '.webmanifest': 'application/manifest+json',
 };
 // Same policy as src/security/headers.ts, minus upgrade-insecure-requests (this test server is HTTP).
@@ -47,9 +48,17 @@ if (!existsSync(join(DIST, 'index.html'))) {
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost');
   const rel =
-    url.pathname === '/' ? 'index.html' : normalize(url.pathname).replace(/^(\.\.[/\\])+/, '');
-  const file = join(DIST, rel);
-  if (!file.startsWith(DIST) || !existsSync(file) || !statSync(file).isFile()) {
+    url.pathname === '/'
+      ? 'index.html'
+      : normalize(url.pathname)
+          .replace(/^(\.\.[/\\])+/, '')
+          // normalize() keeps a leading separator ("\assets\x.js" on Windows), which resolve()
+          // would read as the drive root, outside DIST.
+          .replace(/^[/\\]+/, '');
+  // Compare absolute paths: DIST is relative with forward slashes, join() returns backslashes on
+  // Windows, so a plain startsWith(DIST) rejected every file there.
+  const file = resolve(DIST, rel);
+  if (!file.startsWith(resolve(DIST) + sep) || !existsSync(file) || !statSync(file).isFile()) {
     res.writeHead(404).end('not found');
     return;
   }
@@ -259,7 +268,7 @@ try {
   const requiredCached = [
     '/',
     '/manifest.webmanifest',
-    '/fonts/NotoSansTelugu-400.woff',
+    '/fonts/NotoSansTelugu-400.woff2',
     '/fonts/Roboto-400-latin.woff',
   ];
   check(
@@ -309,7 +318,9 @@ try {
   check(
     'Smoke test ran to completion',
     false,
-    error instanceof Error ? error.message : String(error),
+    `${error instanceof Error ? error.message : String(error)}${
+      problems.length ? ` | page problems: ${problems.slice(0, 5).join(' | ')}` : ''
+    }`,
   );
 } finally {
   ws.close();

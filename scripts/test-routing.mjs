@@ -164,8 +164,8 @@ async function checkEnvironment(environment, mock = false) {
       ['GET', '/icon-192.png', 200],
       ['GET', '/icon-192.png', 200],
       ['GET', '/fonts/Roboto-400-latin.woff', 200],
-      ['GET', '/fonts/NotoSansTelugu-400.woff', 200],
-      ['GET', '/fonts/NotoSansDevanagari-400.woff', 200],
+      ['GET', '/fonts/NotoSansTelugu-400.woff2', 200],
+      ['GET', '/fonts/NotoSansDevanagari-400.woff2', 200],
       ['GET', '/fonts/Roboto-OFL.txt', 200],
       ['GET', '/healthz', 200],
       ['HEAD', '/healthz', 200],
@@ -221,7 +221,7 @@ async function checkEnvironment(environment, mock = false) {
         if (method === 'GET') assert.equal(response.headers.get('Location'), '/');
       }
       if (path === '/sw.js' && method === 'GET') assert.match(body, /addEventListener/);
-      if (path.endsWith('.woff'))
+      if (path.endsWith('.woff') || path.endsWith('.woff2'))
         assert.match(
           response.headers.get('Content-Type') ?? '',
           /font\/woff/i,
@@ -280,5 +280,13 @@ try {
 } finally {
   process.removeListener('SIGINT', interrupt);
   process.removeListener('SIGTERM', interrupt);
-  rmSync(temporary, { recursive: true, force: true });
+  // Windows can keep workerd state files locked after exit (EBUSY). All assertions have already run,
+  // so a locked temporary folder must not turn a passing run into a failure; warn and move on.
+  try {
+    rmSync(temporary, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+  } catch (error) {
+    console.warn(
+      `Could not remove temporary folder ${temporary}: ${error.code ?? 'unknown error'}`,
+    );
+  }
 }

@@ -67,7 +67,7 @@ export default function TravelScreen() {
                 <li key={row.id} class="card">
                   <h2 class="card__title">{row.name}</h2>
                   <p class="card__meta">
-                    {row.from} → {row.to}
+                    {row.from} – {row.to}
                   </p>
                   <p class="card__meta">
                     {t('travel.dep', { time: row.departs })} ·{' '}

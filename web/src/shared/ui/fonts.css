@@ -18,7 +18,7 @@
 }
 @font-face {
   font-family: 'Mitra Telugu';
-  src: url('/fonts/NotoSansTelugu-400.woff') format('woff');
+  src: url('/fonts/NotoSansTelugu-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -26,7 +26,7 @@
 }
 @font-face {
   font-family: 'Mitra Telugu';
-  src: url('/fonts/NotoSansTelugu-700.woff') format('woff');
+  src: url('/fonts/NotoSansTelugu-700.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -34,7 +34,7 @@
 }
 @font-face {
   font-family: 'Mitra Devanagari';
-  src: url('/fonts/NotoSansDevanagari-400.woff') format('woff');
+  src: url('/fonts/NotoSansDevanagari-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -42,7 +42,7 @@
 }
 @font-face {
   font-family: 'Mitra Devanagari';
-  src: url('/fonts/NotoSansDevanagari-700.woff') format('woff');
+  src: url('/fonts/NotoSansDevanagari-700.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

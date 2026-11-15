@@ -18,11 +18,15 @@ FontTools generated static weights 400 and 700 at width 100 and WOFF files. Robo
 
 The six WOFF assets total **217,236 bytes**; the two Telugu assets total **57,472 bytes**. The proposed first-load transfer budget has not been measured on a device or network. The service worker precaches only these own static font URLs alongside the public shell. The matching SIL OFL files are included beside the fonts. No external runtime font request is made.
 
-| WOFF asset                    | SHA-256                                                            |
-| ----------------------------- | ------------------------------------------------------------------ |
-| `Roboto-400-latin.woff`       | `5b90c77658e5a04721e5e8fb9b678f990a86a34ac708781f16b77638f068001d` |
-| `Roboto-700-latin.woff`       | `9293341a32211a1ec094cdd103a8501d1489f7683f39f24c41cbc111d5726036` |
-| `NotoSansTelugu-400.woff`     | `206ec4a1dbd06bc94e158e8ab2d46c0832f09f681eed3909d4cbda402356de10` |
-| `NotoSansTelugu-700.woff`     | `9ce1672a984199d370492dc21509bcf4a4b39af14c98a58a8134e8b25b1b98b7` |
-| `NotoSansDevanagari-400.woff` | `c365dadd9bb66872d2460239718edc3bcd462af38f06e2112f50d2a428b8492b` |
-| `NotoSansDevanagari-700.woff` | `4966ff01fea1a715c37b52f3ad0b88e48e89b923095fe2312d8024012bdfc7c2` |
+| WOFF asset                     | SHA-256                                                            |
+| ------------------------------ | ------------------------------------------------------------------ |
+| `Roboto-400-latin.woff`        | `5b90c77658e5a04721e5e8fb9b678f990a86a34ac708781f16b77638f068001d` |
+| `Roboto-700-latin.woff`        | `9293341a32211a1ec094cdd103a8501d1489f7683f39f24c41cbc111d5726036` |
+| `NotoSansTelugu-400.woff2`     | `98b86e85da4f346bad6585b1e8b695696e38d002ed0e874da26c762f488f3d57` |
+| `NotoSansTelugu-700.woff2`     | `cdffe38832fb6308a2a391087845c1920462bd608c4e65d9798d1df707e7cb41` |
+| `NotoSansDevanagari-400.woff2` | `f86f14cbd1004f5795689ee9cc70d5d87d915f5135b30283525c1c7b8f0eb192` |
+| `NotoSansDevanagari-700.woff2` | `6a68069c959d7f3c02f4062dd9be85327448b5d753e95455b1c0320f37f68fc1` |
+
+## Update 2026-11-15: full Telugu and Devanagari character sets (WOFF2)
+
+The earlier Noto subsets were cut to the characters in the copy at the time, so letters used later (Telugu ఠ ఔ ఐ ఛ, Hindi ञ ऊ, and the zero-width joiners) rendered in a fallback font. The four Noto assets (the Telugu and Devanagari rows in the table above) were replaced with the complete Telugu and Devanagari Unicode-block files from the `@fontsource/noto-sans-telugu` and `@fontsource/noto-sans-devanagari` 5.3.0 npm packages (Noto Sans, SIL OFL 1.1, WOFF2). The SHA-256 values above are for these WOFF2 files, which are the ones the app now loads; the two Roboto rows are unchanged WOFF. Sizes: Telugu 35,760 + 37,448 bytes, Devanagari 50,416 + 53,984 bytes. A coverage check of the matching WOFF character maps against every non-ASCII character in `web/src` found no Telugu or Devanagari letter missing. The OFL text files beside the fonts are unchanged and should be compared against the package licence by whoever reviews the asset record (NEEDS REVIEW). The symbols `×` and `→` are not in any bundled font, so the screens now use an inline SVG and an en dash instead. The statements above that the assets are subsets of the local copy are historical.

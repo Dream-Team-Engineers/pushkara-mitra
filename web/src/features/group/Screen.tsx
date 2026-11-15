@@ -169,7 +169,22 @@ export default function GroupScreen() {
                       members.value = removeMember(members.value, member.id);
                     }}
                   >
-                    ×
+                    {/* SVG, not the "×" character: no bundled font has that glyph. */}
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        d="M2 2l10 10M12 2L2 12"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        fill="none"
+                      />
+                    </svg>
                   </button>
                 </div>
               )}
