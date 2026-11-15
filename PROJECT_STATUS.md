@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Build id shown on the Me tab; owner still on a cached copy — 2026-11-15 20:41:00 IST
+
+- **Report:** with the owner's Google account added as a test user (Google console screenshot: External, Testing, 3 test users, including the owner's), the owner's desktop Chrome still showed the old Me tab ("Prototype · no data is sent", "Sign-in is not switched on yet"). The served staging bundle was checked again and contains the client ID, so the cause is the owner's browser running an older cached copy; why the offline worker did not take the update is not yet known.
+- **Change:** the Me tab now ends with a "Build <commit>" line (staging builds add "staging"), so any browser can show which copy it runs. Commit `99f3bc9`, staging version `72794104-aeab-475b-87d8-211475b9c86c`; gate passed (47 test files passed, 1 skipped; 625 tests passed, 24 skipped). The live bundle contains the client ID and the build id `99f3bc9 staging`.
+- **Next:** the owner opens staging in an Incognito window (no cached copy) and checks the Build line, then clears site data in the normal window; if a normal window with a current build still cannot sign in, the next suspect is Google's side (origin or test-user list) and the agent will ask for the exact message. Not verified by the agent: a real sign-in.
+- **Rollback:** `npx wrangler rollback 32f5ab75-1d47-4e80-a7e7-73aa5046e283 --env staging`.
+
 ## Stale copy on the owner's browser; updates now apply automatically — 2026-11-15 20:04:00 IST
 
 - **Report:** the owner could not sign in; their screenshot of the Me tab still showed "Prototype · no data is sent" and "Sign-in is not switched on yet", which is the old build. The live site was checked at the same time: the served bundle `index-CPOikPxx.js` contains the staging client ID, so sign-in was enabled on the server; the owner's browser was running a cached copy kept by the offline service worker, which by design waited for the person to tap "Update".
