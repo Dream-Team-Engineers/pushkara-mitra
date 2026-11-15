@@ -152,7 +152,19 @@ ws.onmessage = (message) => {
     problems.push(
       `console.error: ${data.params.args.map((a) => a.value ?? a.description).join(' ')}`,
     );
-  if (data.method === 'Log.entryAdded' && data.params.entry.level === 'error')
+  // This test serves only static files, with no Worker behind it, so the public content API
+  // (/api/public/...) answers 404 here, and it cannot be reached at all during the offline phase.
+  // The app is built to handle both (it shows its draft or offline state) and the browser logs
+  // each as an error. Ignore exactly those two cases for that path; every other error, including
+  // a failure for any other URL, still fails the test.
+  if (
+    data.method === 'Log.entryAdded' &&
+    data.params.entry.level === 'error' &&
+    !(
+      /\/api\/public\//.test(data.params.entry.url ?? '') &&
+      /status of 404|ERR_INTERNET_DISCONNECTED/.test(data.params.entry.text ?? '')
+    )
+  )
     problems.push(`log: ${data.params.entry.text} ${data.params.entry.url ?? ''}`);
 };
 const send = (method, params = {}) =>
