@@ -85,12 +85,16 @@ export function Icon({ name, size = 24 }: { readonly name: IconName; readonly si
 }
 
 export function BrandMark({ size = 32 }: { readonly size?: number }) {
+  // Temporary logo (owner-supplied artwork, see docs/design/brand/README.md).
   return (
-    <svg class="brand-mark" width={size} height={size} viewBox="0 0 72 72" aria-hidden="true">
-      <circle cx="36" cy="36" r="34" class="brand-mark__disc" />
-      <circle cx="48" cy="22" r="7" class="brand-mark__sun" />
-      <path d="M12 44c6-5 12-5 18 0s12 5 18 0 10-4 12-3" class="brand-mark__wave" />
-      <path d="M12 54c6-5 12-5 18 0s12 5 18 0 10-4 12-3" class="brand-mark__wave" />
-    </svg>
+    <img
+      class="brand-mark"
+      src="/logo-96.png"
+      width={size}
+      height={size}
+      alt="Pushkara Mitra"
+      aria-hidden="true"
+      decoding="async"
+    />
   );
 }

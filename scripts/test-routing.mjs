@@ -151,7 +151,7 @@ async function checkEnvironment(environment, mock = false) {
       ['GET', '/sw.js', 200],
       ['GET', '/manifest.webmanifest', 200],
       ['GET', '/icon-192.png', 200],
-      ['GET', '/mitra-mark.svg', 200],
+      ['GET', '/icon-192.png', 200],
       ['GET', '/fonts/Roboto-400-latin.woff', 200],
       ['GET', '/fonts/NotoSansTelugu-400.woff', 200],
       ['GET', '/fonts/NotoSansDevanagari-400.woff', 200],

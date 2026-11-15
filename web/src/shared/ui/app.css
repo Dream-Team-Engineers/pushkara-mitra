@@ -123,19 +123,9 @@ main:focus {
   color: var(--header-text);
 }
 
-.brand-mark__disc {
-  fill: var(--primary-fill);
-}
-
-.brand-mark__sun {
-  fill: var(--accent);
-}
-
-.brand-mark__wave {
-  fill: none;
-  stroke: var(--on-primary);
-  stroke-width: 4;
-  stroke-linecap: round;
+.brand-mark {
+  border-radius: 22%;
+  object-fit: cover;
 }
 
 .offline-banner {
@@ -1289,9 +1279,9 @@ details.note summary {
   padding: var(--space-2) var(--space-4) 0;
 }
 
-.hero svg {
-  width: 40px;
-  height: 40px;
+.hero .brand-mark {
+  width: 56px;
+  height: 56px;
 }
 
 .hero__title {
