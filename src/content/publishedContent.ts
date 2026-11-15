@@ -400,7 +400,14 @@ const HELPLINES_ENTRY: ContentEntry = {
       ownerLine('rjy-control-0883', 'localControl', '0883-1234567', PROVISIONAL),
     ],
   },
-  review: { status: 'draft' },
+  review: {
+    status: 'approved',
+    reviewer: 'gkmraju',
+    reviewedRevision: '92a74c4',
+    reviewedOn: '2026-11-15',
+    scope:
+      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages; every other number was supplied by the owner and is shown as unverified. The two Pushkaralu control-room numbers come from a 2027 portal and are provisional. The owner will recheck all numbers on the last day before the event.',
+  },
 };
 
 export const PUBLISHED_CONTENT: Readonly<Record<ContentKind, ContentEntry>> = {
