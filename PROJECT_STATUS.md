@@ -6,7 +6,7 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
-## Phone-only view, and a fix for "Desktop site" mode — 2026-11-15 15:05:00 IST (committed, not deployed)
+## Phone-only view, and a fix for "Desktop site" mode — 2026-11-15 14:55:00 IST (committed, not deployed)
 
 - **Task / outcome:** the app looked tiny when a phone browser was in "Desktop site" mode (it lays the page out about 980 px wide and shrinks it) and was stretched across wide windows. Two changes: (1) the whole app, header, content and bottom bar, is now a single phone-width column (max 32 rem) centred on wide screens, so desktop browsers show the phone layout only; (2) a small script (`web/src/shared/ui/viewport.ts`) detects a touch phone whose layout is much wider than its screen (Desktop site mode) and zooms the page by the same ratio, so it is phone-sized again. Phones in normal mode, landscape phones, tablets, laptops and desktops are untouched (unit-tested).
 - **Limit:** this is a workaround. The browser's Desktop-site setting cannot be switched off by a web page, and the zoom depends on the browser reporting its screen width; it is verified only in Edge device emulation, not on a real phone. A Play Store (Trusted Web Activity) app does not have a Desktop-site mode.
