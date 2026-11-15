@@ -64,26 +64,22 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
         </h2>
         <CrowdChip level={ghat.crowd} />
       </div>
-      <p class="card__meta">
-        {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
-      </p>
-      <p class="card__meta">{t('crowd.estimate')}</p>
-      {ghat.facilities.length === 0 ? (
-        ghat.synthetic ? null : (
-          <p class="card__meta">{t('ghats.facilitiesNotStated')}</p>
-        )
-      ) : (
+      <div class="card__row">
+        <p class="card__meta">
+          {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
+        </p>
+        <a class="card__link" href={hrefFor('map')}>
+          <Bi k="action.directions" />
+        </a>
+      </div>
+      {ghat.facilities.length === 0 ? null : (
         <ul class="tags" aria-label={t('ghats.facilities')}>
           {ghat.facilities.map((facility) => (
             <li key={facility}>{t(FACILITY_LABELS[facility])}</li>
           ))}
         </ul>
       )}
-      <p class="card__meta">{t('ghats.snanamPending')}</p>
       <SourceStamp meta={ghat} />
-      <a class="button button--secondary" href={hrefFor('map')}>
-        <Bi k="action.directions" />
-      </a>
     </li>
   );
 }
@@ -110,6 +106,9 @@ export default function GhatsScreen() {
           return (
             <>
               <p class="note">{t(note)}</p>
+              <p class="note">
+                {t('crowd.estimate')} {t('ghats.snanamPending')}
+              </p>
               {items.some((item) => item.nameTe !== null || item.nameHi !== null) ? (
                 <p class="note">{t('ghats.namesUnverified')}</p>
               ) : null}

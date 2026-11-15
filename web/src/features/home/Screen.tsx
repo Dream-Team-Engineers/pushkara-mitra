@@ -113,6 +113,10 @@ function CountdownCard() {
             <span class="countdown__value">{pad(state.minutes)}</span>
             <span>{t('home.countdown.minutes')}</span>
           </li>
+          <li>
+            <span class="countdown__value">{pad(state.seconds)}</span>
+            <span>{t('home.countdown.seconds')}</span>
+          </li>
         </ul>
       ) : (
         <p class="countdown__phase">

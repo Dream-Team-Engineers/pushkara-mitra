@@ -4,7 +4,6 @@ import type { HelplineFixture, HelplineKind } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
 import { Bi } from '../../shared/ui/Bi';
 import { Icon } from '../../shared/ui/Icon';
-import { SourceStamp } from '../../shared/ui/Status';
 
 /**
  * Helpline rows, laid out as in the approved UI workflow (Emergency screen): a number chip, the
@@ -90,47 +89,61 @@ export function HelplineList({ lines }: { readonly lines: readonly HelplineFixtu
   const chosen = lines.find((line) => line.id === pending.value);
   return (
     <>
-      <ul class="helpline-list">
+      <ul class="helpline-grid">
         {lines.map((line) => {
           const spec = LINES[line.kind];
           const { number } = line;
+          const unverified = line.status === 'unverified';
           return (
-            <li key={line.id} class="helpline">
-              <span
-                class={`helpline__chip${spec.urgent ? ' helpline__chip--urgent' : ''}${number === null ? ' helpline__chip--off' : ''}`}
-              >
-                {number ?? '—'}
-              </span>
-              <span class="helpline__body">
-                <span class="helpline__name">
-                  <Bi k={spec.label} stacked />
-                </span>
-                {number === null ? (
-                  <span class="helpline__meta">{t('help.numbers.unavailable')}</span>
-                ) : (
-                  <SourceStamp meta={line} />
-                )}
-              </span>
+            <li
+              key={line.id}
+              class={`helpline${(number?.length ?? 0) > 6 ? ' helpline--wide' : ''}`}
+            >
               <button
                 type="button"
-                class="helpline__call"
+                class={`helpline__call${spec.urgent ? ' helpline__call--urgent' : ''}`}
                 disabled={number === null}
                 aria-haspopup="dialog"
                 aria-label={
                   number === null
                     ? `${t(spec.label)}: ${t('help.numbers.unavailable')}`
-                    : t('help.call.aria', { name: t(spec.label), number })
+                    : `${t('help.call.aria', { name: t(spec.label), number })}${unverified ? `. ${t('state.unverified')}` : ''}`
                 }
                 onClick={() => {
                   pending.value = line.id;
                 }}
               >
-                {t('help.call.button')}
+                <span class="helpline__chip">
+                  <Icon name="phone" size={14} />
+                  <span>{number ?? '—'}</span>
+                </span>
+                <span class="helpline__name">
+                  <Bi k={spec.label} stacked />
+                </span>
+                {unverified ? (
+                  <span class="helpline__flag" aria-hidden="true">
+                    *
+                  </span>
+                ) : null}
               </button>
             </li>
           );
         })}
       </ul>
+      {lines.some((line) => line.status === 'unverified') ? (
+        <p class="helpline__legend">* {t('state.unverified')}</p>
+      ) : null}
+      <details class="helpline__sources">
+        <summary>{t('help.sources')}</summary>
+        <ul>
+          {lines.map((line) => (
+            <li key={line.id}>
+              <strong>{line.number ?? '—'}</strong> {t(LINES[line.kind].label)}: {line.source}
+              {line.status === 'unverified' ? ` · ${t('state.unverified')}` : ''}
+            </li>
+          ))}
+        </ul>
+      </details>
       {chosen === undefined || chosen.number === null ? null : (
         <CallConfirm
           kind={chosen.kind}

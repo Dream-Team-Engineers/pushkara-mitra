@@ -6,9 +6,9 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 describe('countdown', () => {
-  it('counts down to the provisional start in whole days, hours and minutes', () => {
+  it('counts down to the provisional start in whole days, hours, minutes and seconds', () => {
     const now = EVENT.start - (3 * DAY + 5 * HOUR + 7 * MINUTE + 59_000);
-    expect(countdown(now)).toEqual({ phase: 'before', days: 3, hours: 5, minutes: 7 });
+    expect(countdown(now)).toEqual({ phase: 'before', days: 3, hours: 5, minutes: 7, seconds: 59 });
   });
 
   it('shows zero units one second before the start', () => {
@@ -17,6 +17,7 @@ describe('countdown', () => {
       days: 0,
       hours: 0,
       minutes: 0,
+      seconds: 1,
     });
   });
 

@@ -23,10 +23,12 @@ export type Countdown =
       readonly days: number;
       readonly hours: number;
       readonly minutes: number;
+      readonly seconds: number;
     }
   | { readonly phase: 'during' }
   | { readonly phase: 'after' };
 
+const SECOND = 1000;
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -40,6 +42,7 @@ export function countdown(now: number, event: EventWindow = EVENT): Countdown {
     days: Math.floor(left / DAY),
     hours: Math.floor((left % DAY) / HOUR),
     minutes: Math.floor((left % HOUR) / MINUTE),
+    seconds: Math.floor((left % MINUTE) / SECOND),
   };
 }
 
@@ -53,11 +56,13 @@ export function minutesSince(isoTimestamp: string, now: number): number | null {
 export const now = signal(Date.now());
 
 /** Ticks the shared clock while the page is visible. Returns a stop function. */
-export function startClock(intervalMs = 30_000): () => void {
+export function startClock(intervalMs = 1000): () => void {
   const tick = (): void => {
     now.value = Date.now();
   };
-  const timer = setInterval(tick, intervalMs);
+  const timer = setInterval(() => {
+    if (document.visibilityState === 'visible') tick();
+  }, intervalMs);
   const onVisible = (): void => {
     if (document.visibilityState === 'visible') tick();
   };
