@@ -11,9 +11,15 @@ export function AppHeader() {
         <BrandMark size={28} />
         <span>{t('app.name')}</span>
       </a>
-      <a class="icon-link" href={hrefFor('settings')} aria-label={t('settings.language')}>
-        <Icon name="globe" />
-      </a>
+      <div class="app-header__actions">
+        <a class="account-link" href={hrefFor('pass')}>
+          <Icon name="group" size={20} />
+          <span>{t('account.header')}</span>
+        </a>
+        <a class="icon-link" href={hrefFor('settings')} aria-label={t('settings.language')}>
+          <Icon name="globe" />
+        </a>
+      </div>
     </header>
   );
 }

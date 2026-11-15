@@ -1,5 +1,7 @@
 # Privacy notice for the read-only v1 (DRAFT)
 
+> **OUT OF DATE (2026-11-15):** the owner later decided that v1 includes sign-in with a Google account. This draft says the app collects nothing, which would then be wrong. It must be rewritten to cover the name and email received from Google, consent, under-18s and deletion before publication (OQ-030, `docs/operations/GOOGLE_SIGNIN_PLAN.md`).
+
 **Status: DRAFT, NEEDS REVIEW (OQ-029).** Written by Claude Code (agent) on 2026-11-15 from what the code does today. It is not legal advice and not approved. Before publication: (1) the owner confirms every statement against the live app, (2) a lawyer reviews the wording and answers the questions in `docs/operations/LAUNCH_APPROVALS.md` step 2, (3) native Telugu and Hindi speakers translate and check it. No statute, section number or date is cited here on purpose; add them only after counsel confirms them (OQ-003).
 
 Scope: the read-only v1 decided by the owner on 2026-11-15 (OQ-021). If any personal-data feature is switched on later, this notice must be replaced first.

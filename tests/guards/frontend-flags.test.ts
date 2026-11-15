@@ -11,6 +11,7 @@ import { findDynamicFlagSources } from './frontend-scan';
 const REQUIRED_FLAGS: readonly FlagName[] = [
   'geolocation',
   'pilgrimPass',
+  'googleSignIn',
   'myGroup',
   'liveMap',
   'sosDispatch',

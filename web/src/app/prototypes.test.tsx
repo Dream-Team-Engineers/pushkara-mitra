@@ -11,7 +11,7 @@ import { HELPLINES, type HelplineFixture } from '../shared/data/fixtures';
 import { HelplineList, dialTarget } from '../features/help/HelplineList';
 import { helplinesResource, helpPointsResource } from '../shared/data/resources';
 import { LOCALES, setLocale, t } from '../shared/i18n/i18n';
-import { validateName, validatePhone } from '../shared/privacy/validation';
+import { validateName } from '../shared/privacy/validation';
 import { accessibilityIssues, countTag } from '../shared/testing/html';
 import { ROUTE_IDS } from './router';
 import { screenLoader } from './routes';
@@ -21,7 +21,7 @@ afterEach(async () => {
 });
 
 const PROTOTYPES = [
-  ['pass', PassScreen, 'pilgrimPass'],
+  ['pass', PassScreen, 'googleSignIn'],
   ['group', GroupScreen, 'myGroup'],
   ['map', MapScreen, 'liveMap'],
   ['help', HelpScreen, 'sosDispatch'],
@@ -61,23 +61,23 @@ describe('prototype screens', () => {
   });
 });
 
-describe('Pilgrim Pass', () => {
-  it('validates a 10-digit Indian mobile number and a bounded name', () => {
-    expect(validatePhone('98765 43210')).toBe(true);
-    expect(validatePhone('5876543210')).toBe(false);
-    expect(validatePhone('987654321')).toBe(false);
-    expect(validatePhone('')).toBe(false);
+describe('Me tab', () => {
+  it('validates a bounded name', () => {
     expect(validateName('  Lakshmi ')).toBe(true);
     expect(validateName('   ')).toBe(false);
     expect(validateName('x'.repeat(61))).toBe(false);
   });
 
-  it('opens on the phone step with no stored or prefilled personal data', () => {
+  it('offers Google sign-in only, with no phone, OTP or pass creation, and it is off', () => {
     const html = render(<PassScreen />);
-    expect(html).toContain('id="pass-phone"');
-    expect(html).not.toContain('id="pass-name"');
+    expect(html).toContain(t('account.intro'));
+    expect(html).toContain(t('account.age.adult'));
+    expect(html).toContain(t('account.age.minor'));
+    expect(html).toContain(t('account.pending'));
+    expect(html).not.toContain('type="tel"');
+    expect(html).not.toMatch(/OTP (login|send)|id="pass-/i);
     expect(html).not.toMatch(/value="[^"]+"/);
-    expect(html).toContain(t('pass.otp.note'));
+    expect(html).toMatch(/<button[^>]*disabled[^>]*>/);
   });
 });
 
@@ -181,7 +181,9 @@ describe('Emergency / Help', () => {
 describe('Partners and volunteers', () => {
   it('opens on the partner panel and never lists unverified partners', () => {
     const html = render(<PartnersScreen />);
-    expect(html).toContain('id="partner-phone"');
+    expect(html).toContain('id="partner-name"');
+    expect(html).not.toContain('partner-phone');
+    expect(html).toContain(t('account.signin'));
     expect(html).not.toContain('id="report-ghat"');
     expect(accessibilityIssues(html)).toEqual([]);
   });
@@ -194,8 +196,9 @@ describe('Partners and volunteers', () => {
     expect(accessibilityIssues(html)).toEqual([]);
   });
 
-  it('partner panel starts signed out with no verification claims', () => {
+  it('partner panel makes no verification claims and has no OTP', () => {
     const html = render(<PartnerPanel />);
-    expect(html).not.toContain(t('partners.verify.phone'));
+    expect(html).not.toMatch(/OTP|type="tel"/);
+    expect(html).toContain(t('partners.verify.note'));
   });
 });

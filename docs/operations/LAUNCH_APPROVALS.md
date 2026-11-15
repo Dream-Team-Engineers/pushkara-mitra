@@ -47,7 +47,7 @@ Strongly recommended even for v1. Book one consultation with an Indian technolog
 
 ## Step 3 — Scope decision for v1 (item 3)
 
-- [x] Decided 2026-11-15 by the owner: "v1 is read-only. No accounts, no personal data, all personal-data features stay off. G1 decisions are deferred to v2."
+- [x] Decided 2026-11-15 by the owner (**later amended the same day: v1 also includes Google sign-in, see `GOOGLE_SIGNIN_PLAN.md` and OQ-030**): "v1 is read-only. No accounts, no personal data, all personal-data features stay off. G1 decisions are deferred to v2."
 - **Record it:** tell Claude "record the v1 read-only scope decision". It goes into `OPEN_QUESTIONS.md` (OQ-021) and `PROJECT_STATUS.md` with your name and the date.
 
 If you want accounts or groups in v1 instead, the G1 decisions in `docs/proposals/OWNER_DECISION_PACK.md` (sign-in method, roles, retention, consent wording) must be made first, and the lawyer questions in step 2, item 7 become mandatory.

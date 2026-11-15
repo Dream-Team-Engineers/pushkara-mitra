@@ -1,194 +1,98 @@
 import { useSignal } from '@preact/signals';
-import { Bi } from '../../shared/ui/Bi';
+import { isEnabled } from '../../shared/flags/flags';
 import { t } from '../../shared/i18n/i18n';
-import { validateName, validatePhone } from '../../shared/privacy/validation';
+import { Bi } from '../../shared/ui/Bi';
+import { Icon } from '../../shared/ui/Icon';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 
 /**
- * Pilgrim Pass prototype (flag `pilgrimPass` is off). Entries live in component memory only:
- * nothing is stored, sent or logged, and leaving the screen discards them. There is no form
- * element, no OTP, no camera and no real QR code. ADR 0008 and counsel come first.
+ * Me tab: the one place to sign in, with a Google account (the one used for the Play Store), so
+ * there is no password and no OTP. Sign-in is OFF (flag `googleSignIn`) until the Google client,
+ * the consent wording and counsel review exist (ADR 0008, OQ-030). Choices made here live in
+ * component memory only: nothing is stored, sent or logged, and leaving the screen discards them.
  */
-type Step = 1 | 2 | 3;
+type Age = 'adult' | 'minor';
 
-function Stepper({ step }: { readonly step: Step }) {
-  return (
-    <ol class="stepper" aria-label={t('pass.step', { current: step, total: 3 })}>
-      {(
-        [
-          [1, 'pass.step.phone'],
-          [2, 'pass.step.details'],
-          [3, 'pass.step.pass'],
-        ] as const
-      ).map(([number, label]) => (
-        <li key={number} aria-current={step === number ? 'step' : undefined}>
-          <span class="stepper__dot">{number}</span>
-          <span>{t(label)}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-export default function PassScreen() {
-  const step = useSignal<Step>(1);
-  const phone = useSignal('');
-  const name = useSignal('');
+export default function MeScreen() {
+  const age = useSignal<Age | null>(null);
   const consent = useSignal(false);
+  const parent = useSignal(false);
   const tried = useSignal(false);
-
-  const reset = (): void => {
-    step.value = 1;
-    phone.value = '';
-    name.value = '';
-    consent.value = false;
-    tried.value = false;
-  };
+  const live = isEnabled('googleSignIn');
+  const ready = age.value !== null && consent.value && (age.value === 'adult' || parent.value);
 
   return (
     <>
-      <ScreenHeader titleKey="module.pass.title" subtitleKey="module.pass.subtitle" />
-      <PrototypeBanner />
-      <Stepper step={step.value} />
-      {step.value === 1 ? (
+      <ScreenHeader titleKey="nav.me" />
+      {live ? null : <PrototypeBanner />}
+      <p class="note">{t('account.intro')}</p>
+      <fieldset class="choice-group">
+        <legend>{t('account.age.legend')}</legend>
+        {(
+          [
+            ['adult', 'account.age.adult'],
+            ['minor', 'account.age.minor'],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            class="choice"
+            aria-pressed={age.value === value}
+            onClick={() => {
+              age.value = value;
+              parent.value = false;
+            }}
+          >
+            {t(label)}
+          </button>
+        ))}
+      </fieldset>
+      {age.value === 'minor' ? (
         <>
-          <div class="field">
-            <label for="pass-phone">
-              <Bi k="pass.phone.label" />
-            </label>
-            <input
-              id="pass-phone"
-              type="tel"
-              inputMode="numeric"
-              autocomplete="off"
-              maxLength={14}
-              aria-invalid={tried.value && !validatePhone(phone.value)}
-              aria-describedby="pass-phone-error"
-              value={phone.value}
-              onInput={(event) => {
-                phone.value = event.currentTarget.value;
-              }}
-            />
-            <p id="pass-phone-error" class="field__error" role="alert">
-              {tried.value && !validatePhone(phone.value) ? t('pass.phone.error') : ''}
-            </p>
-          </div>
-          <p class="note">{t('pass.otp.note')}</p>
-          <div class="actions">
-            <button
-              type="button"
-              class="button"
-              onClick={() => {
-                tried.value = true;
-                if (validatePhone(phone.value)) {
-                  tried.value = false;
-                  step.value = 2;
-                }
-              }}
-            >
-              {t('pass.otp.send')}
-            </button>
-          </div>
-        </>
-      ) : null}
-      {step.value === 2 ? (
-        <>
-          <div class="field">
-            <label for="pass-name">
-              <Bi k="pass.name.label" />
-            </label>
-            <input
-              id="pass-name"
-              type="text"
-              autocomplete="off"
-              maxLength={60}
-              aria-invalid={tried.value && !validateName(name.value)}
-              aria-describedby="pass-name-error"
-              value={name.value}
-              onInput={(event) => {
-                name.value = event.currentTarget.value;
-              }}
-            />
-            <p id="pass-name-error" class="field__error" role="alert">
-              {tried.value && !validateName(name.value) ? t('pass.name.error') : ''}
-            </p>
-          </div>
-          <p class="note">
-            {t('pass.photo.label')}: {t('pass.photo.unavailable')}
-          </p>
+          <p class="note">{t('account.minor.note')}</p>
           <div class="field field--check">
             <input
-              id="pass-consent"
+              id="me-parent"
               type="checkbox"
-              checked={consent.value}
+              checked={parent.value}
               onChange={(event) => {
-                consent.value = event.currentTarget.checked;
+                parent.value = event.currentTarget.checked;
               }}
             />
-            <label for="pass-consent">
-              <Bi k="pass.consent" />
-            </label>
-          </div>
-          <p class="field__error" role="alert">
-            {tried.value && !consent.value ? t('pass.consent.error') : ''}
-          </p>
-          <p class="note">{t('proto.consentPending')}</p>
-          <div class="actions">
-            <button
-              type="button"
-              class="button"
-              onClick={() => {
-                tried.value = true;
-                if (validateName(name.value) && consent.value) {
-                  tried.value = false;
-                  step.value = 3;
-                }
-              }}
-            >
-              {t('pass.generate')}
-            </button>
+            <label for="me-parent">{t('account.parent.consent')}</label>
           </div>
         </>
       ) : null}
-      {step.value === 3 ? (
-        <>
-          <section class="pass-card" aria-labelledby="pass-card-title">
-            <h2 id="pass-card-title" class="pass-card__title">
-              <Bi k="pass.card.title" />
-            </h2>
-            <dl class="pass-card__rows">
-              <div>
-                <dt>{t('pass.card.name')}</dt>
-                <dd>{name.value.trim()}</dd>
-              </div>
-              <div>
-                <dt>{t('pass.card.id')}</dt>
-                <dd>PM-SAMPLE</dd>
-              </div>
-            </dl>
-            <div class="qr-placeholder" role="img" aria-label={t('pass.card.qr')}>
-              <span>{t('pass.card.qr')}</span>
-            </div>
-            <p class="card__meta">{t('pass.card.valid')}</p>
-            <p class="card__meta">{t('pass.card.note')}</p>
-          </section>
-          <div class="actions">
-            <button
-              type="button"
-              class="button button--secondary"
-              onClick={() => {
-                step.value = 2;
-              }}
-            >
-              {t('action.edit')}
-            </button>
-            <button type="button" class="button button--danger" onClick={reset}>
-              <Bi k="action.delete" />
-            </button>
-          </div>
-        </>
-      ) : null}
-      <p class="note">{t('proto.notSent')}</p>
+      <div class="field field--check">
+        <input
+          id="me-consent"
+          type="checkbox"
+          checked={consent.value}
+          onChange={(event) => {
+            consent.value = event.currentTarget.checked;
+          }}
+        />
+        <label for="me-consent">{t('account.consent')}</label>
+      </div>
+      <p class="field__error" role="alert">
+        {tried.value && !ready ? t('account.consent.error') : ''}
+      </p>
+      <p class="note">{t('proto.consentPending')}</p>
+      <div class="actions">
+        <button
+          type="button"
+          class="button"
+          disabled={!live}
+          onClick={() => {
+            tried.value = true;
+          }}
+        >
+          <Icon name="lock" size={20} />
+          <Bi k="account.signin" />
+        </button>
+      </div>
+      {live ? null : <p class="note">{t('account.pending')}</p>}
     </>
   );
 }

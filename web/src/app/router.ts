@@ -27,7 +27,7 @@ export interface RouteInfo {
 
 export const ROUTES: readonly RouteInfo[] = [
   { id: 'home', path: '/', titleKey: 'app.name' },
-  { id: 'pass', path: '/pass', titleKey: 'module.pass.title' },
+  { id: 'pass', path: '/pass', titleKey: 'nav.me' },
   { id: 'group', path: '/group', titleKey: 'module.group.title' },
   { id: 'map', path: '/map', titleKey: 'module.map.title' },
   { id: 'ghats', path: '/ghats', titleKey: 'module.ghats.title' },

@@ -31,6 +31,8 @@ export const FLAGS = {
    * route and approved copy (docs/proposals/BACKEND_CONTRACT_ACCEPTANCE.md); until then it is off.
    */
   publishedInformation: false,
+  /** Google sign-in (Me tab and header). Needs the Google client set up, consent wording and counsel review. */
+  googleSignIn: false,
   /** Donation collection. Blocked until counsel approves recipient, FCRA and tax treatment. */
   donations: false,
 } as const;

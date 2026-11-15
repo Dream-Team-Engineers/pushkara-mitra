@@ -2,14 +2,13 @@ import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { GHATS } from '../../shared/data/fixtures';
-import { t, type MessageKey } from '../../shared/i18n/i18n';
-import { validatePhone } from '../../shared/privacy/validation';
+import { t } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 
 /**
  * Community partners and volunteers prototype (flag `partnerContact` is off). Entries stay in
- * component memory, no partner is listed to pilgrims, no OTP is sent and no report leaves the
+ * component memory, no partner is listed to pilgrims, sign-in is the Google account on the Me tab and no report leaves the
  * device. Vendor verification, moderation and takedown processes must exist before this is real.
  */
 type Role = 'partner' | 'volunteer';
@@ -33,18 +32,9 @@ const LEVELS: readonly ChipOption<Level>[] = [
   { value: 'high', label: 'crowd.high' },
 ];
 
-const VERIFY_STEPS: readonly MessageKey[] = [
-  'partners.verify.phone',
-  'partners.verify.docs',
-  'partners.verify.live',
-];
-
 export function PartnerPanel() {
   const type = useSignal<PartnerType>('pandit');
-  const phone = useSignal('');
   const business = useSignal('');
-  const signedIn = useSignal(false);
-  const tried = useSignal(false);
   return (
     <>
       <ChipGroup
@@ -55,27 +45,6 @@ export function PartnerPanel() {
           type.value = value;
         }}
       />
-      <div class="field">
-        <label for="partner-phone">
-          <Bi k="pass.phone.label" />
-        </label>
-        <input
-          id="partner-phone"
-          type="tel"
-          inputMode="numeric"
-          autocomplete="off"
-          maxLength={14}
-          aria-invalid={tried.value && !validatePhone(phone.value)}
-          aria-describedby="partner-phone-error"
-          value={phone.value}
-          onInput={(event) => {
-            phone.value = event.currentTarget.value;
-          }}
-        />
-        <p id="partner-phone-error" class="field__error" role="alert">
-          {tried.value && !validatePhone(phone.value) ? t('pass.phone.error') : ''}
-        </p>
-      </div>
       <div class="field">
         <label for="partner-name">
           <Bi k="partners.name.label" />
@@ -92,30 +61,11 @@ export function PartnerPanel() {
         />
       </div>
       <div class="actions">
-        <button
-          type="button"
-          class="button"
-          onClick={() => {
-            tried.value = true;
-            signedIn.value = validatePhone(phone.value);
-          }}
-        >
-          {t('partners.signin')}
-        </button>
+        <a class="button" href={hrefFor('pass')}>
+          <Bi k="account.signin" />
+        </a>
       </div>
-      {signedIn.value ? (
-        <section class="section" aria-labelledby="verify-title">
-          <h2 id="verify-title" class="section__title">
-            <Bi k="partners.verify.title" />
-          </h2>
-          <ol class="steps">
-            {VERIFY_STEPS.map((key) => (
-              <li key={key}>{t(key)}</li>
-            ))}
-          </ol>
-          <p class="note note--flush">{t('partners.verify.note')}</p>
-        </section>
-      ) : null}
+      <p class="note">{t('partners.verify.note')}</p>
     </>
   );
 }

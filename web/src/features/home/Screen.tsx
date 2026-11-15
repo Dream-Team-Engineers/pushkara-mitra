@@ -14,15 +14,8 @@ interface QuickCard {
   readonly subtitle: MessageKey;
 }
 
-/** The ten agreed modules, in the order of the decided prototype (ADR 0011, F1). */
+/** The nine agreed modules (Me is the account tab in the bottom bar), in the order of the decided prototype (ADR 0011, F1). */
 export const QUICK_CARDS: readonly QuickCard[] = [
-  {
-    id: 'pass',
-    icon: 'pass',
-    tone: 'teal',
-    title: 'module.pass.title',
-    subtitle: 'module.pass.subtitle',
-  },
   {
     id: 'group',
     icon: 'group',

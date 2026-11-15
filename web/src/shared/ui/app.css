@@ -1374,3 +1374,21 @@ details.note summary {
   font-weight: 700;
   text-decoration: none;
 }
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--target-min);
+  padding-inline: var(--space-2);
+  color: var(--header-text);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  text-decoration: none;
+}
