@@ -85,6 +85,45 @@ function pad(value: number): string {
   return String(value).padStart(2, '0');
 }
 
+const DOTS = 36;
+
+/** One countdown unit: a ring of dots, lit in proportion to how much of the unit is left. */
+function Ring({
+  value,
+  text,
+  of,
+  label,
+}: {
+  readonly value: number;
+  readonly text: string;
+  readonly of: number;
+  readonly label: MessageKey;
+}) {
+  const lit = Math.max(0, Math.min(DOTS, Math.round((value / of) * DOTS)));
+  return (
+    <li class="ring">
+      <div class="ring__face">
+        <svg class="ring__dots" viewBox="0 0 100 100" aria-hidden="true">
+          {Array.from({ length: DOTS }, (_, index) => {
+            const angle = (index / DOTS) * 2 * Math.PI - Math.PI / 2;
+            return (
+              <circle
+                key={index}
+                cx={50 + 44 * Math.cos(angle)}
+                cy={50 + 44 * Math.sin(angle)}
+                r={3.2}
+                class={index < lit ? 'ring__dot ring__dot--lit' : 'ring__dot'}
+              />
+            );
+          })}
+        </svg>
+        <span class="ring__value">{text}</span>
+      </div>
+      <span class="ring__label">{t(label)}</span>
+    </li>
+  );
+}
+
 function CountdownCard() {
   const state = countdown(now.value);
   return (
@@ -93,23 +132,26 @@ function CountdownCard() {
         <Bi k="home.countdown.title" />
       </h2>
       {state.phase === 'before' ? (
-        <ul class="countdown__tiles">
-          <li>
-            <span class="countdown__value">{formatNumber(state.days)}</span>
-            <span>{t('home.countdown.days')}</span>
-          </li>
-          <li>
-            <span class="countdown__value">{pad(state.hours)}</span>
-            <span>{t('home.countdown.hours')}</span>
-          </li>
-          <li>
-            <span class="countdown__value">{pad(state.minutes)}</span>
-            <span>{t('home.countdown.minutes')}</span>
-          </li>
-          <li>
-            <span class="countdown__value">{pad(state.seconds)}</span>
-            <span>{t('home.countdown.seconds')}</span>
-          </li>
+        <ul class="countdown__rings">
+          <Ring
+            value={state.days}
+            text={formatNumber(state.days)}
+            of={365}
+            label="home.countdown.days"
+          />
+          <Ring value={state.hours} text={pad(state.hours)} of={24} label="home.countdown.hours" />
+          <Ring
+            value={state.minutes}
+            text={pad(state.minutes)}
+            of={60}
+            label="home.countdown.minutes"
+          />
+          <Ring
+            value={state.seconds}
+            text={pad(state.seconds)}
+            of={60}
+            label="home.countdown.seconds"
+          />
         </ul>
       ) : (
         <p class="countdown__phase">
@@ -150,17 +192,14 @@ export default function HomeScreen() {
         <img
           class="hero-logo"
           src="/hero-logo.png"
-          width={176}
-          height={156}
-          alt="Pushkara Mitra"
+          width={200}
+          height={239}
+          alt="Pushkara Mitra, your companion at the Godavari"
           decoding="async"
         />
-        <h1 id="screen-title" tabIndex={-1} class="hero__title">
-          <Bi k="app.name" stacked />
+        <h1 id="screen-title" tabIndex={-1} class="visually-hidden">
+          <Bi k="app.name" />
         </h1>
-        <p class="hero__tagline">
-          <Bi k="app.tagline" stacked />
-        </p>
       </section>
       <CountdownCard />
       <section class="section" aria-labelledby="quick-title">
