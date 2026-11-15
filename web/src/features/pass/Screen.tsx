@@ -1,5 +1,6 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
+import { BUILD_ID } from '../../shared/build';
 import { renderGoogleButton, signInError, signOut, user } from '../../shared/auth/google';
 import { isEnabled } from '../../shared/flags/flags';
 import { t } from '../../shared/i18n/i18n';
@@ -58,6 +59,7 @@ export default function MeScreen() {
         <ScreenHeader titleKey="nav.me" />
         <SignedIn />
         <p class="note">{t('account.memoryOnly')}</p>
+        <p class="build-id">Build {BUILD_ID}</p>
       </>
     );
   }
@@ -139,6 +141,7 @@ export default function MeScreen() {
           {t('account.loadFailed')}
         </p>
       ) : null}
+      <p class="build-id">Build {BUILD_ID}</p>
     </>
   );
 }

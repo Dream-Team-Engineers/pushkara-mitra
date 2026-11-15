@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import preact from '@preact/preset-vite';
 import { defineConfig } from 'vite';
@@ -16,9 +17,21 @@ import { serviceWorkerPlugin } from './web/build/sw';
 const STAGING_GOOGLE_CLIENT_ID =
   '433695131529-igclhmojpijekd1nq65m2jnue5rno8tr.apps.googleusercontent.com';
 
+/** Short commit of the source being built, shown in the app so a stale copy is easy to spot. */
+function buildId(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+  } catch {
+    return 'unknown';
+  }
+}
+
 export default defineConfig(({ mode }) => ({
   root: 'web',
   define: {
+    'import.meta.env.VITE_BUILD_ID': JSON.stringify(
+      `${buildId()}${mode === 'staging' ? ' staging' : ''}`,
+    ),
     'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(
       mode === 'staging' ? STAGING_GOOGLE_CLIENT_ID : '',
     ),

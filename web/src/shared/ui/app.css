@@ -1595,3 +1595,9 @@ details.note summary {
 .google-slot {
   min-height: var(--target-min);
 }
+
+.build-id {
+  margin: var(--space-4) var(--space-4) 0;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
