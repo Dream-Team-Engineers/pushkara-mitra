@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Owner confirmed Google sign-in works on staging — 2026-11-15 21:02:00 IST
+
+- **Owner statement (2026-11-15, Krishna Murthy Raju G / `gkmraju`), after trying staging build `065b2fb`:** "its working fine now". Recorded from the owner's message; the agent did not see the sign-in itself. Scope of what works: sign-in with a Google test-user account on staging, with the age and consent choices in front of it. Still open (OQ-030): consent wording and counsel review, under-18 parental consent verification, consent record, account deletion, rewritten privacy notice, Google verification for non-test users, session/nonce hardening, security review of the staging CSP (inline styles) before any production use.
+
 ## Cause found: the CI staging deploy overwrote the staging build — 2026-11-15 20:57:00 IST
 
 - **Finding:** the owner's Incognito window (no cached copy) showed "Build b7b73d5" with no "staging" label and the old "Sign-in is not switched on yet" text. `b7b73d5` is a docs-only commit the agent pushed after deploying staging itself. `.github/workflows/deploy-staging.yml` deploys staging automatically on every push to `main`, and it built with `npm run build:web` (no client ID), replacing the agent's staging build. This also explains the extra staging versions listed before and after the agent's own deploys all session. So the earlier "cached copy" explanation was wrong for this case (a cached copy may still exist, but the served build itself had sign-in off).
