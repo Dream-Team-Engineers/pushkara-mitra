@@ -2,6 +2,8 @@ import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import type { StayFixture, StayKind } from '../../shared/data/fixtures';
 import { stayResource } from '../../shared/data/resources';
+import { STAY_LINKS } from '../../shared/data/sourceLinks';
+import { LinkCards } from '../../shared/ui/LinkCards';
 import { formatNumber, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -53,6 +55,12 @@ export default function StayScreen() {
     <>
       <ScreenHeader titleKey="module.stay.title" subtitleKey="module.stay.subtitle" />
       <p class="note">{t('stay.note')}</p>
+      <section class="section" aria-labelledby="stay-links-title">
+        <h2 id="stay-links-title" class="section__title">
+          <Bi k="links.stay.heading" />
+        </h2>
+        <LinkCards links={STAY_LINKS} />
+      </section>
       <details class="note">
         <summary>
           <Bi k="stay.rank.title" />

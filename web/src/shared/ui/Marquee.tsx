@@ -5,6 +5,18 @@ import { Icon } from './Icon';
 export interface MarqueeItem {
   readonly id: string;
   readonly text: string;
+  /** https link to the story; the item then renders as a link to a new tab. */
+  readonly href?: string;
+}
+
+function MarqueeText({ item }: { readonly item: MarqueeItem }) {
+  return item.href === undefined ? (
+    <>{item.text}</>
+  ) : (
+    <a href={item.href} target="_blank" rel="noopener noreferrer">
+      {item.text}
+    </a>
+  );
 }
 
 /**
@@ -30,7 +42,9 @@ export function Marquee({
       <div class="marquee__viewport">
         <ul class={paused.value ? 'marquee__track is-paused' : 'marquee__track'}>
           {items.map((item) => (
-            <li key={item.id}>{item.text}</li>
+            <li key={item.id}>
+              <MarqueeText item={item} />
+            </li>
           ))}
           {items.map((item) => (
             <li key={`${item.id}-copy`} class="marquee__copy" aria-hidden="true">

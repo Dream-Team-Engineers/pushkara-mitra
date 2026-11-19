@@ -3,7 +3,9 @@ import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { TravelFixture, TravelMode } from '../../shared/data/fixtures';
 import { travelResource } from '../../shared/data/resources';
+import { TRAVEL_LINKS } from '../../shared/data/sourceLinks';
 import { t } from '../../shared/i18n/i18n';
+import { LinkCards } from '../../shared/ui/LinkCards';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
@@ -32,6 +34,13 @@ export default function TravelScreen() {
   return (
     <>
       <ScreenHeader titleKey="module.travel.title" subtitleKey="module.travel.subtitle" />
+      <section class="section" aria-labelledby="travel-links-title">
+        <h2 id="travel-links-title" class="section__title">
+          <Bi k="links.travel.heading" />
+        </h2>
+        <p class="note">{t('links.travel.note')}</p>
+        <LinkCards links={TRAVEL_LINKS} />
+      </section>
       <ChipGroup
         legend="travel.mode.legend"
         options={MODES}

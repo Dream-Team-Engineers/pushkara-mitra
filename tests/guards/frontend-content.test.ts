@@ -31,6 +31,22 @@ describe('frontend content guard', () => {
    */
   const EXTERNAL_URL_ALLOW_LIST: Readonly<Record<string, readonly string[]>> = {
     'shared/auth/google.ts': ['https://accounts.google.com/gsi/client'],
+    /**
+     * Owner request 2026-11-19: outbound source links for travel, stay, culture and maps. Every URL
+     * is a page the agent opened or is marked "not yet checked" on screen. Links open in a new tab;
+     * the page CSP is unchanged because nothing is fetched from these hosts.
+     */
+    'shared/data/sourceLinks.ts': [
+      'https://www.irctc.co.in/',
+      'https://www.apsrtconline.in/',
+      'https://www.aai.aero/',
+      'https://eastgodavari.ap.gov.in/godavari-pushkaralu-2027/',
+      'https://eastgodavari.ap.gov.in/Hotels',
+      'https://eastgodavari.ap.gov.in/religious-tourism/',
+      'https://eastgodavari.ap.gov.in/cultural-tourism/',
+      'https://en.wikipedia.org/wiki/Godavari_Pushkaram',
+      'https://www.openstreetmap.org/search?query=',
+    ],
   };
 
   it('hard-codes no external URLs in application code', () => {

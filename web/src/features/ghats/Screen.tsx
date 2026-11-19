@@ -2,6 +2,7 @@ import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { District, Facility, GhatFixture } from '../../shared/data/fixtures';
+import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { ghatsResource } from '../../shared/data/resources';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, CrowdChip, type ChipOption } from '../../shared/ui/Chips';
@@ -68,9 +69,20 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
         <p class="card__meta">
           {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
         </p>
-        <a class="card__link" href={hrefFor('map')}>
-          <Bi k="action.directions" />
-        </a>
+        {ghat.synthetic ? (
+          <a class="card__link" href={hrefFor('map')}>
+            <Bi k="action.directions" />
+          </a>
+        ) : (
+          <a
+            class="card__link"
+            href={osmSearchUrl(`${ghat.name}, ${ghat.town}, Andhra Pradesh`)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Bi k="action.directions" />
+          </a>
+        )}
       </div>
       {ghat.facilities.length === 0 ? null : (
         <ul class="tags" aria-label={t('ghats.facilities')}>

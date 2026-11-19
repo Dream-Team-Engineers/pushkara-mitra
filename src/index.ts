@@ -1,5 +1,6 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
 import { AUTH_PREFIX, handleAuth } from './routes/googleAuth';
+import { handlePublicNews, PUBLIC_NEWS_PATH } from './routes/news';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
@@ -86,6 +87,10 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   if (pathname === PUBLIC_INFORMATION_PATH) {
     return handlePublicInformation(new URL(request.url));
+  }
+
+  if (pathname === PUBLIC_NEWS_PATH) {
+    return handlePublicNews(new URL(request.url));
   }
 
   if (pathname.startsWith(PUBLIC_CONTENT_PREFIX)) {

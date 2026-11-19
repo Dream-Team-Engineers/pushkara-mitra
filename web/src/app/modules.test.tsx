@@ -106,7 +106,12 @@ describe('public module screens', () => {
     expect(html).toContain('sponsored-label');
     expect(html).toContain(t('home.sponsored'));
     expect(html).toContain(t('stay.rank.body'));
-    expect(html).not.toMatch(/href="https?:/);
+    expect(html).not.toMatch(/href="http:/);
+    // Every outside link opens in a new tab without handing over the opener.
+    for (const tag of html.match(/<a [^>]*href="https:[^>]*>/g) ?? []) {
+      expect(tag).toContain('rel="noopener noreferrer"');
+    }
+    expect(html).toContain('https://eastgodavari.ap.gov.in/Hotels');
   });
 
   it('shows no crowd level for official ghats, and frames crowds as estimates', async () => {

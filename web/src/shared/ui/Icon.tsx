@@ -22,7 +22,14 @@ export type IconName =
   | 'check'
   | 'lock'
   | 'external'
-  | 'close';
+  | 'close'
+  | 'train'
+  | 'bus'
+  | 'plane'
+  | 'temple'
+  | 'news'
+  | 'bed'
+  | 'book';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -62,6 +69,27 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   check: ['M5 12l5 5 9-10'],
   lock: ['M6 11h12v9H6z', 'M8 11V8a4 4 0 0 1 8 0v3'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
+  train: [
+    'M7 3h10a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2z',
+    'M5 11h14',
+    'M8 21l2-3',
+    'M16 21l-2-3',
+    'M9 15h.01',
+    'M15 15h.01',
+  ],
+  bus: ['M5 4h14a2 2 0 0 1 2 2v11H3V6a2 2 0 0 1 2-2z', 'M3 11h18', 'M7 17v3', 'M17 17v3'],
+  plane: ['M2 14l9-2-4-8h2l7 8 5-1a1.5 1.5 0 0 1 0 3l-5-1-7 8H7l4-8-9-1z'],
+  temple: [
+    'M12 3l3 4H9z',
+    'M6 11h12l-2-4H8z',
+    'M4 21h16',
+    'M6 21V11',
+    'M18 21V11',
+    'M10 21v-5h4v5',
+  ],
+  news: ['M4 5h13v14H4z', 'M17 9h3v8a2 2 0 0 1-2 2', 'M7 9h7', 'M7 13h7', 'M7 16h4'],
+  bed: ['M3 19V6', 'M3 14h18v5', 'M21 14v-2a3 3 0 0 0-3-3h-8v5'],
+  book: ['M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', 'M5 17a3 3 0 0 1 3-3h11'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'],
 };
 

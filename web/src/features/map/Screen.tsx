@@ -1,6 +1,8 @@
 import { hrefFor } from '../../app/router';
 import { Bi } from '../../shared/ui/Bi';
+import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { t } from '../../shared/i18n/i18n';
+import { Icon } from '../../shared/ui/Icon';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 
 /**
@@ -18,6 +20,24 @@ export default function MapScreen() {
         <span class="state-line__dot" aria-hidden="true" />
         {t('map.sharing.off')}
       </p>
+      <a
+        class="card link-card"
+        href={osmSearchUrl('Rajahmundry, Andhra Pradesh')}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="link-card__icon">
+          <Icon name="map" />
+        </span>
+        <span class="link-card__body">
+          <span class="card__title">{t('map.openOsm')}</span>
+          <span class="card__meta">{t('map.osmNote')}</span>
+        </span>
+        <span class="link-card__go">
+          <Icon name="external" size={20} />
+          <span class="visually-hidden">{t('links.opensNewTab')}</span>
+        </span>
+      </a>
       <figure class="map-figure">
         <svg viewBox="0 0 320 200" role="img" aria-label={t('map.alt')}>
           <rect class="map__land" x="0" y="0" width="320" height="200" />

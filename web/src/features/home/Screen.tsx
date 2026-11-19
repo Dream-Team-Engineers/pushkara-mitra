@@ -1,3 +1,4 @@
+import { useLiveNews } from '../../shared/data/news';
 import { ADS, HEADLINES } from '../../shared/data/fixtures-home';
 import { countdown, EVENT, now } from '../../shared/data/time';
 import { formatNumber, pair, t, type MessageKey } from '../../shared/i18n/i18n';
@@ -177,7 +178,19 @@ function WeatherStrip() {
   );
 }
 
+/** Live headlines when the service has them; otherwise the labelled samples. */
+function headlineItems(live: ReturnType<typeof useLiveNews>) {
+  return live === null || live.length === 0
+    ? HEADLINES
+    : live.map((item) => ({
+        id: item.id,
+        text: `${item.title} · ${item.source}`,
+        href: item.url,
+      }));
+}
+
 export default function HomeScreen() {
+  const live = useLiveNews();
   return (
     <>
       <WeatherStrip />
@@ -185,7 +198,7 @@ export default function HomeScreen() {
         tone="news"
         badge={t('home.breakingNews')}
         label={t('home.breakingNews')}
-        items={HEADLINES}
+        items={headlineItems(live)}
       />
       <Marquee tone="ad" badge={t('home.sponsored')} label={t('home.sponsored')} items={ADS} />
       <section class="hero">

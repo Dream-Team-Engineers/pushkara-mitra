@@ -114,7 +114,10 @@ describe('Maps', () => {
     expect(html).toContain(t('map.noHistory'));
     expect(html).toContain(t('map.legend.live'));
     expect(html).toContain(t('map.legend.stale'));
-    expect(html).not.toMatch(/<img|tile|openstreetmap/i);
+    expect(html).not.toMatch(/<img|tile/i);
+    // The only outside reference is a plain link to OpenStreetMap search, opened in a new tab.
+    expect(html).toContain('href="https://www.openstreetmap.org/search?query=');
+    expect(html).toContain('rel="noopener noreferrer"');
   });
 });
 

@@ -3,7 +3,11 @@ import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { UpdateFixture, UpdateKind } from '../../shared/data/fixtures';
 import { updatesResource } from '../../shared/data/resources';
-import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { useLiveNews } from '../../shared/data/news';
+import { CULTURE_LINKS, SIGNIFICANCE } from '../../shared/data/sourceLinks';
+import { formatDate, locale, t, type MessageKey } from '../../shared/i18n/i18n';
+import { Icon } from '../../shared/ui/Icon';
+import { LinkCards } from '../../shared/ui/LinkCards';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
@@ -36,6 +40,69 @@ export function filterUpdates(items: readonly UpdateFixture[], tab: Tab): readon
   return items.filter((item) => TAB_KINDS[tab].includes(item.kind));
 }
 
+function LiveNews() {
+  const live = useLiveNews();
+  if (live === null || live.length === 0) return null;
+  return (
+    <section class="section" aria-labelledby="live-news-title">
+      <h2 id="live-news-title" class="section__title">
+        <Bi k="news.heading" />
+      </h2>
+      <p class="note">{t('news.note')}</p>
+      <ul class="card-list">
+        {live.map((item) => (
+          <li key={item.id}>
+            <a class="card link-card" href={item.url} target="_blank" rel="noopener noreferrer">
+              <span class="link-card__icon">
+                <Icon name="news" />
+              </span>
+              <span class="link-card__body">
+                <span class="card__title">{item.title}</span>
+                <span class="card__meta">
+                  {t('news.age', {
+                    source: item.source,
+                    when: formatDate(Date.parse(item.publishedAt)),
+                  })}
+                </span>
+              </span>
+              <span class="link-card__go">
+                <Icon name="external" size={20} />
+                <span class="visually-hidden">{t('links.opensNewTab')}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Culture() {
+  const lang = locale.value;
+  return (
+    <section class="section" aria-labelledby="culture-title">
+      <h2 id="culture-title" class="section__title">
+        <Bi k="culture.heading" />
+      </h2>
+      <p class="note">{t('culture.note')}</p>
+      <ul class="card-list">
+        {SIGNIFICANCE.map((note) => (
+          <li key={note.id} class="card" lang={lang}>
+            <p class="card__title">{note.text[lang]}</p>
+            <p class="stamp">
+              <span>{t('state.source', { source: note.source })}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+      <h3 class="section__title">
+        <Bi k="culture.more" />
+      </h3>
+      <LinkCards links={CULTURE_LINKS} />
+    </section>
+  );
+}
+
 export default function UpdatesScreen() {
   const tab = useSignal<Tab>('today');
   return (
@@ -49,6 +116,8 @@ export default function UpdatesScreen() {
           tab.value = value;
         }}
       />
+      {tab.value === 'today' || tab.value === 'news' ? <LiveNews /> : null}
+      {tab.value === 'rituals' ? <Culture /> : null}
       <ResourceView
         resource={updatesResource}
         render={(items) => {
