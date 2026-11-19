@@ -8,8 +8,11 @@ export interface PrecachePlan {
   readonly optional: readonly string[];
 }
 
-/** Fonts for other languages are cached when first used, so the first visit stays small. */
-const OPTIONAL_PATTERN = /^\/fonts\/NotoSansDevanagari-/;
+/**
+ * Fonts for other languages and the map screen's code (about 1 MB: MapLibre and its worker) are
+ * cached when first used, so the first visit stays small.
+ */
+const OPTIONAL_PATTERN = /^\/fonts\/NotoSansDevanagari-|^\/assets\/(?:LiveMap|maplibre-gl-worker)-/;
 /** The map archive, glyphs and sprites are fetched on demand, never precached (the archive is megabytes). */
 const EXCLUDED_PATTERN = /\.(?:map|txt)$|^\/sw\.js$|^\/maps\//;
 

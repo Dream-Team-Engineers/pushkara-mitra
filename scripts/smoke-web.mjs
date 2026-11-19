@@ -28,6 +28,8 @@ const ROUTES = [
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.pmtiles': 'application/octet-stream',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json',
   '.svg': 'image/svg+xml',
@@ -62,13 +64,29 @@ const server = createServer((req, res) => {
     res.writeHead(404).end('not found');
     return;
   }
-  res.writeHead(200, {
+  const headers = {
     'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream',
     'Content-Security-Policy': CSP,
     'Permissions-Policy': 'geolocation=(), camera=(), microphone=()',
     'Cache-Control': 'no-cache',
-  });
-  res.end(readFileSync(file));
+    'Accept-Ranges': 'bytes',
+  };
+  const body = readFileSync(file);
+  // The map archive is read with byte ranges, as the real Worker serves it (src/routes/mapArchive.ts).
+  const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range ?? '');
+  if (range !== null && Number(range[1]) < body.length) {
+    const start = Number(range[1]);
+    const end = range[2] === '' ? body.length - 1 : Math.min(Number(range[2]), body.length - 1);
+    res.writeHead(206, {
+      ...headers,
+      'Content-Range': `bytes ${start}-${end}/${body.length}`,
+      'Content-Length': end - start + 1,
+    });
+    res.end(body.subarray(start, end + 1));
+    return;
+  }
+  res.writeHead(200, headers);
+  res.end(body);
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const base = `http://127.0.0.1:${server.address().port}`;

@@ -12,6 +12,10 @@ export const TILES_PATH = '/maps/godavari.pmtiles';
 export async function tilesAvailable(
   request: typeof fetch = (input, init) => fetch(input, init),
 ): Promise<boolean> {
+  // Offline: do not even ask (the browser would log a failed request); the schematic is shown.
+  const onLine: unknown =
+    typeof navigator === 'undefined' ? true : Reflect.get(navigator, 'onLine');
+  if (onLine === false) return false;
   try {
     const response = await request(TILES_PATH, {
       headers: { Range: 'bytes=0-6' },

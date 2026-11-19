@@ -18,3 +18,19 @@ describe('tilesAvailable', () => {
     expect(await tilesAvailable(() => Promise.reject(new Error('offline')))).toBe(false);
   });
 });
+
+describe('tilesAvailable while offline', () => {
+  it('does not make a request at all', async () => {
+    const original = Object.getOwnPropertyDescriptor(globalThis.navigator, 'onLine');
+    Object.defineProperty(globalThis.navigator, 'onLine', { value: false, configurable: true });
+    let called = false;
+    const ok = await tilesAvailable(() => {
+      called = true;
+      return Promise.resolve(new Response('PMTiles'));
+    });
+    if (original === undefined) Reflect.deleteProperty(globalThis.navigator, 'onLine');
+    else Object.defineProperty(globalThis.navigator, 'onLine', original);
+    expect(ok).toBe(false);
+    expect(called).toBe(false);
+  });
+});

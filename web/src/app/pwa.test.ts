@@ -6,6 +6,21 @@ import { planPrecache, renderServiceWorker } from '../../build/sw';
 const TEMPLATE = readFileSync('web/build/sw.template.js', 'utf8');
 
 describe('planPrecache and the map files', () => {
+  it('caches the map screen code on first use instead of at install', () => {
+    const plan = planPrecache([
+      'index.html',
+      'assets/LiveMap-abc.js',
+      'assets/LiveMap-abc.css',
+      'assets/maplibre-gl-worker-def.mjs',
+    ]);
+    expect(plan.precache.some((path) => /LiveMap|maplibre/.test(path))).toBe(false);
+    expect(plan.optional).toEqual([
+      '/assets/LiveMap-abc.css',
+      '/assets/LiveMap-abc.js',
+      '/assets/maplibre-gl-worker-def.mjs',
+    ]);
+  });
+
   it('never precaches the map archive, glyphs or sprites', () => {
     const plan = planPrecache([
       'index.html',
