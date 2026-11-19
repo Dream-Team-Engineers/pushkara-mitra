@@ -83,6 +83,12 @@ export function parseNewsFeed(xml: string): readonly NewsItem[] {
     .slice(0, MAX_ITEMS);
 }
 
+/** TEMPORARY diagnostic (2026-11-19): why the feed was unavailable. Remove once staging is understood. */
+function withUpstream(response: Response, why: string): Response {
+  response.headers.set('X-News-Upstream', why);
+  return response;
+}
+
 export type FeedFetcher = (url: string, init: RequestInit) => Promise<Response>;
 
 export async function handlePublicNews(
@@ -96,15 +102,20 @@ export async function handlePublicNews(
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true },
     });
-    if (!upstream.ok) return publicError('CONTENT_UNAVAILABLE', 404);
+    if (!upstream.ok)
+      return withUpstream(publicError('CONTENT_UNAVAILABLE', 404), String(upstream.status));
     const xml = (await upstream.text()).slice(0, MAX_FEED_BYTES);
     const items = parseNewsFeed(xml);
-    if (items.length === 0) return publicError('CONTENT_UNAVAILABLE', 404);
+    if (items.length === 0)
+      return withUpstream(publicError('CONTENT_UNAVAILABLE', 404), `empty-${String(xml.length)}`);
     return Response.json(
       { kind: 'news', fetchedAt: new Date().toISOString(), items },
       { headers: { 'Cache-Control': `public, max-age=${String(CACHE_SECONDS)}` } },
     );
-  } catch {
-    return publicError('CONTENT_UNAVAILABLE', 404);
+  } catch (error) {
+    return withUpstream(
+      publicError('CONTENT_UNAVAILABLE', 404),
+      error instanceof Error ? error.name : 'error',
+    );
   }
 }
