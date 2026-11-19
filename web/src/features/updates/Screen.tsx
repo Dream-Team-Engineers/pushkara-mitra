@@ -53,7 +53,7 @@ function LiveNews() {
         {live.map((item) => (
           <li key={item.id}>
             <a class="card link-card" href={item.url} target="_blank" rel="noopener noreferrer">
-              <span class="link-card__icon">
+              <span class="link-card__icon link-card__icon--navy">
                 <Icon name="news" />
               </span>
               <span class="link-card__body">

@@ -4,6 +4,7 @@ import { t } from '../shared/i18n/i18n';
 import { InstallBanner } from '../shared/pwa/InstallBanner';
 import { UpdateBanner } from '../shared/pwa/UpdateBanner';
 import { AppHeader, BottomBar } from '../shared/ui/Layout';
+import { LanguageSheet } from '../shared/ui/LanguageSheet';
 import { RouteView } from './RouteView';
 import { current, titleKeyFor } from './router';
 
@@ -39,6 +40,7 @@ export function App() {
         <RouteView />
       </main>
       <BottomBar />
+      <LanguageSheet />
     </div>
   );
 }

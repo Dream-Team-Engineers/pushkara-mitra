@@ -1,6 +1,17 @@
 import type { SourceLink } from '../data/sourceLinks';
 import { locale, t } from '../i18n/i18n';
-import { Icon } from './Icon';
+import { Icon, type IconName } from './Icon';
+
+/** One colour per kind of task: trips and stays saffron, culture navy, everything else teal. */
+const TONES: Partial<Record<IconName, string>> = {
+  train: 'saffron',
+  bus: 'saffron',
+  plane: 'saffron',
+  bed: 'saffron',
+  temple: 'navy',
+  partners: 'navy',
+  book: 'navy',
+};
 
 /**
  * Icon cards that open an official or primary source in a new tab. The card names the publisher
@@ -20,7 +31,13 @@ export function LinkCards({ links }: { readonly links: readonly SourceLink[] }) 
             rel="noopener noreferrer"
             lang={lang}
           >
-            <span class="link-card__icon">
+            <span
+              class={
+                TONES[link.icon] === undefined
+                  ? 'link-card__icon'
+                  : `link-card__icon link-card__icon--${TONES[link.icon] ?? ''}`
+              }
+            >
               <Icon name={link.icon} />
             </span>
             <span class="link-card__body">

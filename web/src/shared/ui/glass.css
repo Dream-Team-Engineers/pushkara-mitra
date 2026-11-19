@@ -1,0 +1,484 @@
+/*
+ * Godavari Glass (owner-approved direction, 2026-11-19; mock at claude.ai/artifact/44V3kyEuJQVzY1JsePevHk).
+ * A dawn-over-the-river backdrop, frosted cards, two-tone icons, one colour per kind of task, a
+ * floating tab bar with a raised SOS button, and a labelled language button with a bottom sheet.
+ * Loaded after app.css so it refines those rules. Colours come from tokens.css; the few new
+ * tokens here are surfaces and are never used for text colour on their own. The outdoor theme
+ * drops every blur, gradient and shadow for solid, high-contrast surfaces.
+ */
+:root,
+[data-theme='light'] {
+  --dawn-a: #fdf0dc;
+  --dawn-b: #e4f2ef;
+  --dawn-c: #f7f4ec;
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-card: rgb(255 255 255 / 0.84);
+  --glass-edge: rgb(255 255 255 / 0.92);
+  --glass-shadow: 0 8px 24px rgb(18 48 74 / 0.1);
+  --glass-blur: blur(14px);
+  --sheet-bg: rgb(255 255 255 / 0.97);
+  --scrim: rgb(6 20 31 / 0.5);
+  --navy-soft: #dde6ef;
+}
+
+[data-theme='dark'] {
+  --dawn-a: #1b2230;
+  --dawn-b: #0d2630;
+  --dawn-c: #0f1c28;
+  --glass: rgb(23 42 58 / 0.72);
+  --glass-card: rgb(23 42 58 / 0.84);
+  --glass-edge: rgb(255 255 255 / 0.14);
+  --glass-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  --glass-blur: blur(14px);
+  --sheet-bg: rgb(18 36 50 / 0.97);
+  --scrim: rgb(0 0 0 / 0.6);
+  --navy-soft: #1e3448;
+}
+
+[data-theme='outdoor'] {
+  --dawn-a: #ffffff;
+  --dawn-b: #ffffff;
+  --dawn-c: #ffffff;
+  --glass: #ffffff;
+  --glass-card: #ffffff;
+  --glass-edge: var(--line-strong);
+  --glass-shadow: none;
+  --glass-blur: none;
+  --sheet-bg: #ffffff;
+  --scrim: rgb(6 20 31 / 0.7);
+  --navy-soft: #dde6ef;
+}
+
+/* Backdrop */
+.app {
+  background-color: var(--ground);
+  background-image: linear-gradient(
+    180deg,
+    var(--dawn-a) 0,
+    var(--dawn-b) 44rem,
+    var(--dawn-c) 100%
+  );
+}
+
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, #0a4a4c 0%, var(--header-bg) 60%, #1b6b74 100%);
+  gap: var(--space-2);
+}
+
+[data-theme='outdoor'] .app-header {
+  background: var(--header-bg);
+}
+
+.brand-mark {
+  padding: 2px;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.app-header__brand span {
+  min-width: 0;
+}
+
+/* Language button: shows the current language in its own script */
+.lang-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  padding: 0 var(--space-3) 0 var(--space-1);
+  background: rgb(255 255 255 / 0.16);
+  color: var(--header-text);
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--text-caption);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lang-button__glyph {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  background: #fff;
+  color: #12304a;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.account-link {
+  padding-inline: var(--space-1);
+}
+
+@media (max-width: 24rem) {
+  .account-link > span:not(.account-link__avatar) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Weather becomes a quiet glass line instead of a second dark band */
+.weather {
+  margin: var(--space-3) var(--space-3) 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--glass);
+  color: var(--text);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+}
+
+.weather .icon {
+  color: var(--primary);
+}
+
+.weather__status {
+  color: var(--text-muted);
+}
+
+/* News and sponsored strips become pills */
+.marquee {
+  margin: var(--space-2) var(--space-3) 0;
+  min-height: 3rem;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+}
+
+.marquee--news {
+  background: var(--glass);
+}
+
+.marquee--ad {
+  background: var(--accent-soft);
+}
+
+.marquee__badge {
+  align-self: center;
+  margin: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+}
+
+.marquee--news .marquee__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.marquee--news .marquee__badge::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: currentColor;
+  border-radius: 50%;
+  content: '';
+  animation: live-pulse 1.8s ease-in-out infinite;
+}
+
+.marquee--ad .marquee__badge {
+  background: var(--glass-card);
+  border-inline-end: 0;
+}
+
+@keyframes live-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee--news .marquee__badge::before {
+    animation: none;
+  }
+}
+
+/* Hero and countdown */
+.hero-logo {
+  border: 1px solid var(--glass-edge);
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+}
+
+.countdown {
+  border-radius: 24px;
+  box-shadow:
+    0 12px 28px rgb(10 40 60 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+
+[data-theme='outdoor'] .countdown {
+  background: var(--header-bg);
+  box-shadow: none;
+}
+
+/* Quick access cards */
+.quick-grid {
+  gap: var(--space-3) var(--space-2);
+}
+
+@media (max-width: 21rem) {
+  .quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.qcard {
+  min-height: 5.75rem;
+  padding: var(--space-3) var(--space-1);
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+}
+
+.qcard__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 14px;
+}
+
+.qcard__icon svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.qcard--blue .qcard__icon {
+  background: var(--navy-soft);
+  color: var(--text);
+}
+
+/* Two-tone icons: closed shapes get a soft fill of the line colour */
+.qcard__icon .icon__fill,
+.link-card__icon .icon__fill {
+  fill: currentColor;
+  fill-opacity: 0.16;
+}
+
+/* Cards in lists: frosted but without blur, so long lists stay smooth on low-end phones */
+.card {
+  background: var(--glass-card);
+  border-color: var(--glass-edge);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+a.link-card:hover,
+a.qcard:hover {
+  border-color: var(--primary);
+}
+
+.link-card__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.link-card__icon--saffron {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.link-card__icon--navy {
+  background: var(--navy-soft);
+  color: var(--text);
+}
+
+/* Floating tab bar with a raised SOS button */
+main {
+  padding-block-end: calc(7rem + env(safe-area-inset-bottom));
+}
+
+.bottom-bar {
+  inset-inline: var(--space-3);
+  inset-block-end: calc(var(--space-3) + env(safe-area-inset-bottom));
+  align-items: flex-end;
+  gap: 2px;
+  max-width: 30.5rem;
+  padding: var(--space-2);
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgb(18 48 74 / 0.22);
+  backdrop-filter: blur(18px);
+}
+
+[data-theme='outdoor'] .bottom-bar {
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.bottom-bar a {
+  min-height: 3.5rem;
+  border-radius: 18px;
+}
+
+.bottom-bar a[aria-current='page'] {
+  background: var(--primary-soft);
+  box-shadow: none;
+}
+
+.bottom-bar a.is-danger {
+  min-height: 4.25rem;
+  margin-block-start: -1.1rem;
+  background: var(--danger-fill);
+  color: var(--on-danger);
+  border-radius: 22px;
+  box-shadow: 0 8px 18px rgb(180 35 24 / 0.4);
+}
+
+[data-theme='outdoor'] .bottom-bar a.is-danger {
+  box-shadow: none;
+}
+
+/* Language sheet */
+.sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet-layer__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+}
+
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 32rem;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  background: var(--sheet-bg);
+  color: var(--text);
+  border-block-start: 1px solid var(--glass-edge);
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -12px 40px rgb(0 0 0 / 0.3);
+}
+
+.sheet__grab {
+  align-self: center;
+  width: 2.75rem;
+  height: 0.3rem;
+  background: var(--line-strong);
+  border-radius: 2px;
+}
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sheet__head h2 {
+  font-size: var(--text-card-title);
+}
+
+.sheet__close {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.language-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 4.25rem;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--line-strong);
+  border-radius: 20px;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.language-option__glyph {
+  min-width: 2.2em;
+  color: var(--primary);
+  font-size: 1.375rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.language-option__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.language-option__text b {
+  font-size: var(--text-card-title);
+  line-height: 1.3;
+}
+
+.language-option__text small {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.language-option__tick {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-inline-start: auto;
+  color: transparent;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+}
+
+.language-option[aria-pressed='true'] {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.language-option[aria-pressed='true'] .language-option__tick {
+  background: var(--primary-fill);
+  color: var(--on-primary);
+  border-color: var(--primary-fill);
+}
+
+.sheet__hint {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}

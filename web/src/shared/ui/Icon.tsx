@@ -29,7 +29,8 @@ export type IconName =
   | 'temple'
   | 'news'
   | 'bed'
-  | 'book';
+  | 'book'
+  | 'chevron';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -90,6 +91,7 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   news: ['M4 5h13v14H4z', 'M17 9h3v8a2 2 0 0 1-2 2', 'M7 9h7', 'M7 13h7', 'M7 16h4'],
   bed: ['M3 19V6', 'M3 14h18v5', 'M21 14v-2a3 3 0 0 0-3-3h-8v5'],
   book: ['M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', 'M5 17a3 3 0 0 1 3-3h11'],
+  chevron: ['M6 9l6 6 6-6'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'],
 };
 
@@ -108,7 +110,8 @@ export function Icon({ name, size = 24 }: { readonly name: IconName; readonly si
       aria-hidden="true"
     >
       {PATHS[name].map((d) => (
-        <path key={d} d={d} />
+        // Closed shapes carry a class so tinted contexts can add a soft fill (two-tone icons).
+        <path key={d} d={d} class={/z$/i.test(d) ? 'icon__fill' : undefined} />
       ))}
     </svg>
   );

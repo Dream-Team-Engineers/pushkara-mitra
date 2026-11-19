@@ -4,6 +4,7 @@ import { current, hrefFor, type RouteId } from '../../app/router';
 import { user } from '../auth/google';
 import { pair, t, type MessageKey } from '../i18n/i18n';
 import { BrandMark, Icon, type IconName } from './Icon';
+import { LanguageButton } from './LanguageSheet';
 
 export function AppHeader() {
   return (
@@ -28,9 +29,7 @@ export function AppHeader() {
             </>
           )}
         </a>
-        <a class="icon-link" href={hrefFor('settings')} aria-label={t('settings.language')}>
-          <Icon name="globe" />
-        </a>
+        <LanguageButton />
       </div>
     </header>
   );
