@@ -18,6 +18,7 @@ const MAX_ITEMS = 10;
 const CACHE_SECONDS = 15 * 60;
 const FETCH_TIMEOUT_MS = 6000;
 const MAX_FEED_BYTES = 600_000;
+const MAX_LINK = 2000;
 
 export interface NewsItem {
   readonly id: string;
@@ -62,7 +63,8 @@ export function parseNewsFeed(xml: string): readonly NewsItem[] {
     let title = tag(block, 'title');
     if (title === null || link === null || pubDate === null) continue;
     const time = Date.parse(pubDate);
-    if (Number.isNaN(time) || !link.startsWith('https://')) continue;
+    // Google's article links run past 500 characters; a cut link is a broken link, so never truncate.
+    if (Number.isNaN(time) || !link.startsWith('https://') || link.length > MAX_LINK) continue;
     // Google appends " - Publisher" to the title; the publisher is carried separately.
     if (source !== null && title.endsWith(` - ${source}`)) {
       title = title.slice(0, -(source.length + 3));
@@ -72,7 +74,7 @@ export function parseNewsFeed(xml: string): readonly NewsItem[] {
       id: `n${String(time)}-${String(items.length)}`,
       title,
       source: (source ?? 'News').slice(0, 80),
-      url: link.slice(0, 500),
+      url: link,
       publishedAt: new Date(time).toISOString(),
     });
   }

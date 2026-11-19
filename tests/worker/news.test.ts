@@ -16,6 +16,16 @@ describe('parseNewsFeed', () => {
     expect(items[0]?.publishedAt).toBe('2026-11-16T18:45:26.000Z');
   });
 
+  it('keeps long links whole and drops absurdly long ones', () => {
+    const long = `https://news.example/${'a'.repeat(900)}`;
+    const huge = `https://news.example/${'b'.repeat(2500)}`;
+    const feed = `<rss><channel>
+<item><title>Long</title><link>${long}</link><pubDate>Mon, 16 Nov 2026 18:45:26 GMT</pubDate></item>
+<item><title>Huge</title><link>${huge}</link><pubDate>Mon, 16 Nov 2026 18:45:26 GMT</pubDate></item>
+</channel></rss>`;
+    expect(parseNewsFeed(feed).map((item) => item.url)).toEqual([long]);
+  });
+
   it('drops insecure links and bad dates', () => {
     expect(parseNewsFeed(FEED).every((item) => item.url.startsWith('https://'))).toBe(true);
   });
