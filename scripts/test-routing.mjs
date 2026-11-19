@@ -41,6 +41,16 @@ function googleSignInEnabled(environment) {
   return table !== undefined && GOOGLE_ID.test(table);
 }
 
+// The map may ask for the device position only where wrangler.toml sets DEVICE_LOCATION = "enabled"
+// (staging, OQ-041). Everywhere else geolocation stays denied.
+const DEVICE_LOCATION_ON = /^\s*DEVICE_LOCATION\s*=\s*"enabled"/m;
+function deviceLocationEnabled(environment) {
+  const tables = wranglerToml.split(/^(?=\[)/m);
+  const header = environment ? `[env.${environment}.vars]` : '[vars]';
+  const table = tables.find((part) => part.startsWith(header));
+  return table !== undefined && DEVICE_LOCATION_ON.test(table);
+}
+
 async function availablePort() {
   const server = createServer();
   await new Promise((resolve, reject) => {
@@ -202,6 +212,17 @@ async function checkEnvironment(environment, mock = false) {
       if (googleSignInEnabled(environment)) {
         expectedHeaders['Content-Security-Policy'] = CONTENT_SECURITY_POLICY_GOOGLE;
         expectedHeaders['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups';
+      }
+      assert.equal(
+        deviceLocationEnabled(environment),
+        environment === 'staging',
+        `${label}: device location is switched on in staging only`,
+      );
+      if (deviceLocationEnabled(environment)) {
+        expectedHeaders['Permissions-Policy'] = expectedHeaders['Permissions-Policy'].replace(
+          'geolocation=()',
+          'geolocation=(self)',
+        );
       }
       for (const [name, value] of Object.entries(expectedHeaders)) {
         assert.equal(response.headers.get(name), value, `${context}: ${name}`);

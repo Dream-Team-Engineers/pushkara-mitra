@@ -36,6 +36,8 @@ describe('frontend content guard', () => {
      * is a page the agent opened or is marked "not yet checked" on screen. Links open in a new tab;
      * the page CSP is unchanged because nothing is fetched from these hosts.
      */
+    /** Map attribution link (OpenStreetMap licence page), shown on the map as the ODbL requires. */
+    'features/map/mapStyle.ts': ['https://www.openstreetmap.org/copyright'],
     'shared/data/sourceLinks.ts': [
       'https://www.irctc.co.in/',
       'https://www.apsrtconline.in/',

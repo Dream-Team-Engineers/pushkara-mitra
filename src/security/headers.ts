@@ -59,10 +59,23 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   'Cross-Origin-Resource-Policy': 'same-origin',
 };
 
-export function withSecurityHeaders(response: Response, googleSignIn = false): Response {
+/** Same policy, but this site's own pages may ask for the device position (map screen, after a tap). */
+export const PERMISSIONS_POLICY_DEVICE_LOCATION = PERMISSIONS_POLICY.replace(
+  'geolocation=()',
+  'geolocation=(self)',
+);
+
+export function withSecurityHeaders(
+  response: Response,
+  googleSignIn = false,
+  deviceLocation = false,
+): Response {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     headers.set(name, value);
+  }
+  if (deviceLocation) {
+    headers.set('Permissions-Policy', PERMISSIONS_POLICY_DEVICE_LOCATION);
   }
   if (googleSignIn) {
     headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY_GOOGLE);

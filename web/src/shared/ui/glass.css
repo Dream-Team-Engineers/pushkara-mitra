@@ -482,3 +482,64 @@ main {
   color: var(--text-muted);
   font-size: var(--text-caption);
 }
+
+/* Map screen: the real map, the "you are here" dot and the location control */
+.live-map {
+  height: 22rem;
+  margin: var(--space-2) var(--space-4) 0;
+  overflow: hidden;
+  background: var(--primary-soft);
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+.you-dot {
+  position: relative;
+  width: 1.125rem;
+  height: 1.125rem;
+  background: var(--focus);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+.you-dot::after {
+  position: absolute;
+  inset: -0.6rem;
+  border: 2px solid var(--focus);
+  border-radius: 50%;
+  content: '';
+  animation: you-pulse 2s ease-out infinite;
+}
+
+@keyframes you-pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .you-dot::after {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+.locate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-4) 0;
+}
+
+/* A link card placed directly in the page (Map screen) keeps the page gutter */
+main > a.link-card {
+  margin: var(--space-3) var(--space-4) 0;
+}

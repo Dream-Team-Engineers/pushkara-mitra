@@ -5,6 +5,20 @@ import { planPrecache, renderServiceWorker } from '../../build/sw';
 
 const TEMPLATE = readFileSync('web/build/sw.template.js', 'utf8');
 
+describe('planPrecache and the map files', () => {
+  it('never precaches the map archive, glyphs or sprites', () => {
+    const plan = planPrecache([
+      'index.html',
+      'maps/godavari.pmtiles',
+      'maps/fonts/Noto Sans Regular/0-255.pbf',
+      'maps/sprites/v4/light.png',
+    ]);
+    expect([...plan.precache, ...plan.optional].some((path) => path.startsWith('/maps/'))).toBe(
+      false,
+    );
+  });
+});
+
 describe('planPrecache', () => {
   const plan = planPrecache([
     'index.html',

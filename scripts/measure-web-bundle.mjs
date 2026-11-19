@@ -12,6 +12,9 @@ const DIST = process.argv[2] ?? 'dist/web';
 const BUDGETS = {
   initialJs: 100 * KB,
   routeChunk: 50 * KB,
+  // Owner-accepted exception (2026-11-19, ADR 0016): MapLibre loads only on the Map screen, and only
+  // when the regional archive exists. It has its own cap so it cannot grow unnoticed.
+  mapChunk: 350 * KB,
   css: 25 * KB,
   initialJsAndCss: 125 * KB,
   fonts: 100 * KB,
@@ -85,9 +88,15 @@ if (initialJs.length === 0 || missing.length > 0) {
   process.exit(2);
 }
 const allCss = files.filter((file) => file.ext === '.css');
+const isMapChunk = (file) => /^assets\/LiveMap-/.test(file.path);
 const routeChunks = files.filter(
-  (file) => file.ext === '.js' && file.path !== 'sw.js' && !initialJsPaths.has(file.path),
+  (file) =>
+    file.ext === '.js' &&
+    file.path !== 'sw.js' &&
+    !initialJsPaths.has(file.path) &&
+    !isMapChunk(file),
 );
+const mapChunks = files.filter((file) => file.ext === '.js' && isMapChunk(file));
 const allFonts = files.filter((file) => ['.woff2', '.woff', '.ttf', '.otf'].includes(file.ext));
 // Hindi fonts download only when Hindi text is shown (unicode-range), so they are reported apart.
 const onDemandFonts = allFonts.filter((file) => /Devanagari/.test(file.path));
@@ -100,6 +109,11 @@ const results = [
     'Largest route chunk (gzip)',
     Math.max(0, ...routeChunks.map((file) => file.size)),
     BUDGETS.routeChunk,
+  ],
+  [
+    'Map chunk (gzip, Map screen only)',
+    Math.max(0, ...mapChunks.map((file) => file.size)),
+    BUDGETS.mapChunk,
   ],
   ['All CSS (gzip)', sum(allCss), BUDGETS.css],
   ['Initial JavaScript + CSS (gzip)', sum(initialJs) + sum(initialCss), BUDGETS.initialJsAndCss],

@@ -10,7 +10,8 @@ export interface PrecachePlan {
 
 /** Fonts for other languages are cached when first used, so the first visit stays small. */
 const OPTIONAL_PATTERN = /^\/fonts\/NotoSansDevanagari-/;
-const EXCLUDED_PATTERN = /\.(?:map|txt)$|^\/sw\.js$/;
+/** The map archive, glyphs and sprites are fetched on demand, never precached (the archive is megabytes). */
+const EXCLUDED_PATTERN = /\.(?:map|txt)$|^\/sw\.js$|^\/maps\//;
 
 /** Turns the built file list (paths relative to the output directory) into the cache plan. */
 export function planPrecache(files: readonly string[]): PrecachePlan {

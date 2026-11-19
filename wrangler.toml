@@ -47,6 +47,8 @@ workers_dev = true
 # Public Google OAuth client ID (not a secret). Switches on Google sign-in for staging only.
 [env.staging.vars]
 GOOGLE_CLIENT_ID = "433695131529-igclhmojpijekd1nq65m2jnue5rno8tr.apps.googleusercontent.com"
+# Lets the map ask for the device position (Permissions-Policy geolocation=(self)). Staging only, OQ-041.
+DEVICE_LOCATION = "enabled"
 [env.staging.assets]
 directory = "./dist/web"
 binding = "ASSETS"

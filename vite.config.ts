@@ -35,6 +35,8 @@ export default defineConfig(({ mode }) => ({
     'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(
       mode === 'staging' ? STAGING_GOOGLE_CLIENT_ID : '',
     ),
+    // Device position on the map: staging build only (flags.ts, OQ-041).
+    'import.meta.env.VITE_DEVICE_LOCATION': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
   },
   plugins: [
     preact(),

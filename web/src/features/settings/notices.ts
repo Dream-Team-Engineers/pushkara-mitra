@@ -22,9 +22,22 @@ export const FONT_NOTICES: readonly Notice[] = [
     licence: 'SIL OFL 1.1',
     licenceTextPath: '/fonts/NotoSansDevanagari-OFL.txt',
   },
+  {
+    name: 'Noto Sans (map labels)',
+    licence: 'SIL OFL 1.1',
+    licenceTextPath: '/maps/fonts/OFL.txt',
+  },
 ];
 
 export const SOFTWARE_NOTICES: readonly Notice[] = [
   { name: 'Preact', licence: 'MIT' },
   { name: '@preact/signals', licence: 'MIT' },
+  { name: 'MapLibre GL JS', licence: 'BSD-3-Clause' },
+  { name: 'PMTiles', licence: 'BSD-3-Clause' },
+  { name: 'Protomaps Basemaps (map style)', licence: 'BSD-3-Clause' },
+  {
+    name: 'Map icons (Protomaps sprites, derived from tangrams icons)',
+    licence: 'MIT (per the Protomaps README; licence text to be added)',
+  },
+  { name: 'Map data © OpenStreetMap contributors', licence: 'ODbL 1.0' },
 ];

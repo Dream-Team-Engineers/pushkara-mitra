@@ -8,3 +8,6 @@ docs/ENGINEERING_STANDARDS.md
 scripts/setup-github.sh
 LICENSE
 .release-please-manifest.json
+
+# Third-party map assets (Protomaps sprites, glyphs, archive): kept byte for byte
+web/public/maps/

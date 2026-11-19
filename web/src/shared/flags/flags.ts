@@ -14,6 +14,7 @@
  */
 interface BuildEnv {
   readonly VITE_GOOGLE_CLIENT_ID?: string;
+  readonly VITE_DEVICE_LOCATION?: string;
 }
 const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
 const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
@@ -23,8 +24,12 @@ export const GOOGLE_CLIENT_ID: string | undefined =
     : undefined;
 
 export const FLAGS = {
-  /** Reads device location (foreground only). Needs ADR 0004 accepted and M2 authorised. */
-  geolocation: false,
+  /**
+   * Shows the device's own position on the map (foreground only, after a tap, never sent or
+   * stored). Owner decision 2026-11-19: on in the staging build only (`vite build --mode staging`),
+   * off in production until legal review of the notice (OQ-041). Not read from the URL or storage.
+   */
+  geolocation: BUILD_ENV.VITE_DEVICE_LOCATION === 'enabled',
   /** Pilgrim Pass: personal details, photo, QR. Prototype only until ADR 0008 and counsel. */
   pilgrimPass: false,
   /** My Group: live sharing, invitations. Needs ADR 0004 and a stalking/coercion threat model. */

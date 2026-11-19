@@ -6,25 +6,26 @@ Proposal under [ADR 0011](../decisions/0011-frontend-stack-and-hosting.md). Budg
 
 Where `docs/performance-budget.md` and the frontend master prompt differ, the stricter value is proposed.
 
-| Metric                                   | Proposed target                  | Current (main `1f1fe72`)                  | Source of target          |
-| ---------------------------------------- | -------------------------------- | ----------------------------------------- | ------------------------- |
-| LCP / INP / CLS / FCP                    | 2.5 s / 200 ms / 0.1 / 1.8 s     | Not measured                              | Master prompt             |
-| Repeat visit, Home usable from cache     | 1 s, online or offline           | Not measured                              | Master prompt             |
-| Initial JS (gzip)                        | 100 KB                           | 20.1 KB (six modules, gzipped separately) | Master prompt             |
-| Each route chunk (gzip)                  | 50 KB                            | n/a                                       | Master prompt             |
-| CSS (gzip)                               | 25 KB                            | 6.5 KB                                    | Master prompt             |
-| Initial JS + CSS (gzip)                  | 125 KB                           | 26.6 KB (24.6 KB gzipped together)        | Stricter than 150 KB      |
-| Fonts precached (WOFF2)                  | 100 KB                           | 217 KB (six WOFF files)                   | Master prompt             |
-| Telugu font pair                         | 60 KB                            | 57.5 KB (WOFF)                            | Existing budget           |
-| First-visit transfer                     | 300 KB                           | About 307 KB (estimate)                   | Existing budget, stricter |
-| Public content refresh                   | 50 KB                            | n/a                                       | Master prompt             |
-| Above-the-fold images                    | 80 KB, AVIF or WebP              | 61 KB JPEG                                | Master prompt             |
-| JS heap, Home / Maps                     | 60 MB / 150 MB                   | Not measured                              | Master prompt             |
-| Long tasks during interaction            | none over 50 ms                  | Not measured                              | Master prompt             |
-| First map tiles on the reference network | 3 s                              | n/a                                       | Master prompt             |
-| Map tile cache                           | 30 MB, least recently used first | n/a                                       | Master prompt             |
-| Lighthouse performance / accessibility   | 90 / 95                          | Not measured                              | Master prompt             |
-| Body text / touch targets                | 16 px / 48 px                    | Down to 10.4 px / 30 to 44 px             | Master prompt             |
+| Metric                                   | Proposed target                  | Current (main `1f1fe72`)                  | Source of target                                                                            |
+| ---------------------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------- |
+| LCP / INP / CLS / FCP                    | 2.5 s / 200 ms / 0.1 / 1.8 s     | Not measured                              | Master prompt                                                                               |
+| Repeat visit, Home usable from cache     | 1 s, online or offline           | Not measured                              | Master prompt                                                                               |
+| Initial JS (gzip)                        | 100 KB                           | 20.1 KB (six modules, gzipped separately) | Master prompt                                                                               |
+| Each route chunk (gzip)                  | 50 KB                            | n/a                                       | Master prompt                                                                               |
+| Map chunk (gzip, Map screen only)        | 350 KB                           | about 290 KB                              | Owner exception 2026-11-19 (ADR 0016); loads only on the Map screen when the archive exists |
+| CSS (gzip)                               | 25 KB                            | 6.5 KB                                    | Master prompt                                                                               |
+| Initial JS + CSS (gzip)                  | 125 KB                           | 26.6 KB (24.6 KB gzipped together)        | Stricter than 150 KB                                                                        |
+| Fonts precached (WOFF2)                  | 100 KB                           | 217 KB (six WOFF files)                   | Master prompt                                                                               |
+| Telugu font pair                         | 60 KB                            | 57.5 KB (WOFF)                            | Existing budget                                                                             |
+| First-visit transfer                     | 300 KB                           | About 307 KB (estimate)                   | Existing budget, stricter                                                                   |
+| Public content refresh                   | 50 KB                            | n/a                                       | Master prompt                                                                               |
+| Above-the-fold images                    | 80 KB, AVIF or WebP              | 61 KB JPEG                                | Master prompt                                                                               |
+| JS heap, Home / Maps                     | 60 MB / 150 MB                   | Not measured                              | Master prompt                                                                               |
+| Long tasks during interaction            | none over 50 ms                  | Not measured                              | Master prompt                                                                               |
+| First map tiles on the reference network | 3 s                              | n/a                                       | Master prompt                                                                               |
+| Map tile cache                           | 30 MB, least recently used first | n/a                                       | Master prompt                                                                               |
+| Lighthouse performance / accessibility   | 90 / 95                          | Not measured                              | Master prompt                                                                               |
+| Body text / touch targets                | 16 px / 48 px                    | Down to 10.4 px / 30 to 44 px             | Master prompt                                                                               |
 
 **Immediate findings against these budgets:**
 

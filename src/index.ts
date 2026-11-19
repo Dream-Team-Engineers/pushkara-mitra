@@ -1,5 +1,6 @@
 import { GroupLocation } from './durable-objects/GroupLocation';
 import { AUTH_PREFIX, handleAuth } from './routes/googleAuth';
+import { handleMapArchive, MAP_ARCHIVE_PATH } from './routes/mapArchive';
 import { handlePublicNews, PUBLIC_NEWS_PATH } from './routes/news';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
@@ -14,6 +15,8 @@ export interface Env {
   LOCAL_SYNTHETIC_DEMO?: string;
   /** Public Google OAuth client ID. Set only where Google sign-in is switched on (staging first). */
   GOOGLE_CLIENT_ID?: string;
+  /** Set to `enabled` only where the map may ask for the device position (staging). Off elsewhere. */
+  DEVICE_LOCATION?: string;
   /** Worker secret that signs the sign-in cookie. Without it the person is signed in for one page view only. */
   SESSION_SECRET?: string;
   /** Optional Workers rate-limit binding for /api/auth/*; without it a per-isolate limiter applies. */
@@ -97,6 +100,18 @@ async function route(request: Request, env: Env): Promise<Response> {
     return handlePublicContent(new URL(request.url));
   }
 
+  if (pathname === MAP_ARCHIVE_PATH && env.ASSETS) {
+    return handleMapArchive(request, env.ASSETS);
+  }
+
+  // Retina sprites are named like `light@2x.json`; asking for the canonical `%40` form avoids a
+  // redirect round trip from static-asset serving.
+  if (pathname.startsWith('/maps/sprites/') && pathname.includes('@') && env.ASSETS) {
+    const canonical = new URL(request.url);
+    canonical.pathname = pathname.replaceAll('@', '%40');
+    return env.ASSETS.fetch(new Request(canonical, request));
+  }
+
   // Unmatched API paths are answered here and never fall through to static-asset lookup.
   if (pathname === '/api' || pathname.startsWith('/api/')) {
     return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
@@ -111,6 +126,7 @@ async function route(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const googleSignIn = env.GOOGLE_CLIENT_ID !== undefined && env.GOOGLE_CLIENT_ID !== '';
-    return withSecurityHeaders(await route(request, env), googleSignIn);
+    const deviceLocation = env.DEVICE_LOCATION === 'enabled';
+    return withSecurityHeaders(await route(request, env), googleSignIn, deviceLocation);
   },
 } satisfies ExportedHandler<Env>;

@@ -31,6 +31,16 @@ const NETWORK_ALLOW_LIST: readonly string[] = [];
  */
 const DIAL_ALLOW_LIST: readonly string[] = ['features/help/HelplineList.tsx'];
 
+/**
+ * The only file allowed to read the device position. Owner decision 2026-11-19: show the device's
+ * own position on the map, on this phone only. The file may not touch storage or the network
+ * (checked below); the flag is on in the staging build only (OQ-041).
+ */
+const GEOLOCATION_ALLOW_LIST: readonly string[] = [
+  'shared/location/deviceLocation.ts',
+  'shared/location/deviceLocation.test.ts',
+];
+
 const files = readCode(ROOT, listCodeFiles(ROOT));
 const features = files.filter((file) => file.path.startsWith('features/'));
 
@@ -40,8 +50,18 @@ describe('frontend privacy guard: real sources', () => {
   });
 
   it.each(files.map((file) => file.path))('%s never reads device location', (path) => {
+    if (GEOLOCATION_ALLOW_LIST.includes(path)) return;
     const file = files.find((candidate) => candidate.path === path);
     expect(findGeolocationUse(file?.source ?? '')).toEqual([]);
+  });
+
+  it('keeps location reading to the one reviewed file, which never stores or sends it', () => {
+    for (const path of GEOLOCATION_ALLOW_LIST) {
+      const file = files.find((candidate) => candidate.path === path);
+      expect(file, path).toBeDefined();
+      expect(findBrowserStorage(file?.source ?? '')).toEqual([]);
+      expect(findNetworkUse(file?.source ?? '')).toEqual([]);
+    }
   });
 
   it('keeps browser storage to the allow-list', () => {
