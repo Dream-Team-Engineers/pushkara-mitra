@@ -14,8 +14,8 @@ An independent, Telugu-first, offline-capable pilgrim assistance PWA for the God
 flowchart LR
   pwa[PWA + service worker] -- HTTPS --> worker[Cloudflare Worker]
   worker --> do[GroupLocation Durable Object: memory only]
-  pr[Pull request] --> checks[Required checks] --> main[main] --> staging[Staging]
-  main --> rp[release-please] --> prod[Production]
+  dev[Local npm run check] --> main[main] --> staging[Staging: auto-deploy after CI gate]
+  staging -. owner approval and legal gates .-> prod[Production: blocked]
 ```
 
 More in [docs/architecture.md](docs/architecture.md).
@@ -40,7 +40,7 @@ The [local integration runbook](docs/operations/local-integration.md) explains t
 
 - **Location is never persisted or logged** ([ADR 0004](docs/decisions/0004-ephemeral-location.md)). A guard test enforces it.
 - **GitHub settings change only through** `scripts/setup-github.sh`.
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) and [CLAUDE.md](CLAUDE.md) before your first PR.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) and [CLAUDE.md](CLAUDE.md) before your first change. The owner works directly on `main` (no PRs, no release-please); production stays blocked until the owner approves it.
 
 ## Registers and runbooks
 

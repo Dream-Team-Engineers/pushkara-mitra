@@ -4,6 +4,7 @@ import { handleAuth } from '../../src/routes/googleAuth';
 import {
   clearedSessionCookie,
   createSessionToken,
+  pseudonymFor,
   readCookie,
   readSessionToken,
   SESSION_COOKIE,
@@ -13,18 +14,23 @@ import {
 
 const SECRET = 'test-secret-value-that-is-long-enough-0123456789';
 const NOW = 1_800_000_000;
-const USER = { name: 'Lakshmi Devi', email: 'pilgrim@example.com' };
+const USER = { sub: 'google-sub-1', name: 'Lakshmi Devi', email: 'pilgrim@example.com' };
 const CLIENT_ID = 'client-123.apps.googleusercontent.com';
 
 describe('session token', () => {
-  it('round-trips name and email', async () => {
+  it('round-trips a pseudonymous id and carries no personal data', async () => {
     const token = await createSessionToken(USER, SECRET, NOW);
-    expect(await readSessionToken(token, SECRET, NOW + 60)).toEqual(USER);
+    const session = await readSessionToken(token, SECRET, NOW + 60);
+    expect(session?.id).toBeTruthy();
+    const decoded = atob((token.split('.')[1] ?? '').replaceAll('-', '+').replaceAll('_', '/'));
+    expect(decoded).not.toMatch(/@|Lakshmi|pilgrim|google-sub-1/);
+    expect(await pseudonymFor('google-sub-1', SECRET)).toBe(session?.id);
+    expect(await pseudonymFor('google-sub-2', SECRET)).not.toBe(session?.id);
   });
 
   it('expires after the maximum age', async () => {
     const token = await createSessionToken(USER, SECRET, NOW);
-    expect(await readSessionToken(token, SECRET, NOW + SESSION_MAX_AGE_SECONDS - 1)).toEqual(USER);
+    expect(await readSessionToken(token, SECRET, NOW + SESSION_MAX_AGE_SECONDS - 1)).not.toBeNull();
     expect(await readSessionToken(token, SECRET, NOW + SESSION_MAX_AGE_SECONDS)).toBeNull();
   });
 
@@ -32,9 +38,7 @@ describe('session token', () => {
     const token = await createSessionToken(USER, SECRET, NOW);
     expect(await readSessionToken(token, 'another-secret-another-secret-12345', NOW)).toBeNull();
     const [version, payload, signature] = token.split('.') as [string, string, string];
-    const forgedPayload = btoa(
-      JSON.stringify({ n: 'Admin', e: 'admin@example.com', iat: NOW, exp: NOW + 999999 }),
-    )
+    const forgedPayload = btoa(JSON.stringify({ s: 'admin', iat: NOW, exp: NOW + 999999 }))
       .replaceAll('+', '-')
       .replaceAll('/', '_')
       .replaceAll('=', '');
@@ -79,7 +83,7 @@ function req(path: string, init: RequestInit = {}): Request {
 }
 
 describe('GET /api/auth/me', () => {
-  it('returns the person for a valid cookie, never cached', async () => {
+  it('confirms a valid cookie without any personal data, never cached', async () => {
     const token = await createSessionToken(USER, SECRET, NOW);
     const res = await handleAuth(
       req('/api/auth/me', { headers: { Cookie: `${SESSION_COOKIE}=${token}` } }),
@@ -87,7 +91,7 @@ describe('GET /api/auth/me', () => {
     );
     expect(res.status).toBe(200);
     expect(res.headers.get('Cache-Control')).toBe('no-store');
-    expect(await res.json()).toEqual({ ...USER, remembered: true });
+    expect(await res.json()).toEqual({ remembered: true });
   });
 
   it('answers 401 for no cookie, a bad cookie, an expired cookie or no secret', async () => {
@@ -111,7 +115,10 @@ describe('GET /api/auth/me', () => {
 
 describe('POST /api/auth/logout', () => {
   it('clears the cookie with 204', async () => {
-    const res = await handleAuth(req('/api/auth/logout', { method: 'POST' }), deps(SECRET));
+    const res = await handleAuth(
+      req('/api/auth/logout', { method: 'POST', headers: { Origin: 'https://app.test' } }),
+      deps(SECRET),
+    );
     expect(res.status).toBe(204);
     expect(res.headers.get('Set-Cookie')).toContain('Max-Age=0');
   });
@@ -122,6 +129,8 @@ describe('POST /api/auth/logout', () => {
       headers: { Origin: 'https://evil.example' },
     });
     expect((await handleAuth(foreign, deps(SECRET))).status).toBe(403);
+    const noOrigin = req('/api/auth/logout', { method: 'POST' });
+    expect((await handleAuth(noOrigin, deps(SECRET))).status).toBe(403);
     expect((await handleAuth(req('/api/auth/logout'), deps(SECRET))).status).toBe(405);
   });
 });

@@ -29,11 +29,15 @@ function SignedIn() {
   return (
     <section class="account-card" aria-labelledby="account-name">
       <span class="account-card__avatar" aria-hidden="true">
-        {person.name.slice(0, 1).toUpperCase()}
+        {person.name === '' ? (
+          <Icon name="group" size={20} />
+        ) : (
+          person.name.slice(0, 1).toUpperCase()
+        )}
       </span>
       <div class="account-card__text">
-        <h2 id="account-name">{person.name}</h2>
-        <p class="card__meta">{person.email}</p>
+        <h2 id="account-name">{person.name === '' ? t('account.header') : person.name}</h2>
+        {person.email === '' ? null : <p class="card__meta">{person.email}</p>}
       </div>
       <button
         type="button"

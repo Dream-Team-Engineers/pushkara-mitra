@@ -14,7 +14,7 @@ export function AppHeader() {
       </a>
       <div class="app-header__actions">
         <a class="account-link" href={hrefFor('pass')}>
-          {user.value === null ? (
+          {user.value === null || user.value.name === '' ? (
             <>
               <Icon name="group" size={20} />
               <span>{t('account.header')}</span>

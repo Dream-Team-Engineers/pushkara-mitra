@@ -57,6 +57,7 @@ const GOOD = {
   aud: CLIENT_ID,
   exp: NOW + 3000,
   iat: NOW - 10,
+  sub: 'google-sub-1',
   email: 'pilgrim@example.com',
   email_verified: true,
   name: 'Lakshmi Devi',
@@ -76,8 +77,9 @@ const opts = (keys: readonly Jwk[] = [pair.jwk]) => ({
 });
 
 describe('verifyGoogleIdToken', () => {
-  it('accepts a valid token and returns only name and email', async () => {
+  it('accepts a valid token and returns the sub, name and email', async () => {
     expect(await verifyGoogleIdToken(await sign(pair, GOOD), opts())).toEqual({
+      sub: 'google-sub-1',
       name: 'Lakshmi Devi',
       email: 'pilgrim@example.com',
     });
@@ -86,6 +88,7 @@ describe('verifyGoogleIdToken', () => {
   it('accepts the bare accounts.google.com issuer and falls back to the email name', async () => {
     const token = await sign(pair, { ...GOOD, iss: 'accounts.google.com', name: undefined });
     expect(await verifyGoogleIdToken(token, opts())).toEqual({
+      sub: 'google-sub-1',
       name: 'pilgrim',
       email: 'pilgrim@example.com',
     });
@@ -98,6 +101,7 @@ describe('verifyGoogleIdToken', () => {
     ['a token issued in the future', { iat: NOW + 3600 }],
     ['an unverified email', { email_verified: false }],
     ['a missing email', { email: undefined }],
+    ['a missing sub', { sub: undefined }],
   ])('rejects %s', async (_label, change) => {
     expect(await verifyGoogleIdToken(await sign(pair, { ...GOOD, ...change }), opts())).toBeNull();
   });
@@ -135,7 +139,7 @@ describe('verifyGoogleIdToken', () => {
 function post(body: unknown, headers: Record<string, string> = {}): Request {
   return new Request('https://app.test/api/auth/google', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...headers },
+    headers: { 'Content-Type': 'application/json', Origin: 'https://app.test', ...headers },
     body: typeof body === 'string' ? body : JSON.stringify(body),
   });
 }
@@ -160,8 +164,17 @@ describe('POST /api/auth/google', () => {
       email: 'pilgrim@example.com',
       remembered: false,
     });
+    const issued = await handleGoogleAuth(
+      new Request('https://app.test/api/auth/nonce'),
+      CLIENT_ID,
+      keys,
+      now,
+      'a-long-enough-secret-for-the-test-0123456789',
+    );
+    const nonceCookie = (issued.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
+    const { nonce } = await issued.json<{ nonce: string }>();
     const withSecret = await handleGoogleAuth(
-      post({ credential: token }),
+      post({ credential: await sign(pair, { ...GOOD, nonce }) }, { Cookie: nonceCookie }),
       CLIENT_ID,
       keys,
       now,
@@ -207,12 +220,18 @@ describe('POST /api/auth/google', () => {
     expect((await handleGoogleAuth(get, CLIENT_ID, keys, now)).status).toBe(405);
     const text = new Request('https://app.test/api/auth/google', {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/plain', Origin: 'https://app.test' },
       body: '{}',
     });
     expect((await handleGoogleAuth(text, CLIENT_ID, keys, now)).status).toBe(415);
     const foreign = post({ credential: 'x' }, { Origin: 'https://evil.example' });
     expect((await handleGoogleAuth(foreign, CLIENT_ID, keys, now)).status).toBe(403);
+    const noOrigin = new Request('https://app.test/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: 'x' }),
+    });
+    expect((await handleGoogleAuth(noOrigin, CLIENT_ID, keys, now)).status).toBe(403);
     expect((await handleGoogleAuth(post('not json'), CLIENT_ID, keys, now)).status).toBe(400);
     expect((await handleGoogleAuth(post({ credential: 5 }), CLIENT_ID, keys, now)).status).toBe(
       400,

@@ -1,8 +1,19 @@
 import { googleKeyFetcher, verifyGoogleIdToken, type KeyFetcher } from '../security/googleIdToken';
 import {
+  AUTH_WINDOW_SECONDS,
+  memoryRateLimiter,
+  unlimited,
+  type RateLimiter,
+} from '../security/rateLimit';
+import {
+  clearedNonceCookie,
   clearedSessionCookie,
+  createNonce,
   createSessionToken,
+  NONCE_COOKIE,
+  nonceCookie,
   readCookie,
+  readNonce,
   readSessionToken,
   SESSION_COOKIE,
   sessionCookie,
@@ -11,14 +22,17 @@ import {
 /**
  * Sign-in routes. They exist only where GOOGLE_CLIENT_ID is configured (staging first).
  *
+ *   GET  /api/auth/nonce                                           ->  { nonce } (sets a short-lived signed cookie)
  *   POST /api/auth/google  { "credential": "<Google ID token>" }  ->  { name, email, remembered }
- *   GET  /api/auth/me                                              ->  { name, email } or 401
+ *   GET  /api/auth/me                                              ->  { remembered: true } or 401
  *   POST /api/auth/logout                                          ->  204, session cookie cleared
  *
  * Stateless: the Worker verifies the Google token, and, when SESSION_SECRET is set, hands back a
  * signed HttpOnly cookie so the person stays signed in on that device. Nothing is stored on the
  * server and nothing is logged. Without SESSION_SECRET the person stays signed in only while the
- * page is open ("remembered": false).
+ * page is open ("remembered": false). The cookie holds only a pseudonymous ID (never an email or name),
+ * so /api/auth/me cannot return them: the page keeps the name and email from the sign-in response in
+ * memory only. Every route is rate limited per client IP (429 with Retry-After).
  */
 export const AUTH_PREFIX = '/api/auth/';
 export const GOOGLE_AUTH_PATH = '/api/auth/google';
@@ -34,11 +48,25 @@ export interface AuthDeps {
   readonly sessionSecret: string | undefined;
   readonly getKeys?: KeyFetcher;
   readonly nowSeconds?: () => number;
+  readonly limiter?: RateLimiter;
 }
 
+const defaultLimiter = memoryRateLimiter();
+
+/** Browsers always send Origin on a same-origin POST, so a missing or foreign Origin is refused. */
 function sameOrigin(request: Request): boolean {
-  const origin = request.headers.get('Origin');
-  return origin === null || origin === new URL(request.url).origin;
+  return request.headers.get('Origin') === new URL(request.url).origin;
+}
+
+async function nonce(deps: AuthDeps, now: number): Promise<Response> {
+  const secret = deps.sessionSecret;
+  if (secret === undefined || secret === '') {
+    return Response.json({ nonce: null }, { headers: NO_STORE });
+  }
+  const cookieValue = await createNonce(secret, now);
+  const headers = new Headers(NO_STORE);
+  headers.append('Set-Cookie', nonceCookie(cookieValue));
+  return Response.json({ nonce: cookieValue.split('.')[0] }, { headers });
 }
 
 async function signIn(request: Request, deps: AuthDeps, now: number): Promise<Response> {
@@ -56,28 +84,40 @@ async function signIn(request: Request, deps: AuthDeps, now: number): Promise<Re
   }
   if (typeof credential !== 'string') return fail(400, 'bad_request');
 
+  const secret = deps.sessionSecret;
+  const remembered = secret !== undefined && secret !== '';
+  let expectedNonce: string | undefined;
+  if (remembered) {
+    // Replay protection: the token must carry the nonce from this browser's signed nonce cookie.
+    const cookie = readCookie(request.headers.get('Cookie'), NONCE_COOKIE);
+    const value = cookie === null ? null : await readNonce(cookie, secret, now);
+    if (value === null) return fail(401, 'invalid_token');
+    expectedNonce = value;
+  }
+
   const user = await verifyGoogleIdToken(credential, {
     clientId: deps.clientId ?? '',
     nowSeconds: now,
     getKeys: deps.getKeys ?? googleKeyFetcher(() => Math.floor(Date.now() / 1000)),
+    ...(expectedNonce === undefined ? {} : { expectedNonce }),
   });
   if (user === null) return fail(401, 'invalid_token');
 
-  const secret = deps.sessionSecret;
-  const remembered = secret !== undefined && secret !== '';
   const headers = new Headers(NO_STORE);
-  if (remembered)
+  if (remembered) {
     headers.append('Set-Cookie', sessionCookie(await createSessionToken(user, secret, now)));
-  return Response.json({ ...user, remembered }, { headers });
+    headers.append('Set-Cookie', clearedNonceCookie());
+  }
+  return Response.json({ name: user.name, email: user.email, remembered }, { headers });
 }
 
 async function me(request: Request, deps: AuthDeps, now: number): Promise<Response> {
   const secret = deps.sessionSecret;
   const token = readCookie(request.headers.get('Cookie'), SESSION_COOKIE);
   if (secret === undefined || secret === '' || token === null) return fail(401, 'not_signed_in');
-  const user = await readSessionToken(token, secret, now);
-  if (user === null) return fail(401, 'not_signed_in');
-  return Response.json({ ...user, remembered: true }, { headers: NO_STORE });
+  const session = await readSessionToken(token, secret, now);
+  if (session === null) return fail(401, 'not_signed_in');
+  return Response.json({ remembered: true }, { headers: NO_STORE });
 }
 
 function logout(request: Request): Response {
@@ -93,10 +133,19 @@ export async function handleAuth(request: Request, deps: AuthDeps): Promise<Resp
   }
   const { pathname } = new URL(request.url);
   const now = (deps.nowSeconds ?? (() => Math.floor(Date.now() / 1000)))();
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  if (!(await (deps.limiter ?? defaultLimiter).allow(ip, now))) {
+    return fail(429, 'rate_limited', { 'Retry-After': String(AUTH_WINDOW_SECONDS) });
+  }
   if (pathname === GOOGLE_AUTH_PATH) {
     return request.method === 'POST'
       ? signIn(request, deps, now)
       : fail(405, 'method_not_allowed', { Allow: 'POST' });
+  }
+  if (pathname === `${AUTH_PREFIX}nonce`) {
+    return request.method === 'GET'
+      ? nonce(deps, now)
+      : fail(405, 'method_not_allowed', { Allow: 'GET' });
   }
   if (pathname === `${AUTH_PREFIX}me`) {
     return request.method === 'GET'
@@ -120,6 +169,7 @@ export function handleGoogleAuth(
   sessionSecret?: string,
 ): Promise<Response> {
   return handleAuth(request, {
+    limiter: unlimited,
     clientId,
     sessionSecret,
     ...(getKeys === undefined ? {} : { getKeys }),

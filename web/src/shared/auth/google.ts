@@ -4,7 +4,7 @@ import { GOOGLE_CLIENT_ID } from '../flags/flags';
 /**
  * Google sign-in for the Me tab (ADR 0008, OQ-030). The person signs in with the Google account on
  * their phone. Google's own script is loaded only when they have agreed and are ready to sign in, the
- * ID token is sent once to our Worker, which verifies it, and only the name and email come back.
+ * ID token is sent once to our Worker, which verifies it, and only the name and email come back (kept in memory; the cookie holds just a pseudonymous ID).
  * Nothing is stored in the browser or on the server: the signed-in person lives in memory and is gone
  * when the page is closed or they sign out.
  */
@@ -24,6 +24,7 @@ interface GoogleId {
   initialize(config: {
     client_id: string;
     callback: (response: { credential?: string }) => void;
+    nonce?: string;
     use_fedcm_for_prompt?: boolean;
   }): void;
   renderButton(parent: HTMLElement, options: Record<string, string | number>): void;
@@ -97,12 +98,34 @@ export async function restoreSession(): Promise<void> {
     });
     if (!response.ok) return;
     const body: unknown = await response.json();
-    if (isRealUser(body)) {
-      user.value = { name: body.name, email: body.email };
+    // The cookie holds only a pseudonymous ID, so the server cannot say who the person is. Show them
+    // as signed in without a name until they sign in again.
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      (body as { remembered?: unknown }).remembered === true
+    ) {
+      user.value = { name: '', email: '' };
       remembered.value = true;
     }
   } catch {
     // Offline or not configured: the person simply starts signed out.
+  }
+}
+
+/** Asks the Worker for a one-time nonce (bound to a short-lived cookie) so a captured token cannot be replayed. */
+async function fetchNonce(): Promise<string | undefined> {
+  try {
+    const response = await fetch('/api/auth/nonce', {
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
+    if (!response.ok) return undefined;
+    const body: unknown = await response.json();
+    const value = (body as { nonce?: unknown }).nonce;
+    return typeof value === 'string' ? value : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -112,8 +135,10 @@ export async function renderGoogleButton(parent: HTMLElement): Promise<void> {
   await loadScript();
   const id = window.google?.accounts.id;
   if (id === undefined) throw new Error('Google sign-in is unavailable');
+  const nonce = await fetchNonce();
   id.initialize({
     client_id: GOOGLE_CLIENT_ID,
+    ...(nonce === undefined ? {} : { nonce }),
     callback: (response) => {
       if (typeof response.credential === 'string') void exchange(response.credential);
       else signInError.value = true;

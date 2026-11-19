@@ -3,6 +3,7 @@ import { AUTH_PREFIX, handleAuth } from './routes/googleAuth';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { withSecurityHeaders } from './security/headers';
+import { bindingRateLimiter, type RateLimitBinding } from './security/rateLimit';
 
 export { GroupLocation };
 
@@ -14,6 +15,8 @@ export interface Env {
   GOOGLE_CLIENT_ID?: string;
   /** Worker secret that signs the sign-in cookie. Without it the person is signed in for one page view only. */
   SESSION_SECRET?: string;
+  /** Optional Workers rate-limit binding for /api/auth/*; without it a per-isolate limiter applies. */
+  AUTH_RATE_LIMIT?: RateLimitBinding;
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
@@ -21,6 +24,9 @@ async function route(request: Request, env: Env): Promise<Response> {
     return handleAuth(request, {
       clientId: env.GOOGLE_CLIENT_ID,
       sessionSecret: env.SESSION_SECRET,
+      ...(env.AUTH_RATE_LIMIT === undefined
+        ? {}
+        : { limiter: bindingRateLimiter(env.AUTH_RATE_LIMIT) }),
     });
   }
 

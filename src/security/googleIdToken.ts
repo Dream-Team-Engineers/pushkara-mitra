@@ -12,9 +12,14 @@ const ISSUERS: readonly string[] = ['https://accounts.google.com', 'accounts.goo
 const MAX_TOKEN_LENGTH = 4096;
 const CLOCK_SKEW_SECONDS = 60;
 const KEY_CACHE_SECONDS = 3600;
-const KEY_REFRESH_MIN_SECONDS = 300;
+const KEY_REFRESH_MIN_SECONDS = 60;
+const KEY_FETCH_TIMEOUT_MS = 3000;
+const MAX_KEYS_BODY_CHARS = 65536;
+const MAX_KEYS = 20;
 
 export interface GoogleUser {
+  /** Google's stable account identifier. Used only to derive a pseudonymous ID; never put in a cookie. */
+  readonly sub: string;
   readonly name: string;
   readonly email: string;
 }
@@ -27,12 +32,15 @@ export interface Jwk {
   readonly e?: string;
 }
 
-export type KeyFetcher = () => Promise<readonly Jwk[]>;
+/** Returns Google's keys; `kid` lets the source refetch (rate-limited) when it does not know that key. */
+export type KeyFetcher = (kid: string) => Promise<readonly Jwk[]>;
 
 export interface VerifyOptions {
   readonly clientId: string;
   readonly nowSeconds: number;
   readonly getKeys: KeyFetcher;
+  /** When set, the token's `nonce` claim must equal it (replay protection, ADR 0008). */
+  readonly expectedNonce?: string;
 }
 
 function base64UrlToBytes(value: string): Uint8Array<ArrayBuffer> {
@@ -75,7 +83,7 @@ export async function verifyGoogleIdToken(
       return null;
     }
 
-    const jwk = (await options.getKeys()).find(
+    const jwk = (await options.getKeys(header['kid'])).find(
       (key) =>
         key.kid === header['kid'] &&
         key.kty === 'RSA' &&
@@ -102,51 +110,85 @@ export async function verifyGoogleIdToken(
 
     const claims = parseJson(base64UrlToBytes(payloadPart));
     if (claims === null) return null;
-    const { iss, aud, exp, iat, email, email_verified: emailVerified, name } = claims;
+    const { iss, aud, exp, iat, sub, nonce, email, email_verified: emailVerified, name } = claims;
     if (typeof iss !== 'string' || !ISSUERS.includes(iss)) return null;
     if (aud !== options.clientId) return null;
     if (typeof exp !== 'number' || exp <= options.nowSeconds - CLOCK_SKEW_SECONDS) return null;
     if (typeof iat === 'number' && iat > options.nowSeconds + CLOCK_SKEW_SECONDS) return null;
+    if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) return null;
+    if (options.expectedNonce !== undefined && nonce !== options.expectedNonce) return null;
     if (typeof email !== 'string' || email.length === 0 || email.length > 320) return null;
     if (emailVerified !== true) return null;
 
     const display =
       typeof name === 'string' && name.trim() !== '' ? name.trim() : email.split('@')[0];
-    return { name: (display ?? email).slice(0, 80), email };
+    return { sub, name: (display ?? email).slice(0, 80), email };
   } catch {
     return null;
   }
 }
 
 let cachedKeys: readonly Jwk[] = [];
-let cachedAt = 0;
+let cachedAt = Number.NEGATIVE_INFINITY;
+let lastAttempt = Number.NEGATIVE_INFINITY;
+let inFlight: Promise<void> | null = null;
 
-/** Google's public keys, cached in memory for the life of the isolate and refreshed on rotation. */
+function parseKeys(text: string): Jwk[] {
+  if (text.length > MAX_KEYS_BODY_CHARS) throw new Error('keys response too large');
+  const body: unknown = JSON.parse(text);
+  const raw = typeof body === 'object' && body !== null ? (body as { keys?: unknown }).keys : null;
+  if (!Array.isArray(raw)) throw new Error('keys response shape');
+  const keys = (raw as Jwk[]).slice(0, MAX_KEYS);
+  if (keys.length === 0) throw new Error('no keys');
+  return keys;
+}
+
+/**
+ * Google's public keys, cached in memory for the life of the isolate.
+ *
+ * Fail closed (same policy as the disabled Access key source): keys are served only while younger than the TTL, so a
+ * rotated or revoked key is never trusted past it, even when Google cannot be reached. An unknown `kid`
+ * triggers at most one refetch per minimum interval, so forged key ids cannot make the Worker hammer
+ * Google. The fetch has a timeout, no redirects and a body-size cap.
+ */
 export function googleKeyFetcher(
   nowSeconds: () => number,
   fetcher: typeof fetch = fetch,
 ): KeyFetcher {
-  return async () => {
-    const now = nowSeconds();
-    if (cachedKeys.length > 0 && now - cachedAt < KEY_CACHE_SECONDS) return cachedKeys;
-    if (cachedKeys.length > 0 && now - cachedAt < KEY_REFRESH_MIN_SECONDS) return cachedKeys;
-    const response = await fetcher(GOOGLE_JWKS_URL);
-    if (!response.ok) return cachedKeys;
-    const body: unknown = await response.json();
-    const keys =
-      typeof body === 'object' && body !== null && Array.isArray((body as { keys?: unknown }).keys)
-        ? (body as { keys: Jwk[] }).keys
-        : [];
-    if (keys.length > 0) {
-      cachedKeys = keys;
+  async function refresh(now: number): Promise<void> {
+    lastAttempt = now;
+    try {
+      const response = await fetcher(GOOGLE_JWKS_URL, {
+        headers: { Accept: 'application/json' },
+        redirect: 'error',
+        signal: AbortSignal.timeout(KEY_FETCH_TIMEOUT_MS),
+      });
+      if (!response.ok) return;
+      cachedKeys = parseKeys(await response.text());
       cachedAt = now;
+    } catch {
+      // Keep whatever is still within its TTL; nothing older is ever served.
     }
-    return cachedKeys;
+  }
+
+  return async (kid) => {
+    const now = nowSeconds();
+    const fresh = cachedKeys.length > 0 && now - cachedAt < KEY_CACHE_SECONDS;
+    const known = fresh && cachedKeys.some((key) => key.kid === kid);
+    if (!known && now - lastAttempt >= KEY_REFRESH_MIN_SECONDS) {
+      inFlight ??= refresh(now).finally(() => {
+        inFlight = null;
+      });
+      await inFlight;
+    }
+    return cachedKeys.length > 0 && now - cachedAt < KEY_CACHE_SECONDS ? cachedKeys : [];
   };
 }
 
-/** Test helper: forget cached keys. */
+/** Test helper: forget cached keys and the refetch back-off. */
 export function resetKeyCache(): void {
   cachedKeys = [];
-  cachedAt = 0;
+  cachedAt = Number.NEGATIVE_INFINITY;
+  lastAttempt = Number.NEGATIVE_INFINITY;
+  inFlight = null;
 }
