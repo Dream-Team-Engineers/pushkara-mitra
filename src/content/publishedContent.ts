@@ -98,14 +98,7 @@ const GHATS_ENTRY: ContentEntry = {
         'east',
         'Rajamahendravaram',
       ),
-      ghat(
-        'pushkar-ghat',
-        'Pushkar Ghat',
-        'పుష్కర్ ఘాట్',
-        'पुष्कर घाट',
-        'east',
-        'Rajamahendravaram',
-      ),
+      ghat('pushkar-ghat', 'Pushkar Ghat', 'పుష్కర్ ఘాట్', 'पुष्कर घाट', 'east', 'Rajamahendravaram'),
       ghat(
         'saraswati-ghat',
         'Saraswati Ghat',
@@ -114,14 +107,7 @@ const GHATS_ENTRY: ContentEntry = {
         'east',
         'Rajamahendravaram',
       ),
-      ghat(
-        'gowthami-ghat',
-        'Gowthami Ghat',
-        'గౌతమీ ఘాట్',
-        'गौतमी घाट',
-        'east',
-        'Rajamahendravaram',
-      ),
+      ghat('gowthami-ghat', 'Gowthami Ghat', 'గౌతమీ ఘాట్', 'गौतमी घाट', 'east', 'Rajamahendravaram'),
       ghat(
         'tummalapalli-vari-revu',
         'Tummalapalli Vari Revu',
@@ -275,14 +261,7 @@ const GHATS_ENTRY: ContentEntry = {
         'telangana',
         'Mancherial',
       ),
-      guideGhat(
-        'manthani-ghat',
-        'Manthani Ghat',
-        'మంథని ఘాట్',
-        'मंथनी घाट',
-        'telangana',
-        'Peddapalli',
-      ),
+      guideGhat('manthani-ghat', 'Manthani Ghat', 'మంథని ఘాట్', 'मंथनी घाट', 'telangana', 'Peddapalli'),
       guideGhat(
         'manuguru-ghat',
         'Manuguru Ghat',

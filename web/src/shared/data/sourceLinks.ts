@@ -55,11 +55,7 @@ export const TRAVEL_LINKS: readonly SourceLink[] = [
   {
     id: 'aai-rja',
     icon: 'plane',
-    title: L(
-      'Rajahmundry Airport (RJA)',
-      'రాజమండ్రి విమానాశ్రయం (RJA)',
-      'राजमुंदरी हवाई अड्डा (RJA)',
-    ),
+    title: L('Rajahmundry Airport (RJA)', 'రాజమండ్రి విమానాశ్రయం (RJA)', 'राजमुंदरी हवाई अड्डा (RJA)'),
     note: L(
       'Airports Authority of India, for airport information. Book flights with the airline.',
       'విమానాశ్రయ సమాచారం కోసం ఎయిర్‌పోర్ట్స్ అథారిటీ. టికెట్లు విమాన సంస్థ వద్ద.',
