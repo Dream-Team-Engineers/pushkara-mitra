@@ -70,6 +70,10 @@ let cached: Promise<readonly Place[]> | null = null;
 export function loadPlaces(
   request: typeof fetch = (input, init) => fetch(input, init),
 ): Promise<readonly Place[]> {
+  // Offline: do not even ask (the browser would log a failed request); the map shows without pins.
+  const onLine: unknown =
+    typeof navigator === 'undefined' ? true : Reflect.get(navigator, 'onLine');
+  if (onLine === false) return Promise.resolve([]);
   cached ??= request(PLACES_PATH, { credentials: 'omit', signal: AbortSignal.timeout(8000) })
     .then(async (response) => {
       const type = response.headers.get('Content-Type') ?? '';
