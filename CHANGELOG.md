@@ -1,5 +1,52 @@
 # Changelog
 
+## [1.13.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.12.0...v1.13.0) (2026-11-20)
+
+
+### Features
+
+* **account:** Google sign-in scaffold (off), remove OTP and pass creation, header sign-in link; record decision ([fe3ad9f](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/fe3ad9f1fa4e78dc7cb301345c1a81c910f1de04))
+* **auth:** Google sign-in on staging: Worker token verification, Me tab and header, staging-only flag ([8b10d49](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/8b10d49c7b7ef5c00889f0c85204003c5e71faf1))
+* **auth:** stay signed in via signed cookie (when secret set), delete-account and privacy screens, records ([f7666c3](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/f7666c397344777e9a4c31d1580cd23523a2a1e6))
+* **brand:** Home emblem logo and goddess app icon from owner files; sources moved out of dist ([55bf9a5](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/55bf9a56676086b88e4d25b42ea3ba3ff7cfd8e7))
+* **brand:** lotus-and-river app icon and header mark from owner file; drop deity icon ([4cb1316](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/4cb1316a4887a6020bf77d796bce0f1b39e8c2cd))
+* **brand:** temporary lotus logo and app icons from owner artwork; record provenance ([e7df75b](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e7df75b59fb832d8f203f0e6834777ad36337d52))
+* **content:** live news, source links for travel/stay/culture, OSM map links ([87aeadd](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/87aeadda501a33b46dac88970e51752946c9d950))
+* **content:** publish owner-approved ghats and confirm event dates ([3ea871b](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/3ea871b00b42409b9b511b211d4fe68179df155f))
+* **ghats:** corrected Telugu spellings, Hindi names, 15 more ghats marked unverified ([aaea9b5](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/aaea9b56e469ec48d46bd002da9f6692ffa3c672))
+* **ghats:** Telugu names for the 15 approved ghats, shown first in Telugu mode ([e297725](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e2977253d2129b27ecbd0f6e2c79269005512b56))
+* **help:** helpline rows with call confirmation, draft 112/1098 sources, record Telugu review ([e2323ac](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e2323acc40ceaf96e86ea824a5a62255f70804b7))
+* **helplines:** add owner-supplied police, ambulance, tourist and women numbers (unverified) ([d02551c](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d02551ca3c6e8a9a9a948d7e4bb19d8a6a3964b1))
+* **helplines:** approve helplines dataset at 92a74c4 (owner), update tests and status ([4f694a1](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/4f694a11bf40e470a7fab82f9a542a2c1586aae0))
+* **helplines:** approve helplines dataset at d02551c, update tests ([43ab008](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/43ab008f456eabb76705167b0d44c13264e8cf7c))
+* **helplines:** full owner-supplied helpline list with new kinds (unverified, draft until approved) ([92a74c4](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/92a74c458382b131c8492c3a4c157a6a4e8a63ad))
+* **i18n:** dual-language display (Telugu or Hindi plus English), phase 1 ([d572093](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d5720939a43722fe2efd37429e9f7f4dfd882a5d))
+* **i18n:** dual-language headings, labels, buttons and chips on all screens (phase 2) ([70f9f2d](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/70f9f2d345393443869757c29e1c8340d6c3067a))
+* **map:** real map for the Godavari region and device position (staging) ([fc9a4de](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/fc9a4de6946f1d3859092fb4afe6c6acc01c7ea8))
+* **news:** read publishers' own RSS feeds (Siasat, Telangana Today, The Hindu) ([233ec53](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/233ec536e1368c62c0ffcd94e00c2868276f6779))
+* **pwa:** install-the-app banner for browser visitors (Android prompt, iPhone how-to) ([6cefe54](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/6cefe5461ce0759cd133a6931f583ec95a4978bf))
+* **ui:** compact home, help and ghats layout; seconds in the countdown ([74402f3](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/74402f3c47ef6f2c33b362524922807e1814dd00))
+* **ui:** full logo on Home, dot-ring countdown, stacked Help tiles, smaller quick icons ([807e8f0](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/807e8f0f63391bcd506363a9115098d503f74b7a))
+* **ui:** Godavari Glass design, labelled language button with sheet ([a64bf5d](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/a64bf5d8ea58c954854c9226c6338cada2b1ca91))
+* **ui:** show the build id on the Me tab to spot stale copies ([99f3bc9](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/99f3bc9a248fecee1ea5631e5fa15356a83369ee))
+
+
+### Bug Fixes
+
+* **auth:** allow inline style attributes for Google's sign-in button (staging only) ([5d81530](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5d81530cf57972f643a6d51b264d95d29b47d563))
+* **auth:** allow inline styles for Google's sign-in button (staging only, scripts stay strict) ([987c017](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/987c017188b0104d5be1bd51ed0c8a8a73cb6d92))
+* **ci:** build staging in staging mode so pushes keep the Google client ID ([5f18dfc](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5f18dfc63accd1be5d46c84333bda50ce9a91a00))
+* **ci:** fix routing test CSP drift, gate staging deploy on full CI, fix bundle measurement ([117c79f](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/117c79ff3a60501b2ea8ae765103a1d87fee0aae))
+* **ci:** ignore expected /api/public 404 and offline errors in the smoke test ([45014f5](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/45014f5a209978713b945b58fdbced161d24bbc7))
+* **ci:** ignore expected /api/public 404 and offline errors in the smoke test ([#129](https://github.com/Dream-Team-Engineers/pushkara-mitra/issues/129)) ([d0b44ad](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/d0b44ad95bd3fd281580aae6689f5c6a2df5b929))
+* **fonts:** ship full Telugu and Devanagari character sets; fix Windows script bugs ([399d7ef](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/399d7ef55a7a23430e30697db3c432f5abf0b316))
+* **map:** smoke-test server serves byte ranges and module workers; cache map code on first use ([e390cef](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/e390cef27ac6775b17f691aeb6c684bc26758f2d))
+* **news:** never truncate article links (Google links exceed 500 chars) ([6017932](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/6017932891185c91fd2000f2b11d03147700f89b))
+* **pwa:** apply a found update automatically right after the page opens ([5af22e7](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/5af22e734a16118537efb42922cb8d510f33c9e6))
+* **security:** replace high-entropy test fixture and allowlist its history fingerprint ([1f3c1ce](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/1f3c1ce1a44196a69c67bbffbe3d786d873349ab))
+* **ui:** phone-width app column and desktop-site-mode zoom compensation ([371bcba](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/371bcba3d3d7ce2125de61cc74ac856da557941c))
+* **ui:** stop the desktop-mode zoom from inflating page height (blank space below content) ([607718f](https://github.com/Dream-Team-Engineers/pushkara-mitra/commit/607718f4d0dc23b4d1dc13c67d523072ee80553c))
+
 ## [1.12.0](https://github.com/Dream-Team-Engineers/pushkara-mitra/compare/v1.11.0...v1.12.0) (2026-11-14)
 
 
