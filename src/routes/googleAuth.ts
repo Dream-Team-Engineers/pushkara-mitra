@@ -24,15 +24,15 @@ import {
  *
  *   GET  /api/auth/nonce                                           ->  { nonce } (sets a short-lived signed cookie)
  *   POST /api/auth/google  { "credential": "<Google ID token>" }  ->  { name, email, remembered }
- *   GET  /api/auth/me                                              ->  { remembered: true } or 401
+ *   GET  /api/auth/me                                              ->  { remembered: true, name } or 401
  *   POST /api/auth/logout                                          ->  204, session cookie cleared
  *
  * Stateless: the Worker verifies the Google token, and, when SESSION_SECRET is set, hands back a
  * signed HttpOnly cookie so the person stays signed in on that device. Nothing is stored on the
  * server and nothing is logged. Without SESSION_SECRET the person stays signed in only while the
- * page is open ("remembered": false). The cookie holds only a pseudonymous ID (never an email or name),
- * so /api/auth/me cannot return them: the page keeps the name and email from the sign-in response in
- * memory only. Every route is rate limited per client IP (429 with Retry-After).
+ * page is open ("remembered": false). The cookie holds a pseudonymous ID and the display name (never
+ * the email), so /api/auth/me returns the name but not the email: the page keeps the email from the
+ * sign-in response in memory only. Every route is rate limited per client IP (429 with Retry-After).
  */
 export const AUTH_PREFIX = '/api/auth/';
 export const GOOGLE_AUTH_PATH = '/api/auth/google';
@@ -117,7 +117,7 @@ async function me(request: Request, deps: AuthDeps, now: number): Promise<Respon
   if (secret === undefined || secret === '' || token === null) return fail(401, 'not_signed_in');
   const session = await readSessionToken(token, secret, now);
   if (session === null) return fail(401, 'not_signed_in');
-  return Response.json({ remembered: true }, { headers: NO_STORE });
+  return Response.json({ remembered: true, name: session.name }, { headers: NO_STORE });
 }
 
 function logout(request: Request): Response {

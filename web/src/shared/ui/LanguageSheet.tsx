@@ -44,7 +44,7 @@ export function LanguageButton() {
       <span class="lang-button__name" lang={locale.value}>
         {name}
       </span>
-      <Icon name="chevron" size={18} />
+      <Icon name="chevron" size={14} />
     </button>
   );
 }

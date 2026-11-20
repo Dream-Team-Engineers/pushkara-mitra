@@ -98,14 +98,14 @@ export async function restoreSession(): Promise<void> {
     });
     if (!response.ok) return;
     const body: unknown = await response.json();
-    // The cookie holds only a pseudonymous ID, so the server cannot say who the person is. Show them
-    // as signed in without a name until they sign in again.
+    // The cookie holds the display name but not the email, so the email stays empty until sign-in.
     if (
       typeof body === 'object' &&
       body !== null &&
       (body as { remembered?: unknown }).remembered === true
     ) {
-      user.value = { name: '', email: '' };
+      const name = (body as { name?: unknown }).name;
+      user.value = { name: typeof name === 'string' ? name : '', email: '' };
       remembered.value = true;
     }
   } catch {

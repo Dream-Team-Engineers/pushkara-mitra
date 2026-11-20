@@ -18,12 +18,13 @@ const USER = { sub: 'google-sub-1', name: 'Lakshmi Devi', email: 'pilgrim@exampl
 const CLIENT_ID = 'client-123.apps.googleusercontent.com';
 
 describe('session token', () => {
-  it('round-trips a pseudonymous id and carries no personal data', async () => {
+  it('round-trips a pseudonymous id and the display name, but never the email or Google id', async () => {
     const token = await createSessionToken(USER, SECRET, NOW);
     const session = await readSessionToken(token, SECRET, NOW + 60);
     expect(session?.id).toBeTruthy();
+    expect(session?.name).toBe('Lakshmi Devi');
     const decoded = atob((token.split('.')[1] ?? '').replaceAll('-', '+').replaceAll('_', '/'));
-    expect(decoded).not.toMatch(/@|Lakshmi|pilgrim|google-sub-1/);
+    expect(decoded).not.toMatch(/@|pilgrim|google-sub-1/);
     expect(await pseudonymFor('google-sub-1', SECRET)).toBe(session?.id);
     expect(await pseudonymFor('google-sub-2', SECRET)).not.toBe(session?.id);
   });
@@ -83,7 +84,7 @@ function req(path: string, init: RequestInit = {}): Request {
 }
 
 describe('GET /api/auth/me', () => {
-  it('confirms a valid cookie without any personal data, never cached', async () => {
+  it('confirms a valid cookie with the display name but never the email, never cached', async () => {
     const token = await createSessionToken(USER, SECRET, NOW);
     const res = await handleAuth(
       req('/api/auth/me', { headers: { Cookie: `${SESSION_COOKIE}=${token}` } }),
@@ -91,7 +92,7 @@ describe('GET /api/auth/me', () => {
     );
     expect(res.status).toBe(200);
     expect(res.headers.get('Cache-Control')).toBe('no-store');
-    expect(await res.json()).toEqual({ remembered: true });
+    expect(await res.json()).toEqual({ remembered: true, name: 'Lakshmi Devi' });
   });
 
   it('answers 401 for no cookie, a bad cookie, an expired cookie or no secret', async () => {

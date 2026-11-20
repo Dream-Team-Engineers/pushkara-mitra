@@ -22,8 +22,29 @@ export const SAMPLE_MEMBERS: readonly Member[] = [
   { id: 'me', name: null, status: 'off' },
   { id: 'm2', name: '[Member 2]', status: 'off' },
   { id: 'm3', name: '[Member 3]', status: 'off' },
-  { id: 'm4', name: '[Member 4]', status: 'waiting' },
 ];
+
+export const MAX_MEMBERS = 10;
+const MAX_MEMBER_NAME = 40;
+
+export type AddResult =
+  | { readonly ok: true; readonly members: readonly Member[] }
+  | { readonly ok: false; readonly error: 'empty' | 'duplicate' | 'full' };
+
+/**
+ * Adds a member by name. One person stays in one group only, so a name already in the group is
+ * refused (compared without case or extra spaces). `id` must be unique in the list.
+ */
+export function addMember(members: readonly Member[], rawName: string, id: string): AddResult {
+  const name = rawName.trim().replace(/\s+/g, ' ').slice(0, MAX_MEMBER_NAME);
+  if (name === '') return { ok: false, error: 'empty' };
+  if (members.length >= MAX_MEMBERS) return { ok: false, error: 'full' };
+  const key = name.toLocaleLowerCase();
+  if (members.some((member) => member.name?.toLocaleLowerCase() === key)) {
+    return { ok: false, error: 'duplicate' };
+  }
+  return { ok: true, members: [...members, { id, name, status: 'off' }] };
+}
 
 export function approveMember(members: readonly Member[], id: string): readonly Member[] {
   return members.map((member) =>
@@ -50,6 +71,11 @@ export default function GroupScreen() {
   const created = useSignal(false);
   const joined = useSignal(false);
   const members = useSignal<readonly Member[]>(SAMPLE_MEMBERS);
+  // The person starts in the sample group (themselves plus two members), and can be in only one.
+  const inGroup = useSignal(true);
+  const newName = useSignal('');
+  const addError = useSignal<'empty' | 'duplicate' | 'full' | null>(null);
+  const nextId = useSignal(4);
 
   return (
     <>
@@ -85,12 +111,16 @@ export default function GroupScreen() {
               type="button"
               class="button"
               onClick={() => {
+                if (inGroup.value) return;
                 created.value = true;
+                inGroup.value = true;
+                members.value = SAMPLE_MEMBERS;
               }}
             >
               {t('group.create')}
             </button>
           </div>
+          {inGroup.value && !created.value ? <p class="notice">{t('group.already')}</p> : null}
           {created.value ? (
             <section class="card code-card" aria-labelledby="group-code-title">
               <h2 id="group-code-title" class="card__title">
@@ -125,6 +155,7 @@ export default function GroupScreen() {
               type="button"
               class="button"
               onClick={() => {
+                if (inGroup.value) return;
                 joined.value = true;
               }}
             >
@@ -132,10 +163,14 @@ export default function GroupScreen() {
             </button>
           </div>
           <p class="note">{t('group.join.note')}</p>
-          {joined.value ? <p class="notice">{t('group.status.waiting')}</p> : null}
+          {inGroup.value ? <p class="notice">{t('group.already')}</p> : null}
+          {joined.value && !inGroup.value ? (
+            <p class="notice">{t('group.status.waiting')}</p>
+          ) : null}
         </>
       )}
-      <section class="section" aria-labelledby="members-title">
+      {inGroup.value ? null : <p class="note">{t('group.none')}</p>}
+      <section class="section" aria-labelledby="members-title" hidden={!inGroup.value}>
         <h2 id="members-title" class="section__title">
           {t('group.members', { count: formatNumber(members.value.length) })}
         </h2>
@@ -191,6 +226,50 @@ export default function GroupScreen() {
             </li>
           ))}
         </ul>
+        <div class="field member-add">
+          <label for="member-name">
+            <Bi k="group.add.label" />
+          </label>
+          <div class="member-add__row">
+            <input
+              id="member-name"
+              type="text"
+              autocomplete="off"
+              maxLength={40}
+              value={newName.value}
+              aria-invalid={addError.value !== null}
+              aria-describedby={addError.value === null ? undefined : 'member-add-error'}
+              onInput={(event) => {
+                newName.value = event.currentTarget.value;
+                addError.value = null;
+              }}
+            />
+            <button
+              type="button"
+              class="button"
+              onClick={() => {
+                const result = addMember(members.value, newName.value, `m${String(nextId.value)}`);
+                if (result.ok) {
+                  members.value = result.members;
+                  nextId.value += 1;
+                  newName.value = '';
+                  addError.value = null;
+                } else {
+                  addError.value = result.error;
+                }
+              }}
+            >
+              {t('group.add.button')}
+            </button>
+          </div>
+          {addError.value === null ? null : (
+            <p id="member-add-error" class="notice" role="alert">
+              {addError.value === 'full'
+                ? t('group.add.full', { max: formatNumber(MAX_MEMBERS) })
+                : t(addError.value === 'empty' ? 'group.add.empty' : 'group.add.duplicate')}
+            </p>
+          )}
+        </div>
       </section>
       <section class="section" aria-labelledby="share-title">
         <h2 id="share-title" class="section__title">
@@ -219,7 +298,10 @@ export default function GroupScreen() {
           type="button"
           class="button button--danger"
           onClick={() => {
-            members.value = SAMPLE_MEMBERS;
+            members.value = [];
+            inGroup.value = false;
+            addError.value = null;
+            newName.value = '';
             created.value = false;
             joined.value = false;
             groupName.value = '';

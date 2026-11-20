@@ -1,6 +1,11 @@
 import { render } from 'preact-render-to-string';
 import { afterEach, describe, expect, it } from 'vitest';
-import GroupScreen, { approveMember, removeMember, SAMPLE_MEMBERS } from '../features/group/Screen';
+import GroupScreen, {
+  addMember,
+  approveMember,
+  removeMember,
+  SAMPLE_MEMBERS,
+} from '../features/group/Screen';
 import HelpScreen from '../features/help/Screen';
 import MapScreen from '../features/map/Screen';
 import PartnersScreen, { PartnerPanel, VolunteerPanel } from '../features/partners/Screen';
@@ -92,16 +97,38 @@ describe('My Group', () => {
     expect(html).not.toContain('aria-checked="true"');
   });
 
+  it('starts with the person plus two members', () => {
+    expect(SAMPLE_MEMBERS.map((member) => member.id)).toEqual(['me', 'm2', 'm3']);
+  });
+
   it('approves only waiting members and never removes the creator', () => {
-    const approved = approveMember(SAMPLE_MEMBERS, 'm4');
-    expect(approved.find((member) => member.id === 'm4')?.status).toBe('off');
+    const waiting = [
+      ...SAMPLE_MEMBERS,
+      { id: 'm4', name: '[Member 4]', status: 'waiting' as const },
+    ];
+    expect(approveMember(waiting, 'm4').find((member) => member.id === 'm4')?.status).toBe('off');
     expect(approveMember(SAMPLE_MEMBERS, 'm2')).toEqual(SAMPLE_MEMBERS);
     expect(removeMember(SAMPLE_MEMBERS, 'me')).toEqual(SAMPLE_MEMBERS);
-    expect(removeMember(SAMPLE_MEMBERS, 'm3').map((member) => member.id)).toEqual([
-      'me',
-      'm2',
-      'm4',
-    ]);
+    expect(removeMember(SAMPLE_MEMBERS, 'm3').map((member) => member.id)).toEqual(['me', 'm2']);
+  });
+
+  it('adds members, and keeps one person in one group', () => {
+    const added = addMember(SAMPLE_MEMBERS, '  Lakshmi   Devi ', 'm4');
+    expect(added.ok && added.members.map((member) => member.name)).toContain('Lakshmi Devi');
+    if (!added.ok) throw new Error('expected ok');
+    expect(addMember(added.members, 'lakshmi devi', 'm5')).toEqual({
+      ok: false,
+      error: 'duplicate',
+    });
+    expect(addMember(added.members, '   ', 'm5')).toEqual({ ok: false, error: 'empty' });
+    expect(removeMember(added.members, 'm4').length).toBe(SAMPLE_MEMBERS.length);
+    let full = SAMPLE_MEMBERS;
+    for (let index = 0; index < 20; index += 1) {
+      const next = addMember(full, 'P' + String(index), 'x' + String(index));
+      if (next.ok) full = next.members;
+      else expect(next.error).toBe('full');
+    }
+    expect(full.length).toBe(10);
   });
 });
 

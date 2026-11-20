@@ -107,7 +107,7 @@ describe('H3 / M1: the session cookie holds only a pseudonymous id', () => {
       const res = await handleAuth(signIn(await sign({ email, nonce }), cookie), deps());
       expect(res.status).toBe(200);
       const raw = JSON.stringify(sessionPayload(res));
-      expect(raw).not.toMatch(/@|Lakshmi|pilgrim|google-sub-1/);
+      expect(raw).not.toMatch(/@|pilgrim|google-sub-1/);
       ids.push(sessionPayload(res).s);
     }
     expect(ids[0]).toBeTruthy();

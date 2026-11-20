@@ -100,7 +100,7 @@ function CategoryChips({
               onChange(option);
             }}
           >
-            {option === 'all' ? null : <Icon name={PLACE_ICON[option]} size={18} />}
+            {option === 'all' ? null : <Icon name={PLACE_ICON[option]} size={14} />}
             <span>{t(option === 'all' ? 'map.cat.all' : CATEGORY_KEY[option])}</span>
             <span class="place-chip__count">{count}</span>
           </button>

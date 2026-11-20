@@ -6,7 +6,8 @@
  * missing, malformed, tampered with or expired, or one signed with another secret, does not
  * authenticate. Because nothing is kept on the server, "sign out" clears the cookie on that device;
  * a copied cookie stays valid until it expires (at most SESSION_MAX_AGE_SECONDS, 7 days; server-side
- * revocation needs the database, see the audit item M3). The cookie carries no email or name.
+ * revocation needs the database, see the audit item M3). The cookie carries the display name (so the
+ * header can greet the person after a refresh) but never the email or the raw Google identifier.
  *
  * The __Host- prefix makes browsers accept the cookie only over HTTPS, for this exact host, with
  * Path=/ and no Domain, so a sibling subdomain cannot set or replace it.
@@ -14,7 +15,11 @@
 export interface SessionUser {
   /** Pseudonymous ID: HMAC of the Google `sub`. Not an email, name or the raw Google identifier. */
   readonly id: string;
+  /** Display name for the header after a refresh. Never an email. Empty when the cookie has none. */
+  readonly name: string;
 }
+
+const MAX_NAME = 60;
 
 export const SESSION_COOKIE = '__Host-pm_session';
 export const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
@@ -22,6 +27,7 @@ const VERSION = 'v1';
 
 interface Claims {
   readonly s: string;
+  readonly n?: string;
   readonly iat: number;
   readonly exp: number;
 }
@@ -64,12 +70,14 @@ export async function pseudonymFor(sub: string, secret: string): Promise<string>
 }
 
 export async function createSessionToken(
-  user: { readonly sub: string },
+  user: { readonly sub: string; readonly name?: string },
   secret: string,
   nowSeconds: number,
 ): Promise<string> {
+  const name = (user.name ?? '').trim().slice(0, MAX_NAME);
   const claims: Claims = {
     s: await pseudonymFor(user.sub, secret),
+    ...(name === '' ? {} : { n: name }),
     iat: nowSeconds,
     exp: nowSeconds + SESSION_MAX_AGE_SECONDS,
   };
@@ -104,7 +112,8 @@ export async function readSessionToken(
     if (typeof claims.s !== 'string' || claims.s === '') return null;
     if (typeof claims.exp !== 'number' || claims.exp <= nowSeconds) return null;
     if (typeof claims.iat !== 'number' || claims.iat > nowSeconds + 60) return null;
-    return { id: claims.s };
+    const name = typeof claims.n === 'string' ? claims.n.slice(0, MAX_NAME) : '';
+    return { id: claims.s, name };
   } catch {
     return null;
   }
