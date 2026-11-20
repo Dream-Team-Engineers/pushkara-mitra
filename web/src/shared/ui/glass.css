@@ -713,7 +713,7 @@ main > a.link-card {
 }
 
 .map-stage .place-chip .place-chip__count {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
 }
 
 .map-stage .place-chip {
@@ -916,7 +916,7 @@ main > a.link-card {
 
 .meter__label {
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -930,20 +930,24 @@ main > a.link-card {
 .meter__bar {
   width: 1.5rem;
   height: 0.5rem;
-  background: var(--line);
+  background: transparent;
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
 }
 
 .meter--low .meter__bar.is-on {
   background: #2e8b57;
+  border-color: #2e8b57;
 }
 
 .meter--moderate .meter__bar.is-on {
-  background: #e0a526;
+  background: #b8740a;
+  border-color: #b8740a;
 }
 
 .meter--high .meter__bar.is-on {
   background: var(--danger);
+  border-color: var(--danger);
 }
 
 .meter__text {
@@ -1023,7 +1027,7 @@ main > a.link-card {
 
 .bottom-bar a {
   min-height: 3rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
 }
 
 .bottom-bar a svg {
