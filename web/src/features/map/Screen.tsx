@@ -128,11 +128,7 @@ function PlaceList({
       a.km !== null && b.km !== null ? a.km - b.km : a.place.name.localeCompare(b.place.name),
     );
   return (
-    <section class="section" aria-labelledby="places-title">
-      <h2 id="places-title" class="section__title">
-        {t('map.places.title')}{' '}
-        <span class="place-chip__count">{t('map.places.count', { n: places.length })}</span>
-      </h2>
+    <div class="sheet-body">
       <ul class="legend legend--places">
         {PLACE_CATEGORIES.map((category) => (
           <li key={category}>
@@ -187,29 +183,14 @@ function PlaceList({
           </button>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }
 
 function LocateControl({ outside }: { readonly outside: boolean }) {
   const state = deviceLocation.value;
-  const on = state.status === 'on' || state.status === 'asking';
   return (
-    <section class="locate" aria-labelledby="locate-title">
-      <h2 id="locate-title" class="visually-hidden">
-        {t('map.locate.start')}
-      </h2>
-      <button
-        type="button"
-        class={on ? 'button button--secondary' : 'button'}
-        onClick={() => {
-          if (on) stopDeviceLocation();
-          else startDeviceLocation();
-        }}
-      >
-        <Icon name="map" size={20} />
-        <span>{on ? t('map.locate.stop') : t('map.locate.start')}</span>
-      </button>
+    <section class="locate" aria-label={t('map.locate.start')}>
       <p class="note note--flush" role="status">
         {state.status === 'asking'
           ? t('map.locate.asking')
@@ -222,6 +203,93 @@ function LocateControl({ outside }: { readonly outside: boolean }) {
               : null}
       </p>
       <p class="note note--flush">{t('map.locate.privacy')}</p>
+    </section>
+  );
+}
+
+/** The "my location" button floats on the map (bottom right, above the zoom and scale). */
+function LocateFab() {
+  const state = deviceLocation.value;
+  const on = state.status === 'on' || state.status === 'asking';
+  return (
+    <button
+      type="button"
+      class={on ? 'locate-fab is-on' : 'locate-fab'}
+      aria-pressed={on}
+      onClick={() => {
+        if (on) stopDeviceLocation();
+        else startDeviceLocation();
+      }}
+    >
+      <Icon name="map" size={20} />
+      <span>{on ? t('map.locate.stop') : t('map.locate.start')}</span>
+    </button>
+  );
+}
+
+/**
+ * The bottom sheet under the map. Collapsed it shows the selected place (or a one-line summary);
+ * opened it holds the legend and the full list. It is a normal button and region, not a drag gesture,
+ * so it works with a keyboard and a screen reader.
+ */
+function MapSheet({
+  places,
+  selected,
+  selectedId,
+  from,
+  onSelect,
+}: {
+  readonly places: readonly Place[];
+  readonly selected: Place | undefined;
+  readonly selectedId: string | null;
+  readonly from: { readonly lat: number; readonly lng: number } | null;
+  readonly onSelect: (id: string) => void;
+}) {
+  const open = useSignal(false);
+  const km = selected === undefined || from === null ? null : distanceKm(from, selected);
+  return (
+    <section class={open.value ? 'map-sheet is-open' : 'map-sheet'} aria-labelledby="places-title">
+      <button
+        type="button"
+        class="map-sheet__handle"
+        aria-expanded={open.value}
+        aria-controls="map-sheet-body"
+        onClick={() => {
+          open.value = !open.value;
+        }}
+      >
+        <span class="map-sheet__grip" aria-hidden="true" />
+        <span id="places-title" class="map-sheet__title">
+          {t('map.places.title')}
+        </span>
+        <span class="place-chip__count">{t('map.places.count', { n: places.length })}</span>
+        <Icon name="chevron" size={20} />
+      </button>
+      {selected === undefined ? null : (
+        <div class="map-sheet__selected" role="status">
+          <span class={`map-pin map-pin--${selected.category} map-pin--legend`} aria-hidden="true">
+            <Icon name={PLACE_ICON[selected.category]} size={18} />
+          </span>
+          <div class="place-card__text">
+            <p class="map-sheet__name">{placeName(selected)}</p>
+            <p class="card__meta">
+              {t('map.places.selected')} · {t(CATEGORY_KEY[selected.category])}
+              {km === null ? '' : ' · ' + t('map.places.away', { km: km.toFixed(1) })}
+            </p>
+          </div>
+        </div>
+      )}
+      <div id="map-sheet-body" hidden={!open.value}>
+        <PlaceList
+          places={places}
+          selectedId={selectedId}
+          from={from}
+          onSelect={(id) => {
+            onSelect(id);
+            open.value = false;
+          }}
+        />
+      </div>
     </section>
   );
 }
@@ -296,52 +364,63 @@ export default function MapScreen() {
   return (
     <>
       <ScreenHeader titleKey="module.map.title" subtitleKey="module.map.subtitle" />
-      <PrototypeBanner />
-      <p class="state-line" role="status">
-        <span class="state-line__dot" aria-hidden="true" />
-        {t('map.sharing.off')}
-      </p>
-      {LiveMap !== null && places.value.length > 0 ? (
-        <CategoryChips
-          filter={filter.value}
-          places={places.value}
-          onChange={(next) => {
-            filter.value = next;
-            selectedId.value = null;
-          }}
-        />
-      ) : null}
       {LiveMap === null ? (
-        <Schematic />
+        <>
+          <PrototypeBanner />
+          <p class="state-line" role="status">
+            <span class="state-line__dot" aria-hidden="true" />
+            {t('map.sharing.off')}
+          </p>
+          <Schematic />
+        </>
       ) : (
         <>
-          <LiveMap
-            flavor={flavorFor(theme.value)}
-            position={position}
-            places={visible}
-            placeLabel={pinLabel}
-            selectedId={selectedId.value}
-            onSelect={(id) => {
-              selectedId.value = id;
-            }}
-            onOutside={(value) => {
-              outside.value = value;
-            }}
-          />
+          <div class="map-stage">
+            <LiveMap
+              flavor={flavorFor(theme.value)}
+              position={position}
+              places={visible}
+              placeLabel={pinLabel}
+              selectedId={selectedId.value}
+              onSelect={(id) => {
+                selectedId.value = id;
+              }}
+              onOutside={(value) => {
+                outside.value = value;
+              }}
+            />
+            {places.value.length > 0 ? (
+              <CategoryChips
+                filter={filter.value}
+                places={places.value}
+                onChange={(next) => {
+                  filter.value = next;
+                  selectedId.value = null;
+                }}
+              />
+            ) : null}
+            {FLAGS.geolocation ? <LocateFab /> : null}
+          </div>
+          {places.value.length > 0 ? (
+            <MapSheet
+              places={visible}
+              selected={places.value.find((place) => place.id === selectedId.value)}
+              selectedId={selectedId.value}
+              from={position !== null && !outside.value ? position : null}
+              onSelect={(id) => {
+                selectedId.value = id;
+              }}
+            />
+          ) : null}
           <p class="note">{t('map.live.area')}</p>
+          <PrototypeBanner />
+          <p class="state-line" role="status">
+            <span class="state-line__dot" aria-hidden="true" />
+            {t('map.sharing.off')}
+          </p>
         </>
       )}
       {FLAGS.geolocation ? <LocateControl outside={outside.value} /> : null}
-      {LiveMap !== null && places.value.length > 0 ? (
-        <PlaceList
-          places={visible}
-          selectedId={selectedId.value}
-          from={position !== null && !outside.value ? position : null}
-          onSelect={(id) => {
-            selectedId.value = id;
-          }}
-        />
-      ) : null}
       <a
         class="card link-card"
         href={osmSearchUrl('Rajahmundry, Andhra Pradesh')}
