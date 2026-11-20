@@ -1,4 +1,9 @@
-import { googleKeyFetcher, verifyGoogleIdToken, type KeyFetcher } from '../security/googleIdToken';
+import {
+  googleKeyFetcher,
+  lastRejection,
+  verifyGoogleIdToken,
+  type KeyFetcher,
+} from '../security/googleIdToken';
 import {
   AUTH_WINDOW_SECONDS,
   memoryRateLimiter,
@@ -49,6 +54,8 @@ export interface AuthDeps {
   readonly getKeys?: KeyFetcher;
   readonly nowSeconds?: () => number;
   readonly limiter?: RateLimiter;
+  /** TEMPORARY (remove): adds an X-Auth-Debug reason header on rejected tokens. */
+  readonly debug?: boolean;
 }
 
 const defaultLimiter = memoryRateLimiter();
@@ -101,7 +108,9 @@ async function signIn(request: Request, deps: AuthDeps, now: number): Promise<Re
     getKeys: deps.getKeys ?? googleKeyFetcher(() => Math.floor(Date.now() / 1000)),
     ...(expectedNonce === undefined ? {} : { expectedNonce }),
   });
-  if (user === null) return fail(401, 'invalid_token');
+  if (user === null) {
+    return fail(401, 'invalid_token', deps.debug === true ? { 'X-Auth-Debug': lastRejection } : {});
+  }
 
   const headers = new Headers(NO_STORE);
   if (remembered) {

@@ -19,6 +19,8 @@ export interface Env {
   DEVICE_LOCATION?: string;
   /** Worker secret that signs the sign-in cookie. Without it the person is signed in for one page view only. */
   SESSION_SECRET?: string;
+  /** TEMPORARY (remove): staging-only sign-in diagnostic. */
+  AUTH_DEBUG?: string;
   /** Optional Workers rate-limit binding for /api/auth/*; without it a per-isolate limiter applies. */
   AUTH_RATE_LIMIT?: RateLimitBinding;
 }
@@ -28,6 +30,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     return handleAuth(request, {
       clientId: env.GOOGLE_CLIENT_ID,
       sessionSecret: env.SESSION_SECRET,
+      debug: env.AUTH_DEBUG === '1',
       ...(env.AUTH_RATE_LIMIT === undefined
         ? {}
         : { limiter: bindingRateLimiter(env.AUTH_RATE_LIMIT) }),

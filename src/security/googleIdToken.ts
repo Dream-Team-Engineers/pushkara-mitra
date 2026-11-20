@@ -66,21 +66,28 @@ function parseJson(bytes: Uint8Array): Record<string, unknown> | null {
 }
 
 /** Returns the signed-in person, or null for any token that must not authenticate. */
+/** TEMPORARY staging diagnostic (remove): which check rejected the last token. */
+export let lastRejection = '';
+function rejected(code: string): null {
+  lastRejection = code;
+  return null;
+}
+
 export async function verifyGoogleIdToken(
   token: string,
   options: VerifyOptions,
 ): Promise<GoogleUser | null> {
   try {
     if (options.clientId === '' || token.length === 0 || token.length > MAX_TOKEN_LENGTH) {
-      return null;
+      return rejected('r1');
     }
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) return rejected('r2');
     const [headerPart, payloadPart, signaturePart] = parts as [string, string, string];
 
     const header = parseJson(base64UrlToBytes(headerPart));
     if (header === null || header['alg'] !== 'RS256' || typeof header['kid'] !== 'string') {
-      return null;
+      return rejected('r3');
     }
 
     const jwk = (await options.getKeys(header['kid'])).find(
@@ -90,7 +97,7 @@ export async function verifyGoogleIdToken(
         key.n !== undefined &&
         key.e !== undefined,
     );
-    if (jwk?.n === undefined || jwk.e === undefined) return null;
+    if (jwk?.n === undefined || jwk.e === undefined) return rejected('r4');
 
     const publicKey = await crypto.subtle.importKey(
       'jwk',
@@ -106,25 +113,29 @@ export async function verifyGoogleIdToken(
       base64UrlToBytes(signaturePart),
       signed,
     );
-    if (!valid) return null;
+    if (!valid) return rejected('r5');
 
     const claims = parseJson(base64UrlToBytes(payloadPart));
-    if (claims === null) return null;
+    if (claims === null) return rejected('r6');
     const { iss, aud, exp, iat, sub, nonce, email, email_verified: emailVerified, name } = claims;
-    if (typeof iss !== 'string' || !ISSUERS.includes(iss)) return null;
-    if (aud !== options.clientId) return null;
-    if (typeof exp !== 'number' || exp <= options.nowSeconds - CLOCK_SKEW_SECONDS) return null;
-    if (typeof iat === 'number' && iat > options.nowSeconds + CLOCK_SKEW_SECONDS) return null;
-    if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) return null;
-    if (options.expectedNonce !== undefined && nonce !== options.expectedNonce) return null;
-    if (typeof email !== 'string' || email.length === 0 || email.length > 320) return null;
-    if (emailVerified !== true) return null;
+    if (typeof iss !== 'string' || !ISSUERS.includes(iss)) return rejected('r7');
+    if (aud !== options.clientId) return rejected('r8');
+    if (typeof exp !== 'number' || exp <= options.nowSeconds - CLOCK_SKEW_SECONDS)
+      return rejected('r9');
+    if (typeof iat === 'number' && iat > options.nowSeconds + CLOCK_SKEW_SECONDS)
+      return rejected('r10');
+    if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) return rejected('r11');
+    if (options.expectedNonce !== undefined && nonce !== options.expectedNonce)
+      return rejected('r12');
+    if (typeof email !== 'string' || email.length === 0 || email.length > 320)
+      return rejected('r13');
+    if (emailVerified !== true) return rejected('r14');
 
     const display =
       typeof name === 'string' && name.trim() !== '' ? name.trim() : email.split('@')[0];
     return { sub, name: (display ?? email).slice(0, 80), email };
   } catch {
-    return null;
+    return rejected('r15');
   }
 }
 
