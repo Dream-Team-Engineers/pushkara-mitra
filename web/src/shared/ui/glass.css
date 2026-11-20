@@ -666,12 +666,18 @@ main > a.link-card {
   position: relative;
 }
 
+.map-stage {
+  margin: var(--space-3) var(--space-3) 0;
+}
+
 .map-stage .live-map {
-  height: min(68dvh, 36rem);
-  min-height: 22rem;
+  height: min(60dvh, 34rem);
+  min-height: 20rem;
   margin: 0;
-  border-width: 0;
-  border-radius: 0 0 28px 28px;
+  border: 2px solid var(--glass-edge, var(--line-strong));
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
 }
 
 .map-stage .place-chips {
@@ -755,8 +761,8 @@ main > a.link-card {
 .map-sheet {
   position: relative;
   z-index: 4;
-  margin: -1.75rem var(--space-3) 0;
-  padding: var(--space-2) var(--space-4) var(--space-4);
+  margin: var(--space-3) var(--space-3) 0;
+  padding: var(--space-1) var(--space-4) var(--space-3);
   background: var(--glass-card);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
@@ -771,7 +777,7 @@ main > a.link-card {
   gap: var(--space-2);
   width: 100%;
   min-height: var(--target-min);
-  padding: var(--space-3) 0 var(--space-2);
+  padding: var(--space-2) 0;
   background: transparent;
   color: var(--text);
   border: 0;
@@ -782,13 +788,7 @@ main > a.link-card {
 }
 
 .map-sheet__grip {
-  flex-basis: 100%;
-  width: 2.5rem;
-  height: 0.3rem;
-  margin-inline: auto;
-  background: var(--line-strong);
-  border-radius: 999px;
-  opacity: 0.55;
+  display: none;
 }
 
 .map-sheet__title {
@@ -890,4 +890,68 @@ main > a.link-card {
 .member-add__row input {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* Ghat cards: crowd (bottom left) and traffic (bottom right) heat bars */
+.meter-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--line);
+}
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.meter:last-child {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.meter__label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meter__bars {
+  display: flex;
+  gap: 3px;
+}
+
+.meter__bar {
+  width: 1.5rem;
+  height: 0.5rem;
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.meter--low .meter__bar.is-on {
+  background: #2e8b57;
+}
+
+.meter--moderate .meter__bar.is-on {
+  background: #e0a526;
+}
+
+.meter--high .meter__bar.is-on {
+  background: var(--danger);
+}
+
+.meter__text {
+  font-size: var(--text-caption);
+  font-weight: 700;
+}
+
+.meter--noData .meter__text {
+  color: var(--text-muted);
+  font-weight: 600;
 }

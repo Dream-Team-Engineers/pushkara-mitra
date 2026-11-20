@@ -1,7 +1,6 @@
 import { crowdResource } from '../../shared/data/resources';
 import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
-import { CrowdChip } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
 import { SourceStamp } from '../../shared/ui/Status';
@@ -12,6 +11,31 @@ const TILES: readonly { readonly id: string; readonly title: MessageKey }[] = [
   { id: 'stay', title: 'conditions.stay' },
   { id: 'parking', title: 'conditions.parking' },
 ];
+
+type Level = 'low' | 'moderate' | 'high' | 'noData';
+const LEVEL_TEXT = {
+  low: 'crowd.low',
+  moderate: 'crowd.moderate',
+  high: 'crowd.high',
+  noData: 'crowd.noData',
+} as const satisfies Record<Level, MessageKey>;
+const LEVEL_BARS: Readonly<Record<Level, number>> = { low: 1, moderate: 2, high: 3, noData: 0 };
+
+/** A small heat bar (3 steps) with its name and the level in words, so colour is never the only signal. */
+function Meter({ label, level }: { readonly label: MessageKey; readonly level: Level }) {
+  const bars = LEVEL_BARS[level];
+  return (
+    <div class={'meter meter--' + level}>
+      <span class="meter__label">{t(label)}</span>
+      <span class="meter__bars" aria-hidden="true">
+        {[1, 2, 3].map((step) => (
+          <span key={step} class={step <= bars ? 'meter__bar is-on' : 'meter__bar'} />
+        ))}
+      </span>
+      <span class="meter__text">{t(LEVEL_TEXT[level])}</span>
+    </div>
+  );
+}
 
 /**
  * No real feed is connected, so the tiles say "no data" instead of showing placeholder numbers
@@ -32,11 +56,13 @@ export default function ConditionsScreen() {
             <ul class="card-list">
               {items.map((ghat) => (
                 <li key={ghat.id} class="card">
-                  <div class="card__head">
-                    <h3 class="card__title">{ghat.name}</h3>
-                    <CrowdChip level={ghat.crowd} />
-                  </div>
+                  <h3 class="card__title">{ghat.name}</h3>
                   <SourceStamp meta={ghat} />
+                  <div class="meter-row">
+                    <Meter label="meter.crowd" level={ghat.crowd} />
+                    {/* No traffic feed exists yet: always "No data", never a made-up level. */}
+                    <Meter label="meter.traffic" level="noData" />
+                  </div>
                 </li>
               ))}
             </ul>

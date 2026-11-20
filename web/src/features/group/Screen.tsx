@@ -1,6 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
+import { user } from '../../shared/auth/google';
 import { formatNumber, t } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
@@ -226,50 +227,60 @@ export default function GroupScreen() {
             </li>
           ))}
         </ul>
-        <div class="field member-add">
-          <label for="member-name">
-            <Bi k="group.add.label" />
-          </label>
-          <div class="member-add__row">
-            <input
-              id="member-name"
-              type="text"
-              autocomplete="off"
-              maxLength={40}
-              value={newName.value}
-              aria-invalid={addError.value !== null}
-              aria-describedby={addError.value === null ? undefined : 'member-add-error'}
-              onInput={(event) => {
-                newName.value = event.currentTarget.value;
-                addError.value = null;
-              }}
-            />
-            <button
-              type="button"
-              class="button"
-              onClick={() => {
-                const result = addMember(members.value, newName.value, `m${String(nextId.value)}`);
-                if (result.ok) {
-                  members.value = result.members;
-                  nextId.value += 1;
-                  newName.value = '';
+        {user.value === null ? (
+          <p class="notice member-add">
+            {t('group.add.signin')} <a href={hrefFor('pass')}>{t('nav.me')}</a>
+          </p>
+        ) : (
+          <div class="field member-add">
+            <label for="member-name">
+              <Bi k="group.add.label" />
+            </label>
+            <div class="member-add__row">
+              <input
+                id="member-name"
+                type="text"
+                autocomplete="off"
+                maxLength={40}
+                value={newName.value}
+                aria-invalid={addError.value !== null}
+                aria-describedby={addError.value === null ? undefined : 'member-add-error'}
+                onInput={(event) => {
+                  newName.value = event.currentTarget.value;
                   addError.value = null;
-                } else {
-                  addError.value = result.error;
-                }
-              }}
-            >
-              {t('group.add.button')}
-            </button>
+                }}
+              />
+              <button
+                type="button"
+                class="button"
+                onClick={() => {
+                  const result = addMember(
+                    members.value,
+                    newName.value,
+                    `m${String(nextId.value)}`,
+                  );
+                  if (result.ok) {
+                    members.value = result.members;
+                    nextId.value += 1;
+                    newName.value = '';
+                    addError.value = null;
+                  } else {
+                    addError.value = result.error;
+                  }
+                }}
+              >
+                {t('group.add.button')}
+              </button>
+            </div>
+            {addError.value === null ? null : (
+              <p id="member-add-error" class="notice" role="alert">
+                {addError.value === 'full'
+                  ? t('group.add.full', { max: formatNumber(MAX_MEMBERS) })
+                  : t(addError.value === 'empty' ? 'group.add.empty' : 'group.add.duplicate')}
+              </p>
+            )}
           </div>
-          {addError.value === null ? null : (
-            <p id="member-add-error" class="notice" role="alert">
-              {addError.value === 'full'
-                ? t('group.add.full', { max: formatNumber(MAX_MEMBERS) })
-                : t(addError.value === 'empty' ? 'group.add.empty' : 'group.add.duplicate')}
-            </p>
-          )}
-        </div>
+        )}
       </section>
       <section class="section" aria-labelledby="share-title">
         <h2 id="share-title" class="section__title">
