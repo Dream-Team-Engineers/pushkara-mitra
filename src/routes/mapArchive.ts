@@ -5,8 +5,11 @@
  * with HTTP range requests, but static-asset serving does not always honour them, so the Worker
  * answers ranges itself by slicing the file. The bytes are public map data (OpenStreetMap, ODbL):
  * nothing about the visitor is read, stored or logged, and the cached copy holds only that file.
- * Files up to 25 MiB are supported, the static-asset limit.
+ * Files up to 25 MiB are supported from static assets. A larger archive (a whole country) lives in
+ * an R2 bucket bound as MAP_TILES under the key below; R2 answers byte ranges itself, so only the
+ * requested slice is read. Without the binding, or without that object, the static file is used.
  */
+export const MAP_ARCHIVE_KEY = 'map.pmtiles';
 export const MAP_ARCHIVE_PATH = '/maps/godavari.pmtiles';
 const MAX_BYTES = 25 * 1024 * 1024;
 const CACHE_CONTROL = 'public, max-age=86400';
@@ -42,7 +45,56 @@ export function parseRange(
   return start > end || start >= size ? 'invalid' : [start, end];
 }
 
-export async function handleMapArchive(request: Request, assets: Fetcher): Promise<Response> {
+const R2_HEADERS = {
+  'Content-Type': 'application/octet-stream',
+  'Accept-Ranges': 'bytes',
+  'Cache-Control': CACHE_CONTROL,
+};
+
+/** Serves the archive from R2. Null when the object does not exist, so the caller can fall back. */
+async function fromBucket(request: Request, bucket: R2Bucket): Promise<Response | null> {
+  const head = await bucket.head(MAP_ARCHIVE_KEY);
+  if (head === null) return null;
+  const size = head.size;
+  const range = parseRange(request.headers.get('Range'), size);
+  if (range === 'invalid') {
+    return new Response(null, {
+      status: 416,
+      headers: { ...R2_HEADERS, 'Content-Range': `bytes */${String(size)}` },
+    });
+  }
+  if (request.method === 'HEAD') {
+    return new Response(null, { headers: { ...R2_HEADERS, 'Content-Length': String(size) } });
+  }
+  if (range === null) {
+    const whole = await bucket.get(MAP_ARCHIVE_KEY);
+    if (whole === null) return null;
+    return new Response(whole.body, { headers: { ...R2_HEADERS, 'Content-Length': String(size) } });
+  }
+  const [start, end] = range;
+  const part = await bucket.get(MAP_ARCHIVE_KEY, {
+    range: { offset: start, length: end - start + 1 },
+  });
+  if (part === null) return null;
+  return new Response(part.body, {
+    status: 206,
+    headers: {
+      ...R2_HEADERS,
+      'Content-Range': `bytes ${String(start)}-${String(end)}/${String(size)}`,
+      'Content-Length': String(end - start + 1),
+    },
+  });
+}
+
+export async function handleMapArchive(
+  request: Request,
+  assets: Fetcher,
+  bucket?: R2Bucket,
+): Promise<Response> {
+  if (bucket !== undefined) {
+    const served = await fromBucket(request, bucket);
+    if (served !== null) return served;
+  }
   const url = new URL(request.url);
   cached ??= load(assets, url.origin).catch(() => null);
   const file = await cached;

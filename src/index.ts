@@ -12,6 +12,8 @@ export { GroupLocation };
 export interface Env {
   ASSETS?: Fetcher;
   GROUP_LOCATION?: DurableObjectNamespace;
+  /** Optional R2 bucket holding the large map archive (a whole country). Falls back to the static file. */
+  MAP_TILES?: R2Bucket;
   LOCAL_SYNTHETIC_DEMO?: string;
   /** Public Google OAuth client ID. Set only where Google sign-in is switched on (staging first). */
   GOOGLE_CLIENT_ID?: string;
@@ -101,7 +103,7 @@ async function route(request: Request, env: Env): Promise<Response> {
   }
 
   if (pathname === MAP_ARCHIVE_PATH && env.ASSETS) {
-    return handleMapArchive(request, env.ASSETS);
+    return handleMapArchive(request, env.ASSETS, env.MAP_TILES);
   }
 
   // Retina sprites are named like `light@2x.json`; asking for the canonical `%40` form avoids a
