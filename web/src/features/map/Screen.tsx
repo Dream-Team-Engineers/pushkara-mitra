@@ -327,6 +327,8 @@ function Schematic() {
 
 export default function MapScreen() {
   const live = useSignal<ComponentType<LiveMapProps> | null>(null);
+  // 'pending' until we know whether the real map can load, so the schematic sample is not flashed first.
+  const phase = useSignal<'pending' | 'fallback'>('pending');
   const outside = useSignal(false);
   const places = useSignal<readonly Place[]>([]);
   const filter = useSignal<Filter>('all');
@@ -339,12 +341,17 @@ export default function MapScreen() {
       if (isMounted()) places.value = list;
     });
     void tilesAvailable().then(async (ok) => {
-      if (!ok || !isMounted()) return;
+      if (!isMounted()) return;
+      if (!ok) {
+        phase.value = 'fallback';
+        return;
+      }
       try {
         const module = await import('./LiveMap');
         if (isMounted()) live.value = module.LiveMap;
       } catch {
-        // The schematic stays; the map is an enhancement.
+        // The schematic is shown; the map is an enhancement.
+        if (isMounted()) phase.value = 'fallback';
       }
     });
     return () => {
@@ -365,14 +372,15 @@ export default function MapScreen() {
     <>
       <ScreenHeader titleKey="module.map.title" subtitleKey="module.map.subtitle" />
       {LiveMap === null ? (
-        <>
+        <div class={phase.value === 'pending' ? 'map-pending' : undefined}>
+          {phase.value === 'pending' ? <div class="map-skeleton" aria-hidden="true" /> : null}
           <PrototypeBanner />
           <p class="state-line" role="status">
             <span class="state-line__dot" aria-hidden="true" />
             {t('map.sharing.off')}
           </p>
           <Schematic />
-        </>
+        </div>
       ) : (
         <>
           <div class="map-stage">

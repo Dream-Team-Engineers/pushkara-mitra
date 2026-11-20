@@ -955,3 +955,86 @@ main > a.link-card {
   color: var(--text-muted);
   font-weight: 600;
 }
+
+/* Map screen: while we find out whether the real map can load, show a quiet placeholder, not the sample */
+.map-pending {
+  position: relative;
+}
+
+.map-pending > :not(.map-skeleton) {
+  visibility: hidden;
+}
+
+.map-skeleton {
+  position: absolute;
+  inset: var(--space-3) var(--space-3) auto;
+  height: min(60dvh, 34rem);
+  min-height: 20rem;
+  background: var(--glass-card);
+  border: 2px solid var(--glass-edge, var(--line-strong));
+  border-radius: 24px;
+  animation: map-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes map-skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-skeleton {
+    animation: none;
+  }
+}
+
+/* The Sign in placeholder has the same size and shape as Google's own button, so nothing jumps when it appears */
+.google-placeholder,
+.google-slot {
+  width: min(100%, 17.5rem);
+  min-height: 2.5rem;
+}
+
+.google-placeholder {
+  justify-content: center;
+  padding: 0 var(--space-4);
+  background: #fff;
+  color: var(--text-muted);
+  border: 1px solid #dadce0;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Smaller icons throughout (about half the earlier size) */
+.qcard__icon,
+.link-card__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 10px;
+}
+
+.qcard__icon svg,
+.link-card__icon svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.bottom-bar a {
+  min-height: 3rem;
+  font-size: 0.6875rem;
+}
+
+.bottom-bar a svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.account-link svg,
+.back-link svg,
+.proto-banner svg,
+.button svg {
+  width: 1rem;
+  height: 1rem;
+}

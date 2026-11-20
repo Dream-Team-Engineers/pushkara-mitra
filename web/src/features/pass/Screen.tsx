@@ -145,8 +145,8 @@ export default function MeScreen() {
         {live && ready ? (
           <div class="google-slot" ref={slot} />
         ) : (
-          <button type="button" class="button" disabled>
-            <Icon name="lock" size={20} />
+          <button type="button" class="button google-placeholder" disabled>
+            <Icon name="lock" size={16} />
             <Bi k="account.signin" />
           </button>
         )}
