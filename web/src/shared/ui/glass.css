@@ -332,16 +332,9 @@ main {
 }
 
 .bottom-bar a.is-danger {
-  min-height: 4.25rem;
-  margin-block-start: -1.1rem;
-  background: var(--danger-fill);
-  color: var(--on-danger);
-  border-radius: 22px;
-  box-shadow: 0 8px 18px rgb(180 35 24 / 0.4);
-}
-
-[data-theme='outdoor'] .bottom-bar a.is-danger {
-  box-shadow: none;
+  background: transparent;
+  color: var(--danger);
+  font-weight: 700;
 }
 
 /* Language sheet */

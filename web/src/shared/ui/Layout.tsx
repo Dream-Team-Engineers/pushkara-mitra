@@ -18,7 +18,7 @@ export function AppHeader() {
           {user.value === null || user.value.name === '' ? (
             <>
               <Icon name="group" size={20} />
-              <span>{t('account.header')}</span>
+              <span>{t(user.value === null ? 'account.header' : 'account.signedIn')}</span>
             </>
           ) : (
             <>

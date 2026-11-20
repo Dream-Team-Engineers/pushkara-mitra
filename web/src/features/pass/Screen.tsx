@@ -36,7 +36,7 @@ function SignedIn() {
         )}
       </span>
       <div class="account-card__text">
-        <h2 id="account-name">{person.name === '' ? t('account.header') : person.name}</h2>
+        <h2 id="account-name">{person.name === '' ? t('account.signedIn') : person.name}</h2>
         {person.email === '' ? null : <p class="card__meta">{person.email}</p>}
       </div>
       <button

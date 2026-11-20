@@ -236,6 +236,7 @@
     "partners.name.label": "Name or business",
     "account.signin": "Sign in with Google",
     "account.header": "Sign in",
+    "account.signedIn": "You are signed in",
     "account.intro": "Sign in with the Google account on your phone, the one you use for the Play Store. No password and no OTP.",
     "account.age.legend": "Your age",
     "account.age.adult": "I am 18 or older",

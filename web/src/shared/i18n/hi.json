@@ -236,6 +236,7 @@
     "partners.name.label": "नाम / व्यवसाय",
     "account.signin": "Google से साइन इन करें",
     "account.header": "साइन इन",
+    "account.signedIn": "आप साइन इन हैं",
     "account.intro": "अपने फ़ोन के Google खाते से (जो प्ले स्टोर के लिए उपयोग होता है) साइन इन करें। न पासवर्ड, न OTP।",
     "account.age.legend": "आपकी आयु",
     "account.age.adult": "मेरी आयु 18 वर्ष या अधिक है",
