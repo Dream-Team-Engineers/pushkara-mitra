@@ -213,6 +213,8 @@
     "map.places.filter": "Choose which places to show",
     "map.places.unverified": "Unverified: taken from OpenStreetMap and not yet checked by the organisers. Do not rely on it for ghat timings or safety.",
     "map.places.show": "Show on map",
+    "map.places.approx": "Approximate position: the exact ghat is not yet confirmed.",
+    "map.places.outside": "Open on OpenStreetMap",
     "map.places.more": "Show more",
     "map.places.empty": "No places to show yet.",
     "map.places.away": "{km} km away",

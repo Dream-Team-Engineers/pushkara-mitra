@@ -1,0 +1,93 @@
+{
+  "source": "Owner list of Godavari Pushkaralu ghats (2026-11-20). Coordinates are the owner's own readings or OpenStreetMap, none surveyed. NEEDS REVIEW (O7).",
+  "ghats": [
+    {
+      "name": "Pushkar Ghat",
+      "area": "Rajamahendravaram",
+      "lat": 17.00841,
+      "lng": 81.76695,
+      "from": "osm",
+      "match": "Pushkar Ghat"
+    },
+    { "name": "Kotilingala Revu", "area": "Rajamahendravaram", "lat": 17.02239, "lng": 81.7841 },
+    {
+      "name": "Saraswati Ghat",
+      "area": "Rajamahendravaram",
+      "lat": 16.99483,
+      "lng": 81.77087,
+      "from": "osm",
+      "match": "Saraswathi Ghat"
+    },
+    {
+      "name": "Gowthami Ghat",
+      "area": "Rajamahendravaram",
+      "lat": 16.99,
+      "lng": 81.7833,
+      "approx": true
+    },
+    {
+      "name": "Tummalapalli Vari Revu",
+      "area": "Rajamahendravaram",
+      "lat": 16.9833,
+      "lng": 81.7833,
+      "approx": true
+    },
+    {
+      "name": "Sri Narasimha Nagar Ghat",
+      "area": "Rajamahendravaram",
+      "lat": 16.9833,
+      "lng": 81.7833,
+      "approx": true
+    },
+    { "name": "Dowleswaram Barrage Ghat", "area": "Dowleswaram", "lat": 16.9363, "lng": 81.762 },
+    {
+      "name": "Venkateswara Ghat",
+      "area": "Rajamahendravaram",
+      "lat": 16.9833,
+      "lng": 81.7833,
+      "approx": true
+    },
+    {
+      "name": "Goshpada Kshetram Ghat",
+      "area": "Kovvur",
+      "lat": 17.0167,
+      "lng": 81.7333,
+      "approx": true
+    },
+    {
+      "name": "Subrahmanyeswara Ghat",
+      "area": "Kovvur",
+      "lat": 17.0167,
+      "lng": 81.7333,
+      "approx": true
+    },
+    {
+      "name": "Nagareswaram Ghat",
+      "area": "Kovvur",
+      "lat": 17.0167,
+      "lng": 81.7333,
+      "approx": true
+    },
+    {
+      "name": "Seethanagaram Ghat",
+      "area": "Seethanagaram",
+      "lat": 17.1779,
+      "lng": 81.6932,
+      "approx": true
+    },
+    {
+      "name": "Antarvedi Ghat",
+      "area": "Antarvedi, Konaseema",
+      "lat": 16.3333,
+      "lng": 81.7333,
+      "approx": true
+    },
+    {
+      "name": "Bhadrachalam Ghat",
+      "area": "Bhadrachalam, Telangana",
+      "lat": 17.6666,
+      "lng": 80.8797,
+      "approx": true
+    }
+  ]
+}

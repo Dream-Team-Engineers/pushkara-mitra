@@ -48,6 +48,7 @@ describe('frontend content guard', () => {
       'https://eastgodavari.ap.gov.in/cultural-tourism/',
       'https://en.wikipedia.org/wiki/Godavari_Pushkaram',
       'https://www.openstreetmap.org/search?query=',
+      'https://www.openstreetmap.org/?mlat=',
     ],
   };
 

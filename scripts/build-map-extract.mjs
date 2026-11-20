@@ -26,7 +26,7 @@ if (url === undefined || out === undefined) {
 }
 const MAX_ZOOM = Number(maxZoomArg ?? 15);
 /** west, south, east, north (degrees) */
-const BBOX = [81.62, 16.9, 81.92, 17.12];
+const BBOX = [81.6, 16.88, 81.95, 17.28];
 const CENTER = { lon: 81.7787, lat: 17.0005, zoom: 12 };
 
 const lon2x = (lon, z) => Math.floor(((lon + 180) / 360) * 2 ** z);

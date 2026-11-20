@@ -213,6 +213,8 @@
     "map.places.filter": "चुनें कौन-से स्थान दिखाने हैं",
     "map.places.unverified": "असत्यापित: OpenStreetMap से लिया गया है और आयोजकों ने अभी जाँचा नहीं है। घाट के समय या सुरक्षा के लिए इस पर भरोसा न करें।",
     "map.places.show": "नक्शे पर दिखाएँ",
+    "map.places.approx": "अनुमानित स्थान: घाट की सही जगह अभी पक्की नहीं है।",
+    "map.places.outside": "OpenStreetMap पर खोलें",
     "map.places.more": "और दिखाएँ",
     "map.places.empty": "अभी दिखाने के लिए कोई स्थान नहीं है।",
     "map.places.away": "{km} किमी दूर",

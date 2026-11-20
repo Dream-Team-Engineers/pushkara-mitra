@@ -213,6 +213,8 @@
     "map.places.filter": "ఏ ప్రదేశాలు చూపాలో ఎంచుకోండి",
     "map.places.unverified": "ధృవీకరించలేదు: OpenStreetMap నుండి తీసుకున్నది, నిర్వాహకులు ఇంకా తనిఖీ చేయలేదు. ఘాట్ సమయాలు లేదా భద్రత కోసం దీనిపై ఆధారపడకండి.",
     "map.places.show": "మ్యాప్‌లో చూపండి",
+    "map.places.approx": "సుమారు స్థానం: ఘాట్ ఖచ్చితమైన స్థానం ఇంకా నిర్ధారించబడలేదు.",
+    "map.places.outside": "OpenStreetMapలో తెరవండి",
     "map.places.more": "మరిన్ని చూపండి",
     "map.places.empty": "ఇంకా చూపడానికి ప్రదేశాలు లేవు.",
     "map.places.away": "{km} కి.మీ. దూరం",

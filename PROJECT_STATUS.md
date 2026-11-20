@@ -953,3 +953,10 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 3. Run Phase 3 (M0 issues). Run Phase 2 after ADR 0007 and the DEV2 and DEV3 usernames are settled.
 
 ---
+
+## Owner ghat list and wider map area (staging) — 2026-11-20
+
+- 14 ghats from the owner's list are now the `ghat` places (scripts/owner-ghats.json, merged by scripts/merge-owner-ghats.mjs after scripts/build-map-places.mjs). All are unverified. Entries whose coordinates are shared or town-level are flagged `approx` and say so on the card. Pushkar and Saraswati use the OpenStreetMap positions.
+- Map archive rebuilt for west 81.6, south 16.88, east 81.95, north 17.28 (4.2 MiB, still a static file; R2 not needed, not enabled). MAP_BOUNDS, build-map-extract.mjs and build-map-places.mjs share that box.
+- Antarvedi and Bhadrachalam are outside the box: listed with an "Open on OpenStreetMap" link, no pin.
+- Still open (O7): coordinates for Pattiseema, Purushottapatnam, Vangalapudi, Munikudali, Narasapuram; confirmed positions for the `approx` ghats; native review of the new Hindi/Telugu strings (O1). Legal sign-off not given for OSM data.

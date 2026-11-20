@@ -15,6 +15,10 @@ export interface Place {
   readonly name: string;
   readonly nameTe?: string;
   readonly nameHi?: string;
+  /** Town or area, e.g. "Kovvur". */
+  readonly area?: string;
+  /** True when the position is a town-level reading, not the ghat itself. */
+  readonly approx?: boolean;
   readonly lat: number;
   readonly lng: number;
 }
@@ -41,6 +45,7 @@ function parsePlace(raw: unknown): Place | null {
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
   const nameTe = text(row['nameTe']);
   const nameHi = text(row['nameHi']);
+  const area = text(row['area']);
   return {
     id,
     category,
@@ -49,6 +54,8 @@ function parsePlace(raw: unknown): Place | null {
     lng,
     ...(nameTe === undefined ? {} : { nameTe }),
     ...(nameHi === undefined ? {} : { nameHi }),
+    ...(area === undefined ? {} : { area }),
+    ...(row['approx'] === true ? { approx: true } : {}),
   };
 }
 

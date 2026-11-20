@@ -9,7 +9,7 @@ import {
   type Place,
   type PlaceCategory,
 } from '../../shared/data/places';
-import { osmSearchUrl } from '../../shared/data/sourceLinks';
+import { osmPointUrl, osmSearchUrl } from '../../shared/data/sourceLinks';
 import { FLAGS } from '../../shared/flags/flags';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import {
@@ -23,7 +23,7 @@ import { Icon } from '../../shared/ui/Icon';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 import { theme } from '../../shared/ui/theme';
 import type { LiveMapProps } from './LiveMap';
-import { flavorFor } from './mapStyle';
+import { flavorFor, MAP_BOUNDS } from './mapStyle';
 import { PLACE_ICON } from './placeIcons';
 
 /**
@@ -53,6 +53,12 @@ function placeName(place: Place): string {
   if (locale.value === 'te') return place.nameTe ?? place.name;
   if (locale.value === 'hi') return place.nameHi ?? place.name;
   return place.name;
+}
+
+/** True when the place lies inside the area covered by the map archive. */
+function onMap(place: Place): boolean {
+  const [west, south, east, north] = MAP_BOUNDS;
+  return place.lng >= west && place.lng <= east && place.lat >= south && place.lat <= north;
 }
 
 function pinLabel(place: Place): string {
@@ -154,19 +160,32 @@ function PlaceList({
               <p class="card__title">{placeName(place)}</p>
               <p class="card__meta">
                 {t(CATEGORY_KEY[place.category])}
+                {place.area === undefined ? '' : ' · ' + place.area}
                 {km === null ? '' : ' · ' + t('map.places.away', { km: km.toFixed(1) })}
               </p>
+              {place.approx === true ? <p class="card__meta">{t('map.places.approx')}</p> : null}
             </div>
-            <button
-              type="button"
-              class="button button--secondary place-card__show"
-              onClick={() => {
-                onSelect(place.id);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            >
-              {t('map.places.show')}
-            </button>
+            {onMap(place) ? (
+              <button
+                type="button"
+                class="button button--secondary place-card__show"
+                onClick={() => {
+                  onSelect(place.id);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                {t('map.places.show')}
+              </button>
+            ) : (
+              <a
+                class="button button--secondary place-card__show"
+                href={osmPointUrl(place.lat, place.lng)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('map.places.outside')}
+              </a>
+            )}
           </li>
         ))}
       </ul>
@@ -368,6 +387,8 @@ export default function MapScreen() {
       ? places.value
       : places.value.filter((place) => place.category === filter.value);
 
+  const visibleOnMap = visible.filter(onMap);
+
   return (
     <>
       <ScreenHeader titleKey="module.map.title" subtitleKey="module.map.subtitle" />
@@ -387,7 +408,7 @@ export default function MapScreen() {
             <LiveMap
               flavor={flavorFor(theme.value)}
               position={position}
-              places={visible}
+              places={visibleOnMap}
               placeLabel={pinLabel}
               selectedId={selectedId.value}
               onSelect={(id) => {

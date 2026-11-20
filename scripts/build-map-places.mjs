@@ -8,7 +8,7 @@ import { fileURLToPath, URL } from 'node:url';
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const output = resolve(root, 'web/public/maps/places.json');
 // Same box as MAP_BOUNDS in web/src/features/map/mapStyle.ts (west, south, east, north).
-const [west, south, east, north] = [81.62, 16.9, 81.92, 17.12];
+const [west, south, east, north] = [81.6, 16.88, 81.95, 17.28];
 const box = `${south},${west},${north},${east}`;
 const SERVERS = [
   'https://overpass-api.de/api/interpreter',

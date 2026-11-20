@@ -196,6 +196,13 @@ export const SIGNIFICANCE: readonly SignificanceNote[] = [
   },
 ];
 
+/** Link to one point on OpenStreetMap. Opens in a new tab; nothing is sent from here. */
+export function osmPointUrl(lat: number, lng: number): string {
+  const la = lat.toFixed(5);
+  const lo = lng.toFixed(5);
+  return 'https://www.openstreetmap.org/?mlat=' + la + '&mlon=' + lo + '#map=15/' + la + '/' + lo;
+}
+
 /** Search link into OpenStreetMap (open data, no key). Opens in a new tab; nothing is sent from here. */
 export function osmSearchUrl(query: string): string {
   return 'https://www.openstreetmap.org/search?query=' + encodeURIComponent(query);

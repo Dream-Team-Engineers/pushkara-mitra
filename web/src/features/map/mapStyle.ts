@@ -11,7 +11,7 @@ import { TILES_PATH } from '../../shared/data/mapArchive';
  *
  * Data: OpenStreetMap contributors (ODbL), via a Protomaps basemap build. Attribution is mandatory.
  */
-export const MAP_BOUNDS: readonly [number, number, number, number] = [81.62, 16.9, 81.92, 17.12];
+export const MAP_BOUNDS: readonly [number, number, number, number] = [81.6, 16.88, 81.95, 17.28];
 export const MAP_CENTER: readonly [number, number] = [81.7787, 17.0005];
 export const MAP_START_ZOOM = 12;
 /** Tiles end at zoom 15; the map zooms in further by enlarging them. */
