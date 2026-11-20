@@ -66,29 +66,21 @@ function parseJson(bytes: Uint8Array): Record<string, unknown> | null {
 }
 
 /** Returns the signed-in person, or null for any token that must not authenticate. */
-/** TEMPORARY staging diagnostic (remove): which check rejected the last token. */
-export let lastRejection = '';
-export let keyDiag = '';
-function rejected(code: string): null {
-  lastRejection = code;
-  return null;
-}
-
 export async function verifyGoogleIdToken(
   token: string,
   options: VerifyOptions,
 ): Promise<GoogleUser | null> {
   try {
     if (options.clientId === '' || token.length === 0 || token.length > MAX_TOKEN_LENGTH) {
-      return rejected('r1');
+      return null;
     }
     const parts = token.split('.');
-    if (parts.length !== 3) return rejected('r2');
+    if (parts.length !== 3) return null;
     const [headerPart, payloadPart, signaturePart] = parts as [string, string, string];
 
     const header = parseJson(base64UrlToBytes(headerPart));
     if (header === null || header['alg'] !== 'RS256' || typeof header['kid'] !== 'string') {
-      return rejected('r3');
+      return null;
     }
 
     const jwk = (await options.getKeys(header['kid'])).find(
@@ -98,7 +90,7 @@ export async function verifyGoogleIdToken(
         key.n !== undefined &&
         key.e !== undefined,
     );
-    if (jwk?.n === undefined || jwk.e === undefined) return rejected('r4');
+    if (jwk?.n === undefined || jwk.e === undefined) return null;
 
     const publicKey = await crypto.subtle.importKey(
       'jwk',
@@ -114,29 +106,25 @@ export async function verifyGoogleIdToken(
       base64UrlToBytes(signaturePart),
       signed,
     );
-    if (!valid) return rejected('r5');
+    if (!valid) return null;
 
     const claims = parseJson(base64UrlToBytes(payloadPart));
-    if (claims === null) return rejected('r6');
+    if (claims === null) return null;
     const { iss, aud, exp, iat, sub, nonce, email, email_verified: emailVerified, name } = claims;
-    if (typeof iss !== 'string' || !ISSUERS.includes(iss)) return rejected('r7');
-    if (aud !== options.clientId) return rejected('r8');
-    if (typeof exp !== 'number' || exp <= options.nowSeconds - CLOCK_SKEW_SECONDS)
-      return rejected('r9');
-    if (typeof iat === 'number' && iat > options.nowSeconds + CLOCK_SKEW_SECONDS)
-      return rejected('r10');
-    if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) return rejected('r11');
-    if (options.expectedNonce !== undefined && nonce !== options.expectedNonce)
-      return rejected('r12');
-    if (typeof email !== 'string' || email.length === 0 || email.length > 320)
-      return rejected('r13');
-    if (emailVerified !== true) return rejected('r14');
+    if (typeof iss !== 'string' || !ISSUERS.includes(iss)) return null;
+    if (aud !== options.clientId) return null;
+    if (typeof exp !== 'number' || exp <= options.nowSeconds - CLOCK_SKEW_SECONDS) return null;
+    if (typeof iat === 'number' && iat > options.nowSeconds + CLOCK_SKEW_SECONDS) return null;
+    if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) return null;
+    if (options.expectedNonce !== undefined && nonce !== options.expectedNonce) return null;
+    if (typeof email !== 'string' || email.length === 0 || email.length > 320) return null;
+    if (emailVerified !== true) return null;
 
     const display =
       typeof name === 'string' && name.trim() !== '' ? name.trim() : email.split('@')[0];
     return { sub, name: (display ?? email).slice(0, 80), email };
   } catch {
-    return rejected('r15');
+    return null;
   }
 }
 
@@ -161,7 +149,7 @@ function parseKeys(text: string): Jwk[] {
  * Fail closed (same policy as the disabled Access key source): keys are served only while younger than the TTL, so a
  * rotated or revoked key is never trusted past it, even when Google cannot be reached. An unknown `kid`
  * triggers at most one refetch per minimum interval, so forged key ids cannot make the Worker hammer
- * Google. The fetch has a timeout, no redirects and a body-size cap.
+ * Google. The fetch has a timeout, never follows redirects (Workers accept only follow or manual; a 3xx is not ok, so it is refused) and a body-size cap.
  */
 export function googleKeyFetcher(
   nowSeconds: () => number,
@@ -172,16 +160,13 @@ export function googleKeyFetcher(
     try {
       const response = await fetcher(GOOGLE_JWKS_URL, {
         headers: { Accept: 'application/json' },
-        redirect: 'error',
+        redirect: 'manual',
         signal: AbortSignal.timeout(KEY_FETCH_TIMEOUT_MS),
       });
-      keyDiag = 'http' + String(response.status);
       if (!response.ok) return;
       cachedKeys = parseKeys(await response.text());
       cachedAt = now;
-      keyDiag = 'ok' + String(cachedKeys.length);
-    } catch (error) {
-      keyDiag = `err:${error instanceof Error ? error.name + ':' + error.message.slice(0, 60) : 'x'}`;
+    } catch {
       // Keep whatever is still within its TTL; nothing older is ever served.
     }
   }

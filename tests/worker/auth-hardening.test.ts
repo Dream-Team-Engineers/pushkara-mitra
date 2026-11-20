@@ -189,6 +189,18 @@ describe('H1: googleKeyFetcher', () => {
   const keysBody = (kid: string) => JSON.stringify({ keys: [{ ...jwk, kid }] });
   const asFetch = (fn: (url: string) => Promise<Response>) => fn as unknown as typeof fetch;
 
+  it('uses only fetch options Cloudflare Workers accept (redirect "error" threw on staging)', async () => {
+    resetKeyCache();
+    let redirect: unknown;
+    const getKeys = googleKeyFetcher(() => t0, ((_url: string, init?: RequestInit) => {
+      redirect = init?.redirect;
+      return Promise.resolve(new Response(keysBody('k1')));
+    }) as unknown as typeof fetch);
+    await getKeys('k1');
+    expect(['follow', 'manual']).toContain(redirect);
+    expect(redirect).toBe('manual');
+  });
+
   it('caches, refetches once for an unknown kid, then backs off', async () => {
     resetKeyCache();
     let now = t0;
