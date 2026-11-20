@@ -13,7 +13,7 @@ import { memoryRateLimiter } from '../../src/security/rateLimit';
 // contents, sub identity), M2 (nonce replay protection), M4 (Origin required).
 
 const CLIENT_ID = 'client-123.apps.googleusercontent.com';
-const SECRET = 'a-long-enough-secret-for-the-test-0123456789';
+const SECRET = 'test-only-session-secret-not-real';
 const NOW = 1_800_000_000;
 
 function b64url(input: string | Uint8Array): string {

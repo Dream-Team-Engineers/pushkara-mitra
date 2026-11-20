@@ -1,0 +1,2 @@
+# Test fixture in the history (replaced with an obviously fake value); not a credential.
+348e10aedd61ae854f29648785b150008bc16ce3:tests/worker/auth-hardening.test.ts:generic-api-key:16
