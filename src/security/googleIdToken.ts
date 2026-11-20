@@ -175,11 +175,11 @@ export function googleKeyFetcher(
         redirect: 'error',
         signal: AbortSignal.timeout(KEY_FETCH_TIMEOUT_MS),
       });
-      keyDiag = `http${response.status}`;
+      keyDiag = 'http' + String(response.status);
       if (!response.ok) return;
       cachedKeys = parseKeys(await response.text());
       cachedAt = now;
-      keyDiag = `ok${cachedKeys.length}`;
+      keyDiag = 'ok' + String(cachedKeys.length);
     } catch (error) {
       keyDiag = `err:${error instanceof Error ? error.name + ':' + error.message.slice(0, 60) : 'x'}`;
       // Keep whatever is still within its TTL; nothing older is ever served.
