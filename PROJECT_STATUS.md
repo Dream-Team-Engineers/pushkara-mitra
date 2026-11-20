@@ -6,6 +6,24 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Day close and starting point for next session — 2026-11-20 22:10:00 IST
+
+- **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.
+- **State now:** `main` at `9bbbf82`, pushed; staging redeploys on every push (https://pushkara-mitra-staging.dreamteamtech.workers.dev). Production is **not deployed**. Last local `npm run check`: exit 0 (724 passed, 24 skipped, Prettier clean).
+- **Done today:** chips fit the phone width; header shows the name after refresh; Group starts as self plus two, add and remove, one person one group, sign-in needed to add; bordered map with the places strip below it; Crowd and Traffic meters on ghat cards ("No data", nothing invented); no schematic-map flash; Google-style sign-in placeholder; smaller icons; Worker can serve the map from an optional R2 bucket (not enabled, owner chose the free tier); map area widened; the owner's 14-ghat list added; zoom buttons moved below the chips; crowd-bar contrast fixed (moderate amber 3.79:1, outlined empty bars); launch-status document added (`docs/Pushkara_Mitra_Launch_Status.docx`).
+- **Owner confirmed on a phone (screenshot):** chips fit, border and strip fine, no flash, Crowd/Traffic present. The zoom-button fix (`1ae32f0`) and the contrast fix (`9bbbf82`) are **not yet confirmed on a device**.
+- **Not verified:** the launch-status .docx was never rendered (no LibreOffice here); contrast was checked by calculation, not on screen; no 200% text-size check; the 12px chip, language-button and bottom-bar text is below the 14px caption rule because of the fit-on-screen request.
+- **Starting point tomorrow:** (1) owner checks the map zoom buttons and the Conditions meters on staging; (2) A3, Telugu street labels on the map; (3) A2, privacy notice update for the name cookie and Google sign-in; (4) A9, offline map tiles; (5) finish A1 with a real-device pass in light, dark and outdoor themes and a 200% text-size check.
+- **Needs the owner:** coordinates for Pattiseema, Purushottapatnam, Vangalapudi, Munikudali, Narasapuram and exact positions for the 9 approximate ghats (O7); native review of Hindi and Telugu text (O1); a real-phone location test (O2); the version 1 scope decision (browse-only or including Group, SOS and Pass); counsel (OQ-024).
+- **Legal:** no sign-off given. Engineering readiness and legal sign-off are reported separately.
+
+## Owner ghat list and wider map area (staging) — 2026-11-20
+
+- 14 ghats from the owner's list are now the `ghat` places (scripts/owner-ghats.json, merged by scripts/merge-owner-ghats.mjs after scripts/build-map-places.mjs). All are unverified. Entries whose coordinates are shared or town-level are flagged `approx` and say so on the card. Pushkar and Saraswati use the OpenStreetMap positions.
+- Map archive rebuilt for west 81.6, south 16.88, east 81.95, north 17.28 (4.2 MiB, still a static file; R2 not needed, not enabled). MAP_BOUNDS, build-map-extract.mjs and build-map-places.mjs share that box.
+- Antarvedi and Bhadrachalam are outside the box: listed with an "Open on OpenStreetMap" link, no pin.
+- Still open (O7): coordinates for Pattiseema, Purushottapatnam, Vangalapudi, Munikudali, Narasapuram; confirmed positions for the `approx` ghats; native review of the new Hindi/Telugu strings (O1). Legal sign-off not given for OSM data.
+
 ## Map places: pins, category chips, list (staging) — 2026-11-20
 
 - **Task / outcome:** at the owner's request (a reference screenshot of another app's map) the Map screen now shows category chips (All, Ghats, Temples, Hospitals), a pin per place on the real map, the device position dot (unchanged), and below the map a legend, a list with name, category and distance (distance only while the device position is on) and a "Show on map" button. Pins are keyboard-focusable buttons.
@@ -951,12 +969,3 @@ Engineering readiness and legal sign-off are reported separately. Nothing here i
 1. Receive the V2 file.
 2. Decide how to fix the Release workflow, and the visibility question (ADR 0007).
 3. Run Phase 3 (M0 issues). Run Phase 2 after ADR 0007 and the DEV2 and DEV3 usernames are settled.
-
----
-
-## Owner ghat list and wider map area (staging) — 2026-11-20
-
-- 14 ghats from the owner's list are now the `ghat` places (scripts/owner-ghats.json, merged by scripts/merge-owner-ghats.mjs after scripts/build-map-places.mjs). All are unverified. Entries whose coordinates are shared or town-level are flagged `approx` and say so on the card. Pushkar and Saraswati use the OpenStreetMap positions.
-- Map archive rebuilt for west 81.6, south 16.88, east 81.95, north 17.28 (4.2 MiB, still a static file; R2 not needed, not enabled). MAP_BOUNDS, build-map-extract.mjs and build-map-places.mjs share that box.
-- Antarvedi and Bhadrachalam are outside the box: listed with an "Open on OpenStreetMap" link, no pin.
-- Still open (O7): coordinates for Pattiseema, Purushottapatnam, Vangalapudi, Munikudali, Narasapuram; confirmed positions for the `approx` ghats; native review of the new Hindi/Telugu strings (O1). Legal sign-off not given for OSM data.
