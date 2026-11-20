@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Map places: pins, category chips, list (staging) — 2026-11-20
+
+- **Task / outcome:** at the owner's request (a reference screenshot of another app's map) the Map screen now shows category chips (All, Ghats, Temples, Hospitals), a pin per place on the real map, the device position dot (unchanged), and below the map a legend, a list with name, category and distance (distance only while the device position is on) and a "Show on map" button. Pins are keyboard-focusable buttons.
+- **Data:** `scripts/build-map-places.mjs` queries OpenStreetMap via Overpass for the map area and writes `web/public/maps/places.json` (retrieved 2026-11-20): **3 ghats, 61 Hindu-tagged temples, 273 hospitals**. Every place is **unverified**; the screen says so. OpenStreetMap has very few ghats here (and one of the three is an organisation, not a ghat), so the ghat layer needs the owner's list (card O7) before it is useful. Hindi and Telugu names appear only where OpenStreetMap has them; the new Hindi and Telugu interface strings were written by the agent and need native review (card O1).
+- **Not done:** transport, parking and stay categories (not requested for v1); ghat coordinates from the owner; Telugu street labels on the map (A3).
+- **Legal / privacy:** no new personal data; the file is public map data under the ODbL (OQ-036 still covers the licence review). Legal sign-in: none given.
+- **Evidence:** `npm run check` exit 0 (719 passed, 24 skipped); `npm run build:web` succeeded.
+
 ## Session handover and job cards for 2026-11-20 — 2026-11-19
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.

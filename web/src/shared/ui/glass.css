@@ -536,3 +536,127 @@ main {
 main > a.link-card {
   margin: var(--space-3) var(--space-4) 0;
 }
+
+/* Map places: category chips, pins, legend and the list below the map. Drawn with classes only
+   (the page policy blocks inline style attributes). */
+.place-chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-2) var(--space-4) 0;
+  padding-block-end: var(--space-1);
+  overflow-x: auto;
+}
+
+.place-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-4);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.place-chip[aria-pressed='true'] {
+  background: var(--primary-fill);
+  color: var(--on-primary);
+  border-color: var(--primary-fill);
+}
+
+.place-chip__count {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+.place-chip[aria-pressed='true'] .place-chip__count {
+  color: var(--on-primary);
+}
+
+.map-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: #fff;
+  background: var(--primary-fill);
+  border: 2px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4);
+  cursor: pointer;
+  transform: rotate(-45deg);
+}
+
+.map-pin .icon {
+  transform: rotate(45deg);
+}
+
+.map-pin--ghat {
+  background: var(--primary-fill);
+}
+
+.map-pin--temple {
+  background: var(--accent-text);
+}
+
+.map-pin--hospital {
+  background: var(--danger-fill);
+}
+
+.map-pin.is-selected {
+  width: 2.5rem;
+  height: 2.5rem;
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.map-pin--legend {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  cursor: default;
+  transform: none;
+  border-radius: 50%;
+}
+
+.map-pin--legend .icon {
+  transform: none;
+}
+
+.legend--places {
+  flex-wrap: wrap;
+}
+
+.place-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.place-card.is-selected {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.place-card__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.place-card__show {
+  flex: none;
+  min-height: var(--target-min);
+}
+
+.map-pin-holder {
+  padding-block-end: 0.5rem;
+}

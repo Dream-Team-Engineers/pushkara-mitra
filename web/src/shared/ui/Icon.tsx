@@ -1,5 +1,6 @@
 /** Original line icons drawn for this app (24 x 24 grid, 2 px stroke). No third-party icon set. */
 export type IconName =
+  | 'hospital'
   | 'home'
   | 'pass'
   | 'group'
@@ -41,6 +42,7 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
     'M17 7a2.5 2.5 0 1 1 0 5',
     'M18 14.2c1.8.7 3 2.4 3 4.8',
   ],
+  hospital: ['M9 4h6v5h5v6h-5v5H9v-5H4V9h5z'],
   ghats: ['M3 20h4v-4h4v-4h4V8h6', 'M3 23h18'],
   map: [
     'M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11z',

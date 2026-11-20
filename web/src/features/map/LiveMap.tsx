@@ -9,7 +9,11 @@ import {
 import 'maplibre-gl/dist/maplibre-gl.css';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import { Protocol } from 'pmtiles';
+import { render } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
+import type { Place } from '../../shared/data/places';
+import { Icon } from '../../shared/ui/Icon';
+import { PLACE_ICON } from './placeIcons';
 import type { DevicePosition } from '../../shared/location/deviceLocation';
 import { t } from '../../shared/i18n/i18n';
 import {
@@ -46,12 +50,26 @@ export interface LiveMapProps {
   readonly flavor: MapFlavor;
   readonly position: DevicePosition | null;
   readonly onOutside: (outside: boolean) => void;
+  /** Pins to draw (already filtered by category) and the label for each pin. */
+  readonly places?: readonly Place[];
+  readonly placeLabel?: (place: Place) => string;
+  readonly selectedId?: string | null;
+  readonly onSelect?: (id: string) => void;
 }
 
-export function LiveMap({ flavor, position, onOutside }: LiveMapProps) {
+export function LiveMap({
+  flavor,
+  position,
+  onOutside,
+  places = [],
+  placeLabel = (place) => place.name,
+  selectedId = null,
+  onSelect,
+}: LiveMapProps) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<MapLibreMap | null>(null);
   const dot = useRef<Marker | null>(null);
+  const pins = useRef<Map<string, { marker: Marker; element: HTMLButtonElement }>>(new Map());
   const centred = useRef(false);
   const styledWith = useRef(flavor);
 
@@ -78,6 +96,8 @@ export function LiveMap({ flavor, position, onOutside }: LiveMapProps) {
     return () => {
       dot.current?.remove();
       dot.current = null;
+      for (const pin of pins.current.values()) pin.marker.remove();
+      pins.current.clear();
       instance.remove();
       map.current = null;
       centred.current = false;
@@ -126,6 +146,48 @@ export function LiveMap({ flavor, position, onOutside }: LiveMapProps) {
       });
     }
   }, [position, onOutside]);
+
+  useEffect(() => {
+    const instance = map.current;
+    if (instance === null) return;
+    for (const pin of pins.current.values()) pin.marker.remove();
+    pins.current.clear();
+    for (const place of places) {
+      const element = document.createElement('button');
+      element.type = 'button';
+      element.className = `map-pin map-pin--${place.category}`;
+      element.setAttribute('aria-label', placeLabel(place));
+      render(<Icon name={PLACE_ICON[place.category]} size={18} />, element);
+      element.addEventListener('click', () => {
+        onSelect?.(place.id);
+      });
+      const holder = document.createElement('div');
+      holder.className = 'map-pin-holder';
+      holder.append(element);
+      const marker = new Marker({ element: holder, anchor: 'bottom' })
+        .setLngLat([place.lng, place.lat])
+        .addTo(instance);
+      pins.current.set(place.id, { marker, element });
+    }
+    // placeLabel and onSelect are stable enough for a pin redraw only when the places change.
+  }, [places]);
+
+  useEffect(() => {
+    const instance = map.current;
+    for (const [id, pin] of pins.current) {
+      pin.element.classList.toggle('is-selected', id === selectedId);
+      if (id === selectedId) pin.element.setAttribute('aria-current', 'true');
+      else pin.element.removeAttribute('aria-current');
+    }
+    const place = places.find((candidate) => candidate.id === selectedId);
+    if (instance !== null && place !== undefined) {
+      instance.flyTo({
+        center: [place.lng, place.lat],
+        zoom: Math.max(instance.getZoom(), 15),
+      });
+    }
+    // Only a change of selection moves the map.
+  }, [selectedId, places]);
 
   return (
     <div

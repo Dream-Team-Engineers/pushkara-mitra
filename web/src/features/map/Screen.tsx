@@ -3,9 +3,15 @@ import type { ComponentType } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { hrefFor } from '../../app/router';
 import { tilesAvailable } from '../../shared/data/mapArchive';
+import {
+  loadPlaces,
+  PLACE_CATEGORIES,
+  type Place,
+  type PlaceCategory,
+} from '../../shared/data/places';
 import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { FLAGS } from '../../shared/flags/flags';
-import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import {
   deviceLocation,
   startDeviceLocation,
@@ -18,6 +24,7 @@ import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 import { theme } from '../../shared/ui/theme';
 import type { LiveMapProps } from './LiveMap';
 import { flavorFor } from './mapStyle';
+import { PLACE_ICON } from './placeIcons';
 
 /**
  * Maps (flag `liveMap` stays off: nobody else's position is shown). The base map is public: when
@@ -33,6 +40,156 @@ const FAILURE_TEXT = {
   timeout: 'map.locate.timeout',
   unsupported: 'map.locate.unsupported',
 } as const satisfies Record<LocationFailure, MessageKey>;
+
+type Filter = 'all' | PlaceCategory;
+const PAGE = 20;
+const CATEGORY_KEY = {
+  ghat: 'map.cat.ghat',
+  temple: 'map.cat.temple',
+  hospital: 'map.cat.hospital',
+} as const satisfies Record<PlaceCategory, MessageKey>;
+
+function placeName(place: Place): string {
+  if (locale.value === 'te') return place.nameTe ?? place.name;
+  if (locale.value === 'hi') return place.nameHi ?? place.name;
+  return place.name;
+}
+
+function pinLabel(place: Place): string {
+  return `${placeName(place)}, ${t(CATEGORY_KEY[place.category])}`;
+}
+
+/** Straight-line distance in km. Computed on this phone only, from a position that is never stored. */
+function distanceKm(
+  from: { readonly lat: number; readonly lng: number },
+  to: { readonly lat: number; readonly lng: number },
+): number {
+  const rad = Math.PI / 180;
+  const dLat = (to.lat - from.lat) * rad;
+  const dLng = (to.lng - from.lng) * rad;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(from.lat * rad) * Math.cos(to.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+function CategoryChips({
+  filter,
+  places,
+  onChange,
+}: {
+  readonly filter: Filter;
+  readonly places: readonly Place[];
+  readonly onChange: (next: Filter) => void;
+}) {
+  const options: readonly Filter[] = ['all', ...PLACE_CATEGORIES];
+  return (
+    <div class="place-chips" role="group" aria-label={t('map.places.filter')}>
+      {options.map((option) => {
+        const count =
+          option === 'all'
+            ? places.length
+            : places.filter((place) => place.category === option).length;
+        return (
+          <button
+            key={option}
+            type="button"
+            class="place-chip"
+            aria-pressed={filter === option}
+            onClick={() => {
+              onChange(option);
+            }}
+          >
+            {option === 'all' ? null : <Icon name={PLACE_ICON[option]} size={18} />}
+            <span>{t(option === 'all' ? 'map.cat.all' : CATEGORY_KEY[option])}</span>
+            <span class="place-chip__count">{count}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function PlaceList({
+  places,
+  selectedId,
+  from,
+  onSelect,
+}: {
+  readonly places: readonly Place[];
+  readonly selectedId: string | null;
+  readonly from: { readonly lat: number; readonly lng: number } | null;
+  readonly onSelect: (id: string) => void;
+}) {
+  const shown = useSignal(PAGE);
+  const sorted = [...places]
+    .map((place) => ({ place, km: from === null ? null : distanceKm(from, place) }))
+    .sort((a, b) =>
+      a.km !== null && b.km !== null ? a.km - b.km : a.place.name.localeCompare(b.place.name),
+    );
+  return (
+    <section class="section" aria-labelledby="places-title">
+      <h2 id="places-title" class="section__title">
+        {t('map.places.title')}{' '}
+        <span class="place-chip__count">{t('map.places.count', { n: places.length })}</span>
+      </h2>
+      <ul class="legend legend--places">
+        {PLACE_CATEGORIES.map((category) => (
+          <li key={category}>
+            <span class={`map-pin map-pin--${category} map-pin--legend`} aria-hidden="true">
+              <Icon name={PLACE_ICON[category]} size={16} />
+            </span>
+            {t(CATEGORY_KEY[category])}
+          </li>
+        ))}
+      </ul>
+      <p class="note">{t('map.places.unverified')}</p>
+      {sorted.length === 0 ? <p class="note">{t('map.places.empty')}</p> : null}
+      <ul class="card-list card-list--flush">
+        {sorted.slice(0, shown.value).map(({ place, km }) => (
+          <li
+            key={place.id}
+            class={place.id === selectedId ? 'card place-card is-selected' : 'card place-card'}
+          >
+            <span class={`map-pin map-pin--${place.category} map-pin--legend`} aria-hidden="true">
+              <Icon name={PLACE_ICON[place.category]} size={16} />
+            </span>
+            <div class="place-card__text">
+              <p class="card__title">{placeName(place)}</p>
+              <p class="card__meta">
+                {t(CATEGORY_KEY[place.category])}
+                {km === null ? '' : ' · ' + t('map.places.away', { km: km.toFixed(1) })}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="button button--secondary place-card__show"
+              onClick={() => {
+                onSelect(place.id);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              {t('map.places.show')}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {sorted.length > shown.value ? (
+        <div class="actions">
+          <button
+            type="button"
+            class="button button--secondary"
+            onClick={() => {
+              shown.value += PAGE;
+            }}
+          >
+            {t('map.places.more')}
+          </button>
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 function LocateControl({ outside }: { readonly outside: boolean }) {
   const state = deviceLocation.value;
@@ -103,10 +260,16 @@ function Schematic() {
 export default function MapScreen() {
   const live = useSignal<ComponentType<LiveMapProps> | null>(null);
   const outside = useSignal(false);
+  const places = useSignal<readonly Place[]>([]);
+  const filter = useSignal<Filter>('all');
+  const selectedId = useSignal<string | null>(null);
 
   useEffect(() => {
     const mounted = { current: true };
     const isMounted = (): boolean => mounted.current;
+    void loadPlaces().then((list) => {
+      if (isMounted()) places.value = list;
+    });
     void tilesAvailable().then(async (ok) => {
       if (!ok || !isMounted()) return;
       try {
@@ -125,6 +288,10 @@ export default function MapScreen() {
 
   const position = deviceLocation.value.status === 'on' ? deviceLocation.value.position : null;
   const LiveMap = live.value;
+  const visible =
+    filter.value === 'all'
+      ? places.value
+      : places.value.filter((place) => place.category === filter.value);
 
   return (
     <>
@@ -134,6 +301,16 @@ export default function MapScreen() {
         <span class="state-line__dot" aria-hidden="true" />
         {t('map.sharing.off')}
       </p>
+      {LiveMap !== null && places.value.length > 0 ? (
+        <CategoryChips
+          filter={filter.value}
+          places={places.value}
+          onChange={(next) => {
+            filter.value = next;
+            selectedId.value = null;
+          }}
+        />
+      ) : null}
       {LiveMap === null ? (
         <Schematic />
       ) : (
@@ -141,6 +318,12 @@ export default function MapScreen() {
           <LiveMap
             flavor={flavorFor(theme.value)}
             position={position}
+            places={visible}
+            placeLabel={pinLabel}
+            selectedId={selectedId.value}
+            onSelect={(id) => {
+              selectedId.value = id;
+            }}
             onOutside={(value) => {
               outside.value = value;
             }}
@@ -149,6 +332,16 @@ export default function MapScreen() {
         </>
       )}
       {FLAGS.geolocation ? <LocateControl outside={outside.value} /> : null}
+      {LiveMap !== null && places.value.length > 0 ? (
+        <PlaceList
+          places={visible}
+          selectedId={selectedId.value}
+          from={position !== null && !outside.value ? position : null}
+          onSelect={(id) => {
+            selectedId.value = id;
+          }}
+        />
+      ) : null}
       <a
         class="card link-card"
         href={osmSearchUrl('Rajahmundry, Andhra Pradesh')}
