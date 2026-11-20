@@ -1,5 +1,6 @@
 import {
   googleKeyFetcher,
+  keyDiag,
   lastRejection,
   verifyGoogleIdToken,
   type KeyFetcher,
@@ -109,7 +110,11 @@ async function signIn(request: Request, deps: AuthDeps, now: number): Promise<Re
     ...(expectedNonce === undefined ? {} : { expectedNonce }),
   });
   if (user === null) {
-    return fail(401, 'invalid_token', deps.debug === true ? { 'X-Auth-Debug': lastRejection } : {});
+    return fail(
+      401,
+      'invalid_token',
+      deps.debug === true ? { 'X-Auth-Debug': `${lastRejection} ${keyDiag}` } : {},
+    );
   }
 
   const headers = new Headers(NO_STORE);
