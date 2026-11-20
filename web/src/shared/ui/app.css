@@ -504,7 +504,7 @@ main:focus {
 }
 
 .qcard--red .qcard__icon {
-  background: var(--danger-soft);
+  background: var(--ground);
   color: var(--danger);
 }
 

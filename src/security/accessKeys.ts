@@ -72,7 +72,7 @@ export function createAccessKeyLookup(options: KeySourceOptions): KeyLookup {
       const response = await fetcher(url, {
         method: 'GET',
         headers: { Accept: 'application/json' },
-        redirect: 'error',
+        redirect: 'manual',
         signal: AbortSignal.timeout(timeoutMs),
       });
       if (!response.ok) throw new Error('keys endpoint status');

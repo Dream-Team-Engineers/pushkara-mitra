@@ -71,7 +71,7 @@ describe('fetches the configured team keys safely', () => {
     await lookupFor(state)('k1');
     expect(state.calls).toHaveLength(1);
     expect(state.calls[0]?.url).toBe(`${ISSUER}${KEYS_PATH}`);
-    expect(state.calls[0]?.init.redirect).toBe('error');
+    expect(state.calls[0]?.init.redirect).toBe('manual');
     expect(state.calls[0]?.init.signal).toBeInstanceOf(AbortSignal);
     expect(state.calls[0]?.init.method).toBe('GET');
   });
