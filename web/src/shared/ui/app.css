@@ -342,6 +342,34 @@ main:focus {
   border: 0;
 }
 
+.marquee__track--30 {
+  animation-duration: 30s;
+}
+
+.marquee__track--45 {
+  animation-duration: 45s;
+}
+
+.marquee__track--60 {
+  animation-duration: 60s;
+}
+
+.marquee__track--90 {
+  animation-duration: 90s;
+}
+
+.marquee__track--120 {
+  animation-duration: 120s;
+}
+
+.marquee__track--180 {
+  animation-duration: 180s;
+}
+
+.marquee__track--240 {
+  animation-duration: 240s;
+}
+
 @keyframes marquee-scroll {
   from {
     transform: translateX(0);
