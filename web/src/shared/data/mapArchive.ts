@@ -1,3 +1,5 @@
+import { offlineMapStatus } from '../pwa/offlineMap';
+
 /**
  * Where the regional map archive lives on this site, and a check that it is really there
  * (feature code may not use the network, so the request lives here with the other data clients).
@@ -12,10 +14,11 @@ export const TILES_PATH = '/maps/godavari.pmtiles';
 export async function tilesAvailable(
   request: typeof fetch = (input, init) => fetch(input, init),
 ): Promise<boolean> {
-  // Offline: do not even ask (the browser would log a failed request); the schematic is shown.
+  // Offline: do not even ask the network (the browser would log a failed request). The real map is
+  // still used when the person saved it on this phone; otherwise the schematic is shown.
   const onLine: unknown =
     typeof navigator === 'undefined' ? true : Reflect.get(navigator, 'onLine');
-  if (onLine === false) return false;
+  if (onLine === false) return (await offlineMapStatus()) === true;
   try {
     const response = await request(TILES_PATH, {
       headers: { Range: 'bytes=0-6' },

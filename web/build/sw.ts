@@ -6,6 +6,8 @@ import type { Plugin } from 'vite';
 export interface PrecachePlan {
   readonly precache: readonly string[];
   readonly optional: readonly string[];
+  /** Map archive, glyphs, sprites and places: saved only when the person asks (offline map). */
+  readonly map: readonly string[];
 }
 
 /**
@@ -15,6 +17,14 @@ export interface PrecachePlan {
 const OPTIONAL_PATTERN = /^\/fonts\/NotoSansDevanagari-|^\/assets\/(?:LiveMap|maplibre-gl-worker)-/;
 /** The map archive, glyphs and sprites are fetched on demand, never precached (the archive is megabytes). */
 const EXCLUDED_PATTERN = /\.(?:map|txt)$|^\/sw\.js$|^\/maps\//;
+const MAP_FILE_PATTERN = /^maps\/.*(?<!\.txt)$/;
+
+/** Files (relative to the output directory) that make up the downloadable offline map. */
+export function mapFiles(files: readonly string[]): string[] {
+  return files
+    .map((file) => file.replaceAll('\\', '/'))
+    .filter((file) => MAP_FILE_PATTERN.test(file));
+}
 
 /** Turns the built file list (paths relative to the output directory) into the cache plan. */
 export function planPrecache(files: readonly string[]): PrecachePlan {
@@ -27,11 +37,22 @@ export function planPrecache(files: readonly string[]): PrecachePlan {
     .filter((path) => !OPTIONAL_PATTERN.test(path))
     .map((path) => (path === '/index.html' ? '/' : path))
     .sort();
-  return { precache, optional };
+  // Paths are stored percent-encoded, as `URL.pathname` reports them (glyph folders contain spaces).
+  const map = mapFiles(files)
+    .map((file) => encodeURI(`/${file}`))
+    .sort();
+  return { precache, optional, map };
 }
 
-export function renderServiceWorker(template: string, plan: PrecachePlan, version: string): string {
+export function renderServiceWorker(
+  template: string,
+  plan: PrecachePlan,
+  version: string,
+  mapVersion = version,
+): string {
   return template
+    .replace('__MAP_VERSION__', mapVersion)
+    .replace('__MAP__', JSON.stringify(plan.map))
     .replace('__VERSION__', version)
     .replace('__PRECACHE__', JSON.stringify(plan.precache))
     .replace('__OPTIONAL__', JSON.stringify(plan.optional));
@@ -68,7 +89,13 @@ export function serviceWorkerPlugin(templatePath: string): Plugin {
       const files = listFiles(outDir).filter((file) => file !== 'sw.js');
       const plan = planPrecache(files);
       const version = versionFor(outDir, files);
-      const source = renderServiceWorker(readFileSync(templatePath, 'utf8'), plan, version);
+      const mapVersion = versionFor(outDir, mapFiles(files));
+      const source = renderServiceWorker(
+        readFileSync(templatePath, 'utf8'),
+        plan,
+        version,
+        mapVersion,
+      );
       writeFileSync(join(outDir, 'sw.js'), source);
     },
   };

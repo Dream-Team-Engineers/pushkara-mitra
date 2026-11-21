@@ -12,6 +12,7 @@ import {
 import { osmPointUrl, osmSearchUrl } from '../../shared/data/sourceLinks';
 import { FLAGS } from '../../shared/flags/flags';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
+import { offlineMapStatus, saveOfflineMap } from '../../shared/pwa/offlineMap';
 import {
   deviceLocation,
   startDeviceLocation,
@@ -222,6 +223,58 @@ function LocateControl({ outside }: { readonly outside: boolean }) {
               : null}
       </p>
       <p class="note note--flush">{t('map.locate.privacy')}</p>
+    </section>
+  );
+}
+
+/**
+ * "Save map for offline use": shown only where a service worker is active. The worker stores the
+ * map files on this phone; nothing is sent about the person.
+ */
+function OfflineMapControl() {
+  const state = useSignal<'hidden' | 'idle' | 'saving' | 'saved' | 'failed'>('hidden');
+  useEffect(() => {
+    const mounted = { current: true };
+    void offlineMapStatus().then((ready) => {
+      if (mounted.current && ready !== null) state.value = ready ? 'saved' : 'idle';
+    });
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  if (state.value === 'hidden') return null;
+  return (
+    <section class="locate" aria-labelledby="offline-map-title">
+      <h2 id="offline-map-title" class="card__title">
+        {t('map.offline.title')}
+      </h2>
+      <p class="note note--flush" role="status">
+        {state.value === 'saving'
+          ? t('map.offline.saving')
+          : state.value === 'saved'
+            ? t('map.offline.saved')
+            : state.value === 'failed'
+              ? t('map.offline.failed')
+              : null}
+      </p>
+      {state.value === 'saved' ? null : (
+        <div class="actions">
+          <button
+            type="button"
+            class="button button--secondary"
+            disabled={state.value === 'saving'}
+            onClick={() => {
+              state.value = 'saving';
+              void saveOfflineMap().then((ok) => {
+                state.value = ok === true ? 'saved' : 'failed';
+              });
+            }}
+          >
+            {t('map.offline.save')}
+          </button>
+        </div>
+      )}
+      <p class="note note--flush">{t('map.offline.note')}</p>
     </section>
   );
 }
@@ -450,6 +503,7 @@ export default function MapScreen() {
         </>
       )}
       {FLAGS.geolocation ? <LocateControl outside={outside.value} /> : null}
+      <OfflineMapControl />
       <a
         class="card link-card"
         href={osmSearchUrl('Rajahmundry, Andhra Pradesh')}

@@ -81,6 +81,8 @@ function load(
   version = 'v1',
   fetcher: (url: string) => Response = () => new Response('net', { status: 200 }),
   stores: Map<string, Map<string, Response>> = new Map(),
+  map: string[] = [],
+  optional: string[] = ['/fonts/opt.woff'],
 ): Harness {
   const listeners = new Map<string, (event: unknown) => void>();
   const fetched: string[] = [];
@@ -126,16 +128,13 @@ function load(
       return Promise.resolve(fetcher(request.url));
     },
     Request,
+    Response,
     URL,
     Set,
     Promise,
     Error,
   };
-  const source = renderServiceWorker(
-    TEMPLATE,
-    { precache, optional: ['/fonts/opt.woff'] },
-    version,
-  );
+  const source = renderServiceWorker(TEMPLATE, { precache, optional, map }, version, 'm1');
   runInContext(source, createContext(sandbox));
   return { listeners, stores, fetched, skipped };
 }
@@ -231,5 +230,136 @@ describe('generated service worker', () => {
     expect(h.skipped).toEqual([]);
     h.listeners.get('message')?.({ data: { type: 'SKIP_WAITING' } });
     expect(h.skipped).toEqual([true]);
+  });
+});
+
+describe('offline map', () => {
+  it('plans the map files, percent-encoded, without licence text, outside the precache', () => {
+    const plan = planPrecache([
+      'index.html',
+      'maps/godavari.pmtiles',
+      'maps/places.json',
+      'maps/fonts/Noto Sans Regular/0-255.pbf',
+      'maps/fonts/OFL.txt',
+    ]);
+    expect(plan.map).toEqual([
+      '/maps/fonts/Noto%20Sans%20Regular/0-255.pbf',
+      '/maps/godavari.pmtiles',
+      '/maps/places.json',
+    ]);
+    expect(plan.precache).toEqual(['/']);
+  });
+
+  const MAP = ['/maps/godavari.pmtiles', '/maps/fonts/Noto%20Sans%20Regular/0-255.pbf'];
+  const OPTIONAL = ['/fonts/opt.woff', '/assets/LiveMap-1.js', '/assets/LiveMap-1.css'];
+  const fresh = () => load(['/'], 'v1', () => new Response('0123456789'), new Map(), MAP, OPTIONAL);
+
+  async function command(h: Harness, type: string): Promise<unknown> {
+    let reply: unknown;
+    let wait: Promise<unknown> = Promise.resolve();
+    h.listeners.get('message')?.({
+      data: { type },
+      ports: [{ postMessage: (value: unknown) => (reply = value) }],
+      waitUntil: (p: Promise<unknown>) => (wait = p),
+    });
+    await wait;
+    return reply;
+  }
+
+  it('is not saved until asked, and is never fetched at install', async () => {
+    const h = fresh();
+    await installed(h);
+    expect(h.fetched.some((url) => url.includes('/maps/'))).toBe(false);
+    expect(await command(h, 'MAP_STATUS')).toEqual({ ready: false });
+  });
+
+  it('saves the map files and the map screen code, then reports saved', async () => {
+    const h = fresh();
+    await installed(h);
+    expect(await command(h, 'MAP_DOWNLOAD')).toEqual({ ready: true });
+    expect([...(h.stores.get('pushkara-map-m1')?.keys() ?? [])].sort()).toEqual(
+      [...MAP, '/__map-saved__'].sort(),
+    );
+    const app = h.stores.get('pushkara-app-v1');
+    expect(app?.has('/assets/LiveMap-1.js')).toBe(true);
+    expect(app?.has('/assets/LiveMap-1.css')).toBe(true);
+    expect(app?.has('/fonts/opt.woff')).toBe(false);
+    expect(await command(h, 'MAP_STATUS')).toEqual({ ready: true });
+  });
+
+  it('does not report saved when a file fails, and writes no marker', async () => {
+    const h = load(
+      ['/'],
+      'v1',
+      (url) => (url.endsWith('.pbf') ? new Response('no', { status: 500 }) : new Response('x')),
+      new Map(),
+      MAP,
+      OPTIONAL,
+    );
+    await installed(h);
+    expect(await command(h, 'MAP_DOWNLOAD')).toEqual({ ready: false });
+    expect(await command(h, 'MAP_STATUS')).toEqual({ ready: false });
+  });
+
+  it('serves a saved file from the saved copy, including a byte range', async () => {
+    const h = fresh();
+    await installed(h);
+    await command(h, 'MAP_DOWNLOAD');
+    const before = h.fetched.length;
+
+    const slice = fetchEvent('https://app.test/maps/godavari.pmtiles', {
+      headers: { Range: 'bytes=2-4' },
+    });
+    h.listeners.get('fetch')?.(slice.event);
+    const part = await slice.result();
+    expect(part?.status).toBe(206);
+    expect(await part?.text()).toBe('234');
+    expect(part?.headers.get('Content-Range')).toBe('bytes 2-4/10');
+
+    const open = fetchEvent('https://app.test/maps/godavari.pmtiles', {
+      headers: { Range: 'bytes=7-' },
+    });
+    h.listeners.get('fetch')?.(open.event);
+    expect(await (await open.result())?.text()).toBe('789');
+
+    const past = fetchEvent('https://app.test/maps/godavari.pmtiles', {
+      headers: { Range: 'bytes=50-60' },
+    });
+    h.listeners.get('fetch')?.(past.event);
+    expect((await past.result())?.status).toBe(416);
+
+    const glyph = fetchEvent('https://app.test/maps/fonts/Noto%20Sans%20Regular/0-255.pbf');
+    h.listeners.get('fetch')?.(glyph.event);
+    expect(await (await glyph.result())?.text()).toBe('0123456789');
+    expect(h.fetched.length).toBe(before);
+  });
+
+  it('uses the network for map files that are not saved, and ignores other /maps paths', async () => {
+    const h = fresh();
+    await installed(h);
+    const live = fetchEvent('https://app.test/maps/godavari.pmtiles', {
+      headers: { Range: 'bytes=0-6' },
+    });
+    h.listeners.get('fetch')?.(live.event);
+    expect(await (await live.result())?.text()).toBe('0123456789');
+    const other = fetchEvent('https://app.test/maps/secret.json');
+    h.listeners.get('fetch')?.(other.event);
+    expect(other.result()).toBeNull();
+  });
+
+  it('drops older map caches on activate and ignores unknown or portless commands', async () => {
+    const stores = new Map<string, Map<string, Response>>([
+      ['pushkara-map-m0', new Map()],
+      ['unrelated-cache', new Map()],
+    ]);
+    const h = load(['/'], 'v1', undefined, stores, MAP, OPTIONAL);
+    await installed(h);
+    let wait: Promise<unknown> = Promise.resolve();
+    h.listeners.get('activate')?.({ waitUntil: (p: Promise<unknown>) => (wait = p) });
+    await wait;
+    expect([...h.stores.keys()].sort()).toEqual(['pushkara-app-v1', 'unrelated-cache']);
+    expect(await command(h, 'CACHE_URL')).toBeUndefined();
+    h.listeners.get('message')?.({ data: { type: 'MAP_DOWNLOAD' }, ports: [] });
+    expect(h.fetched.some((url) => url.includes('/maps/'))).toBe(false);
   });
 });
