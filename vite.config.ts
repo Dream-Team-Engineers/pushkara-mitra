@@ -37,6 +37,8 @@ export default defineConfig(({ mode }) => ({
     ),
     // Device position on the map: staging build only (flags.ts, OQ-041).
     'import.meta.env.VITE_DEVICE_LOCATION': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
+    // Real groups and live sharing with the group: staging build only (flags.ts, ADR 0017).
+    'import.meta.env.VITE_GROUPS': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
     // Labelled sample rows and the sample sponsored strip: every build except production (OQ-044).
     'import.meta.env.VITE_SHOW_SAMPLES': JSON.stringify(mode === 'production' ? '' : 'enabled'),
   },

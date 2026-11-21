@@ -1,5 +1,6 @@
 import { useSignal } from '@preact/signals';
-import { SHOW_SAMPLES } from '../../shared/flags/flags';
+import { FLAGS, SHOW_SAMPLES } from '../../shared/flags/flags';
+import LiveGroup from './LiveGroup';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { user } from '../../shared/auth/google';
@@ -71,7 +72,12 @@ const TABS: readonly ChipOption<Tab>[] = [
   { value: 'join', label: 'group.tab.join' },
 ];
 
+/** Real groups in the staging build (ADR 0017); the inert prototype everywhere else. */
 export default function GroupScreen() {
+  return FLAGS.myGroup ? <LiveGroup /> : <PrototypeGroup />;
+}
+
+function PrototypeGroup() {
   const tab = useSignal<Tab>('create');
   const groupName = useSignal('');
   const code = useSignal('');

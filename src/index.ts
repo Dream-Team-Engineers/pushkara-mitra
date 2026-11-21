@@ -29,6 +29,8 @@ export interface Env {
   DB?: D1Database;
   /** Kill switches. A feature is on only when its variable is exactly `enabled` (see src/flags.ts). */
   FLAG_GROUPS?: string;
+  /** Live group room (ADR 0017); needs FLAG_GROUPS too. */
+  FLAG_GROUP_LOCATION?: string;
   FLAG_SOS?: string;
   FLAG_CROWD?: string;
   /** Worker secret: the bearer token that may report crowd levels. Without it the ingest route answers 503. */
@@ -46,6 +48,7 @@ async function route(request: Request, env: Env): Promise<Response> {
       repo: repositoryFor(env),
       sessionSecret: env.SESSION_SECRET,
       crowdIngestToken: env.CROWD_INGEST_TOKEN,
+      groupLocation: env.GROUP_LOCATION,
     });
   }
 

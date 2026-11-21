@@ -81,6 +81,10 @@ export function withSecurityHeaders(
     headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY_GOOGLE);
     headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   }
+  // A WebSocket upgrade must keep its socket; the headers above still apply.
+  if (response.status === 101) {
+    return new Response(null, { status: 101, webSocket: response.webSocket, headers });
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

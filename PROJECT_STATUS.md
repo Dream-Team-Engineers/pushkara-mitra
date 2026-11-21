@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## My Group, real version (staging only) — 2026-11-21 (time not recorded)
+
+- **Who:** owner go-ahead ("YES"), Krishna Murthy Raju G (`gkmraju`); built by Claude Code (agent). Independent reviewer: NONE.
+- **Design:** [ADR 0017](docs/decisions/0017-group-v1.md) with threat model. Groups and join codes in D1 (opaque IDs only); names and positions only in the `GroupLocation` Durable Object's memory while the Group screen is open; sharing off by default, consent recorded once per page load (`group-1`), stop with one tap, leaving closes the connection at once, no history.
+- **Built:** live room (`src/durable-objects/GroupLocation.ts`), route `GET /api/v1/groups/{id}/live` (sign-in, same origin, membership, flag `FLAG_GROUP_LOCATION`), kick on leave, WebSocket pass-through in the security-header wrapper, group client (`web/src/shared/group/groupClient.ts`), real Group screen (`web/src/features/group/LiveGroup.tsx`) behind the staging-only `myGroup` flag; production build keeps the inert prototype. 28 new strings in en/te/hi (Telugu and Hindi by the agent, **not native-reviewed**: keys `group.live.*`).
+- **Evidence:** `npm run gate` (PowerShell): 63 test files passed, 1 skipped; 780 tests passed, 24 skipped; lint, typecheck, Prettier clean; build, bundle budget and 175 routing cases passed. New tests: `tests/worker/group-live.test.ts` (6: flag, upgrade, origin, sign-in, membership, 503 without binding, sharing with rounding, bad input ignored, stop, leave closes the connection) and `web/src/shared/group/groupClient.test.ts` (8).
+- **Not working on staging yet:** staging has **no D1 database**, so the group routes answer 503 and the screen says "Groups are not available yet". Needs the owner's approval to create the staging database (see the session reply). Not tested: a real phone, two real people, the map view of members (not built yet), owner removing a member (no server route yet).
+- **Legal:** no sign-off; counsel details pending (OQ-024). Production stays off.
+
 ## Helplines trimmed, ghat list review recorded, counsel deferred — 2026-11-21 (time not recorded)
 
 - **Who:** owner directions (Krishna Murthy Raju G, `gkmraju`); implemented by Claude Code (agent). Independent reviewer: NONE.

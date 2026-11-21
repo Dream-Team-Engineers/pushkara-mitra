@@ -16,6 +16,7 @@ interface BuildEnv {
   readonly VITE_GOOGLE_CLIENT_ID?: string;
   readonly VITE_DEVICE_LOCATION?: string;
   readonly VITE_SHOW_SAMPLES?: string;
+  readonly VITE_GROUPS?: string;
 }
 const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
 const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
@@ -41,8 +42,12 @@ export const FLAGS = {
   geolocation: BUILD_ENV.VITE_DEVICE_LOCATION === 'enabled',
   /** Pilgrim Pass: personal details, photo, QR. Prototype only until ADR 0008 and counsel. */
   pilgrimPass: false,
-  /** My Group: live sharing, invitations. Needs ADR 0004 and a stalking/coercion threat model. */
-  myGroup: false,
+  /**
+   * My Group: real groups, join codes and live position sharing with the group (ADR 0017). Owner
+   * scope decision 2026-11-21: on in the staging build only (`vite build --mode staging`), off in
+   * production until the owner approves the release. Not read from the URL or storage.
+   */
+  myGroup: BUILD_ENV.VITE_GROUPS === 'enabled',
   /** Live map overlays of people or groups. Public base map is not behind this flag. */
   liveMap: false,
   /** SOS dispatch to responders. The app never replaces police or emergency services. */

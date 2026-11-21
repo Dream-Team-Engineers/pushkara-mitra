@@ -21,6 +21,7 @@ import {
  *   POST   /api/v1/groups/join         join with a code                       [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/invite  owner issues another join code         [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
+ *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
  *   POST   /api/v1/sos                 SOS intake, no sign-in, no location    [flag FLAG_SOS]
  *   GET    /api/v1/crowd               latest crowd level per ghat, public    [flag FLAG_CROWD]
  *   POST   /api/v1/crowd               report a level, bearer token only      [flag FLAG_CROWD]
@@ -38,7 +39,7 @@ const GROUP_LIFETIME_SECONDS = 14 * 24 * 60 * 60; // PROPOSAL: should match the 
 const INVITE_LIFETIME_SECONDS = 24 * 60 * 60;
 const INVITE_USES = 20;
 const GROUP_ID = /^[a-z2-7]{26}$/;
-const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave)$/;
+const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live)$/;
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 const PURPOSES: readonly ConsentPurpose[] = ['sign-in', 'group', 'pass', 'notifications'];
@@ -82,6 +83,8 @@ export interface V1Deps {
   readonly sessionSecret: string | undefined;
   /** Bearer token allowed to report crowd levels. Unset means reporting is unavailable (503). */
   readonly crowdIngestToken?: string | undefined;
+  /** The live-room Durable Object namespace (ADR 0017). Absent means live sharing is unavailable. */
+  readonly groupLocation?: DurableObjectNamespace | undefined;
   readonly sosLimiter?: RateLimiter;
   readonly limiter?: RateLimiter;
   readonly nowSeconds?: () => number;
@@ -270,6 +273,60 @@ async function me(
   return fail('NOT_FOUND', 404);
 }
 
+/** Per-group member handle: the same person gets an unrelated handle in each group. */
+export async function memberHandle(groupId: string, subjectRef: string): Promise<string> {
+  return (await sha256Hex(`member.v1|${groupId}|${subjectRef}`)).slice(0, 16);
+}
+
+function roomFor(ns: DurableObjectNamespace, groupId: string): DurableObjectStub {
+  return ns.get(ns.idFromName(groupId));
+}
+
+/** Closes the leaver's live connections at once. Best effort: the room is memory only. */
+async function kickFromRoom(deps: V1Deps, groupId: string, subjectRef: string): Promise<void> {
+  const ns = deps.groupLocation;
+  if (ns === undefined) return;
+  try {
+    await roomFor(ns, groupId).fetch('https://room/kick', {
+      method: 'POST',
+      headers: { 'X-PM-Member': await memberHandle(groupId, subjectRef) },
+    });
+  } catch {
+    // The room may not exist; nothing is stored there either way.
+  }
+}
+
+/** Opens the WebSocket to the group's live room after sign-in and membership checks (ADR 0017). */
+async function live(
+  request: Request,
+  deps: V1Deps,
+  repo: Repository,
+  now: number,
+  signed: Signed,
+  groupId: string,
+): Promise<Response> {
+  if (request.method !== 'GET') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'GET' });
+  if (!envFlags(deps.env).isEnabled('group-location')) return fail('NOT_FOUND', 404);
+  if ((request.headers.get('Upgrade') ?? '').toLowerCase() !== 'websocket') {
+    return fail('INVALID_REQUEST', 426, { Upgrade: 'websocket' });
+  }
+  if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
+  // Not a member, or the group is closed or gone: the same answer, so ids cannot be probed.
+  if (!(await repo.isActiveMember(signed.subjectRef, groupId, iso(now)))) {
+    return fail('NOT_FOUND', 404);
+  }
+  const ns = deps.groupLocation;
+  if (ns === undefined) return fail('UNAVAILABLE', 503);
+  // A fresh request: nothing the client sent is forwarded except the upgrade itself.
+  return roomFor(ns, groupId).fetch('https://room/live', {
+    headers: {
+      Upgrade: 'websocket',
+      'X-PM-Member': await memberHandle(groupId, signed.subjectRef),
+      'X-PM-Name': signed.name,
+    },
+  });
+}
+
 async function groups(
   request: Request,
   deps: V1Deps,
@@ -319,16 +376,17 @@ async function groups(
       : fail('INVALID_CODE', 400);
   }
 
-  const match = /^\/([a-z2-7]{26})\/(invite|leave)$/.exec(rest);
+  const match = /^\/([a-z2-7]{26})\/(invite|leave|live)$/.exec(rest);
   if (match !== null) {
     const id = match[1] ?? '';
     if (!GROUP_ID.test(id)) return fail('NOT_FOUND', 404);
+    if (match[2] === 'live') return live(request, deps, repo, now, signed, id);
     if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'POST' });
     if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
     if (match[2] === 'leave') {
-      return (await repo.leaveGroup(signed.subjectRef, id))
-        ? new Response(null, { status: 204, headers: NO_STORE })
-        : fail('NOT_FOUND', 404);
+      if (!(await repo.leaveGroup(signed.subjectRef, id))) return fail('NOT_FOUND', 404);
+      await kickFromRoom(deps, id, signed.subjectRef);
+      return new Response(null, { status: 204, headers: NO_STORE });
     }
     const code = randomJoinCode();
     const created = await repo.createInvitation(

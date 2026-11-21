@@ -68,6 +68,8 @@ export interface Repository {
   joinWithCode(subjectRef: string, codeHash: string, nowIso: string): Promise<JoinResult>;
   leaveGroup(subjectRef: string, groupId: string): Promise<boolean>;
   listGroups(subjectRef: string, nowIso: string): Promise<readonly GroupSummary[]>;
+  /** True when the person is a member of this active, unexpired group. */
+  isActiveMember(subjectRef: string, groupId: string, nowIso: string): Promise<boolean>;
 
   /** Idempotent on the request hash: a retry returns the original id with `duplicate: true`. */
   insertSos(input: {
@@ -278,6 +280,17 @@ export function d1Repository(db: D1Database): Repository {
         expiresAt: r.expires_at,
         memberCount: r.member_count,
       }));
+    },
+
+    async isActiveMember(subjectRef, groupId, nowIso) {
+      const rows = await all<{ ok: number }>(
+        `SELECT 1 AS ok FROM membership m JOIN group_ g ON g.id = m.group_id
+         WHERE m.group_id = ? AND m.subject_ref = ? AND g.state = 'active' AND g.expires_at > ?`,
+        groupId,
+        subjectRef,
+        nowIso,
+      );
+      return rows.length > 0;
     },
 
     async insertSos({ requestHash, category, createdAt }) {
