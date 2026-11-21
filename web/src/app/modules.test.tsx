@@ -5,6 +5,7 @@ import GhatsScreen, { filterGhats } from '../features/ghats/Screen';
 import StayScreen, { rankStays } from '../features/stay/Screen';
 import TravelScreen, { filterTravel } from '../features/travel/Screen';
 import UpdatesScreen, { filterUpdates } from '../features/updates/Screen';
+import { crowdLiveResource } from '../shared/data/crowd';
 import { GHATS, STAYS, TRAVEL, UPDATES } from '../shared/data/fixtures';
 import {
   crowdResource,
@@ -98,6 +99,33 @@ describe('public module screens', () => {
     expect(html).toContain(t('ghats.noteVerified'));
     expect(html).not.toContain(t('ghats.note'));
     expect(html).not.toContain('class="tags"');
+  });
+
+  it('shows a fresh staff-reported crowd level on the ghat card, and No data without one', async () => {
+    await setLocale('en');
+    await load();
+    const ready = (data: Record<string, 'low' | 'moderate' | 'high'>) => {
+      crowdLiveResource.state.value = {
+        status: 'ready',
+        data,
+        fetchedAt: Date.now(),
+        refreshFailed: false,
+      };
+    };
+    try {
+      ready({ 'pushkar-ghat': 'high' });
+      const withLevel = render(<GhatsScreen />);
+      expect(withLevel).toContain(t('crowd.high'));
+      // Only the one ghat that has a report: every other card still says No data.
+      expect(withLevel.split(t('crowd.high')).length - 1).toBe(1);
+      expect(withLevel).toContain(t('crowd.noData'));
+      ready({});
+      const without = render(<GhatsScreen />);
+      expect(without).not.toContain(t('crowd.high'));
+      expect(without).toContain(t('crowd.noData'));
+    } finally {
+      crowdLiveResource.state.value = { status: 'loading' };
+    }
   });
 
   it('labels sponsored stays and discloses the ranking criteria', async () => {

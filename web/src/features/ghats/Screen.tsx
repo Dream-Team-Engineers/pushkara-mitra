@@ -1,6 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
+import { useLiveCrowd, type LiveCrowd } from '../../shared/data/crowd';
 import type { District, Facility, GhatFixture } from '../../shared/data/fixtures';
 import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { ghatsResource } from '../../shared/data/resources';
@@ -46,8 +47,10 @@ function localName(ghat: GhatFixture): string | null {
   return null;
 }
 
-function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
+function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: LiveCrowd | null }) {
   const local = localName(ghat);
+  // A fresh staff report wins; otherwise the record's own level, which is "No data" for approved ghats.
+  const crowd = live?.[ghat.id] ?? ghat.crowd;
   return (
     <li class="card">
       <div class="card__head">
@@ -63,7 +66,7 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
             </span>
           )}
         </h2>
-        <CrowdChip level={ghat.crowd} />
+        <CrowdChip level={crowd} />
       </div>
       <div class="card__row">
         <p class="card__meta">
@@ -98,6 +101,7 @@ function GhatCard({ ghat }: { readonly ghat: GhatFixture }) {
 
 export default function GhatsScreen() {
   const filter = useSignal<Filter>('all');
+  const live = useLiveCrowd();
   return (
     <>
       <ScreenHeader titleKey="module.ghats.title" subtitleKey="module.ghats.subtitle" />
@@ -130,7 +134,7 @@ export default function GhatsScreen() {
               ) : (
                 <ul class="card-list">
                   {visible.map((ghat) => (
-                    <GhatCard key={ghat.id} ghat={ghat} />
+                    <GhatCard key={ghat.id} ghat={ghat} live={live} />
                   ))}
                 </ul>
               )}
