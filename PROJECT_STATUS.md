@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Gate 2 worksheets: ghat coordinates (O7) and language review (O1) — 2026-11-21 (time not recorded)
+
+- **Who:** prepared by Claude Code (agent) at the owner's request ("finish as much as possible"). Accountable owner: Krishna Murthy Raju G (`gkmraju`). Independent reviewer: NONE. Documentation only: no app code or data changed, nothing deployed.
+- **Added:** [docs/content/ghat-coordinates-o7.md](docs/content/ghat-coordinates-o7.md): all 19 ghats from `scripts/owner-ghats.json` with current position, origin, on-map flag and priority; 2 from OpenStreetMap, 2 owner readings, 15 approximate, 6 sharing a point with another ghat, 3 outside the map area. [docs/content/language-review-o1.md](docs/content/language-review-o1.md): 32 Telugu/Hindi strings changed after the 2026-11-19 review (compared with `fc9a4de`) plus 14 late 2026-11-19 map strings whose review coverage is UNKNOWN, each with English, Telugu, Hindi and a correction column.
+- **Not done:** no coordinate was added or changed; no string was marked reviewed.
+- **Next / owner:** fill in the O7 table and say "update ghat positions from O7"; review the O1 list and say "te reviewed by <name> on <date>" (and hi). Gate 1 (counsel, OQ-024) is still first.
+
 ## Launch gates, suggested order — 2026-11-21 (time not recorded)
 
 - **Who:** order supplied by the owner (Krishna Murthy Raju G, `gkmraju`); written into this file by Claude Code (agent). Independent reviewer: NONE. Documentation only: no code changed, nothing run or deployed.
