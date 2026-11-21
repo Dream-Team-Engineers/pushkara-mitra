@@ -6,16 +6,16 @@ The npm inventory below comes from the installed packages and their metadata via
 
 ## CI tools and actions
 
-| Tool                                                        | Type          | Licence                                                  | Scope                  | Status       |
-| ----------------------------------------------------------- | ------------- | -------------------------------------------------------- | ---------------------- | ------------ |
-| actions/checkout, setup-node, setup-python, upload-artifact | GitHub Action | MIT (per upstream repository)                            | CI only                | NEEDS REVIEW |
-| github/codeql-action (and the CodeQL CLI it downloads)      | GitHub Action | MIT for the action. CodeQL CLI has separate GitHub terms | CI only, public repos  | NEEDS REVIEW |
-| googleapis/release-please-action                            | GitHub Action | Apache-2.0 (per upstream repository)                     | CI only                | NEEDS REVIEW |
-| ossf/scorecard-action                                       | GitHub Action | Apache-2.0 (per upstream repository)                     | CI only, public repos  | NEEDS REVIEW |
-| gitleaks 8.30.1 (CLI binary)                                | CI tool       | MIT (per upstream repository)                            | CI only                | NEEDS REVIEW |
-| osv-scanner 2.7.0 (CLI binary)                              | CI tool       | Apache-2.0 (per upstream repository)                     | CI only                | NEEDS REVIEW |
-| actionlint 1.7.12, zizmor 1.31.1                            | CI tool       | MIT (per upstream repositories)                          | CI only                | NEEDS REVIEW |
-| Semgrep CE 1.183.0 and its registry rules                   | CI tool       | Engine LGPL-2.1. Registry rule licence terms need review | CI only, private repos | NEEDS REVIEW |
+| Tool                                                        | Type          | Licence                                                  | Scope                  | Status                                |
+| ----------------------------------------------------------- | ------------- | -------------------------------------------------------- | ---------------------- | ------------------------------------- |
+| actions/checkout, setup-node, setup-python, upload-artifact | GitHub Action | MIT (per upstream repository)                            | CI only                | NEEDS REVIEW                          |
+| github/codeql-action (and the CodeQL CLI it downloads)      | GitHub Action | MIT for the action. CodeQL CLI has separate GitHub terms | CI only, public repos  | NEEDS REVIEW                          |
+| googleapis/release-please-action                            | GitHub Action | Apache-2.0 (per upstream repository)                     | CI only                | REMOVED 2026-11-21 (workflow deleted) |
+| ossf/scorecard-action                                       | GitHub Action | Apache-2.0 (per upstream repository)                     | CI only, public repos  | NEEDS REVIEW                          |
+| gitleaks 8.30.1 (CLI binary)                                | CI tool       | MIT (per upstream repository)                            | CI only                | NEEDS REVIEW                          |
+| osv-scanner 2.7.0 (CLI binary)                              | CI tool       | Apache-2.0 (per upstream repository)                     | CI only                | NEEDS REVIEW                          |
+| actionlint 1.7.12, zizmor 1.31.1                            | CI tool       | MIT (per upstream repositories)                          | CI only                | NEEDS REVIEW                          |
+| Semgrep CE 1.183.0 and its registry rules                   | CI tool       | Engine LGPL-2.1. Registry rule licence terms need review | CI only, private repos | NEEDS REVIEW                          |
 
 ## Project licence
 

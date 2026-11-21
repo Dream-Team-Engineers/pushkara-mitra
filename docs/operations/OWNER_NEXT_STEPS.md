@@ -54,6 +54,8 @@ I can do the drafting and code for 3, 6 and 8 as soon as you give the inputs. Re
 
 ## 5. release-please: keep or disable
 
+**Done 2026-11-21:** the owner chose to disable it; the workflow and its two config files were deleted. The text below is kept as the record of the choice.
+
 What it does here: on every push to `main` it opens or updates a "chore(main): release X" pull request that bumps the version and changelog. Merging that PR only tags a version; it does **not** deploy (production deploy is disconnected). You have been merging those, e.g. #127.
 
 |      | Keep it                                                                                                                                                                | Disable it                                                                                                                                                                                                                     |

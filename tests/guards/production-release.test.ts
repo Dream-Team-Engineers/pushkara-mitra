@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -67,34 +67,6 @@ function singleStep(job: Map<string, Entry>): Map<string, Entry> {
   return blockMap(body.replace(/^(\s*)- /, '$1  '));
 }
 
-function assertReleaseSafety(source: string): void {
-  const root = blockMap(source);
-  keys(root, ['name', 'on', 'permissions', 'concurrency', 'jobs']);
-  expect(scalar(root, 'permissions')).toBe('{}');
-  const trigger = nested(root, 'on');
-  keys(trigger, ['push']);
-  const push = nested(trigger, 'push');
-  keys(push, ['branches']);
-  expect(scalar(push, 'branches')).toBe('[main]');
-
-  const jobs = nested(root, 'jobs');
-  keys(jobs, ['release-please']);
-  const release = nested(jobs, 'release-please');
-  keys(release, ['name', 'runs-on', 'timeout-minutes', 'permissions', 'outputs', 'steps']);
-  expect(scalar(release, 'runs-on')).toBe('ubuntu-24.04');
-  const permissions = nested(release, 'permissions');
-  keys(permissions, ['contents', 'pull-requests', 'issues']);
-  for (const key of permissions.keys()) expect(scalar(permissions, key)).toBe('write');
-  const step = singleStep(release);
-  keys(step, ['id', 'uses', 'with']);
-  expect(scalar(step, 'id')).toBe('release');
-  expect(scalar(step, 'uses')).toMatch(/^googleapis\/release-please-action@[a-f0-9]{40}$/);
-  const inputs = nested(step, 'with');
-  keys(inputs, ['config-file', 'manifest-file']);
-  expect(scalar(inputs, 'config-file')).toBe('release-please-config.json');
-  expect(scalar(inputs, 'manifest-file')).toBe('.release-please-manifest.json');
-}
-
 function assertProductionBlocked(source: string): void {
   expect(source).not.toMatch(/\$\{\{/);
   const root = blockMap(source);
@@ -131,50 +103,24 @@ function assertProductionBlocked(source: string): void {
   expect(commands[1]).toBe('exit 1');
 }
 
-const release = workflow('release.yml');
+const workflowsDir = join(import.meta.dirname, '..', '..', '.github', 'workflows');
 const production = workflow('deploy-production.yml');
 
 describe('production release stop gate', () => {
-  it('preserves the sole release-please job without deployment steps or credentials', () => {
-    assertReleaseSafety(release);
+  // Owner decision 2026-11-21: release-please removed (no release PRs, no automatic tags).
+  it('has no release-please workflow or configuration', () => {
+    expect(existsSync(join(workflowsDir, 'release.yml'))).toBe(false);
+    for (const name of readdirSync(workflowsDir)) {
+      expect(workflow(name)).not.toMatch(/release-please/i);
+    }
+    const root = join(import.meta.dirname, '..', '..');
+    expect(existsSync(join(root, 'release-please-config.json'))).toBe(false);
+    expect(existsSync(join(root, '.release-please-manifest.json'))).toBe(false);
   });
 
   it('retains only an unconditional credential-free failing production job', () => {
     assertProductionBlocked(production);
   });
-
-  const releaseMutations: [string, string][] = [
-    [
-      'inline deployment job',
-      `${release}\n  ship:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: npx wrangler deploy --env production\n`,
-    ],
-    [
-      'differently named reusable deployment',
-      `${release}\n  publish:\n    uses: ./.github/workflows/ship.yml\n`,
-    ],
-    [
-      'deployment inside the release job',
-      release.replace(
-        '    steps:',
-        '    steps:\n      - run: npx wrangler deploy --env production',
-      ),
-    ],
-    [
-      'top-level credential inheritance',
-      release.replace(
-        'permissions: {}',
-        'env:\n  TOKEN: ${{ secrets.PRODUCTION_TOKEN }}\npermissions: {}',
-      ),
-    ],
-  ];
-  for (const [name, mutated] of releaseMutations) {
-    it(`rejects ${name}`, () => {
-      expect(mutated).not.toBe(release);
-      expect(() => {
-        assertReleaseSafety(mutated);
-      }).toThrow();
-    });
-  }
 
   const productionMutations: [string, string][] = [
     [

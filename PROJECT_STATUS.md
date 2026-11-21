@@ -6,6 +6,16 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Owner decisions: scope, language review, release-please, phone check — 2026-11-21 (time not recorded)
+
+- **Who:** decisions and statements by the owner, Krishna Murthy Raju G (`gkmraju`); recorded and implemented by Claude Code (agent). Independent reviewer: NONE.
+- **Version 1 scope:** with Group, SOS and Pass (OQ-021). Recorded only: `myGroup`, `sosDispatch` and `pilgrimPass` stay off in every build until each has its ADR, threat model and counsel review; SOS also needs OQ-035 (location versus Hard Rule 1).
+- **Language review (O1):** Telugu and Hindi strings added to 2026-11-21 reviewed by GKM Raju (owner statement), no corrections; `te.json` / `hi.json` meta and `docs/content/language-review-o1.md` updated.
+- **release-please removed:** `.github/workflows/release.yml`, `release-please-config.json` and `.release-please-manifest.json` deleted; `tests/guards/production-release.test.ts` now checks that no release-please workflow or config exists (the production stop-gate checks are unchanged); zizmor, Prettier ignore, engineering standards and licence register updated. Version stays 1.12.0 until bumped by hand. The release-PR exemption in `scripts/check-pr-checklist.mjs` and comments in `scripts/setup-github.sh` are left (dead code; GitHub settings change only through that script). Any open release PR is closed by the owner on GitHub.
+- **Phone check:** owner confirmed on a phone that the zoom buttons (`1ae32f0`) and the crowd-bar contrast (`9bbbf82`) work.
+- **Helplines:** owner re-confirmed the dataset approved 2026-11-15 (review record unchanged). Agent flag: the two provisional control-room numbers `1800-123-2027` and `0883-1234567` look like placeholders; see the session reply.
+- **Ghats (O7):** owner marked `scripts/owner-ghats.json` as reviewed but no coordinates changed; not committed, see the session reply.
+
 ## Telugu and Hindi consent wording: language review recorded — 2026-11-21 (time not recorded)
 
 - **Who:** reviewer GKM Raju (Krishna Murthy Raju G, `gkmraju`, owner), owner statement: "Telugu and Hindi consent wording reviewed by GKM Raju on 21.11.2026". Recorded by Claude Code (agent). Independent reviewer: NONE.
