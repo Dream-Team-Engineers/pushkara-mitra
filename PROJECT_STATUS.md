@@ -6,6 +6,23 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Day close and starting point for next session — 2026-11-21 22:49:00 IST
+
+- **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.
+- **State now:** `main` at `c04af04`, pushed; CI, Security, Supply chain and Deploy staging passed; staging `/healthz` ok; `/api/v1/groups` answers 401 (database reached, sign-in required). Production is **not deployed**. Last local `npm run gate`: 780 passed, 24 skipped; build, budget and 175 routing cases passed.
+- **Done today (session from `b26a46c`):** O7 ghat checklist and O1 language list; Telugu/Hindi consent wording and O1 strings reviewed by GKM Raju (owner statements); ghat list accepted with approximate positions kept; helplines trimmed to 12 (two placeholder-looking control-room numbers removed); release-please removed; v1 scope recorded as Group, SOS and Pass (OQ-021); zoom and contrast confirmed on a phone; **My Group built** (ADR 0017: groups in D1, names and positions in Durable Object memory only, staging build only); **staging D1 created and bound** (APAC, migrations 0001–0003).
+- **Counsel:** owner states approval was obtained 2026-11-21; details to be supplied at the end. Until then OQ-024 and the legal register stay NEEDS REVIEW; engineering proceeds (owner direction).
+- **Starting point tomorrow:**
+  1. **Owner:** two-phone Group test on staging (fresh Incognito window, Me tab build line `c04af04 … staging`): create → join with code → both share → stop → leave. Report results and any error text.
+  2. **Agent:** fix anything from that test.
+  3. **Agent:** Group follow-ups: members on the map (pins while sharing), owner removes a member (server route plus button), server-side 10-member limit.
+  4. **Agent:** start **Pass** (pilgrim card: name, emergency contact, QR; kept on the phone only; ADR first; staging only).
+  5. **Agent, then owner:** add the 28 new `group.live.*` Telugu/Hindi strings to the O1 list for native review.
+  6. Then **SOS** design: settle OQ-035 (sending location versus Hard Rule 1) before building.
+- **Needs the owner:** Group test (item 1); native review of `group.live.*` strings; counsel details when ready (name, what was approved, answers on withdrawal, under-18 option and child age); paid plan before production (OQ-028).
+- **Rollback points:** `git revert` then push (staging redeploys), or `npx wrangler rollback <version> --env staging`. Group can be switched off on staging by removing `FLAG_GROUPS` / `FLAG_GROUP_LOCATION` from `[env.staging.vars]`; the database binding by removing the `d1_databases` block.
+- **Legal:** no sign-off recorded. Engineering readiness and legal sign-off are reported separately.
+
 ## Staging D1 database created — 2026-11-21 (time not recorded)
 
 - **Who:** owner approval ("create the staging database"), Krishna Murthy Raju G (`gkmraju`); run by Claude Code (agent). Independent reviewer: NONE.
