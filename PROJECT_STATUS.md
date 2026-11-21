@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Helplines trimmed, ghat list review recorded, counsel deferred — 2026-11-21 (time not recorded)
+
+- **Who:** owner directions (Krishna Murthy Raju G, `gkmraju`); implemented by Claude Code (agent). Independent reviewer: NONE.
+- **Helplines:** the provisional control-room numbers `1800-123-2027` and `0883-1234567` removed from `src/content/publishedContent.ts` at the owner's direction; 12 lines remain; review scope note updated; test now checks both are absent.
+- **Ghats (O7):** owner accepted the current positions; `scripts/owner-ghats.json` and `places.json` say "none surveyed, reviewed by the owner 2026-11-21", and entries marked `approx` keep their label. No coordinate changed.
+- **Counsel:** owner states counsel approval was obtained on 2026-11-21 and the details will be supplied later; owner directed work to proceed meanwhile. Until the details and evidence reference are recorded, OQ-024 and the legal register entries stay **NEEDS REVIEW** (Hard Rules 6 and 8); engineering work proceeds, production deploy still needs the owner's explicit release approval.
+
 ## Owner decisions: scope, language review, release-please, phone check — 2026-11-21 (time not recorded)
 
 - **Who:** decisions and statements by the owner, Krishna Murthy Raju G (`gkmraju`); recorded and implemented by Claude Code (agent). Independent reviewer: NONE.

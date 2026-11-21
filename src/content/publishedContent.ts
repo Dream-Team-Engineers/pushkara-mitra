@@ -317,8 +317,9 @@ const GHATS_ENTRY: ContentEntry = {
 /**
  * Helplines. 112 and 1098 cite the official page that states them. Every other number was supplied
  * by the owner on 2026-11-15 and is shown as unverified until an official page is found; the two
- * Pushkaralu control-room numbers are provisional. The owner will recheck every number on the last
- * day before the event.
+ * provisional Pushkaralu control-room numbers were removed by the owner on 2026-11-21 (they looked
+ * like placeholders); add them back only from an official district page. The owner will recheck
+ * every number on the last day before the event.
  */
 const HELPLINES_CANDIDATE = {
   updatedAt: '2026-11-15T10:00:00+05:30',
@@ -329,17 +330,14 @@ const HELPLINES_CANDIDATE = {
 const OWNER_SOURCE =
   'Number supplied by the owner (2026-11-15); not yet checked against an official page';
 
-const PROVISIONAL =
-  'Number supplied by the owner (2026-11-15) from a Pushkaralu 2027 portal; provisional: verify with the district administration before the festival';
-
-const ownerLine = (id: string, kind: string, number: string, source = OWNER_SOURCE) => ({
+const ownerLine = (id: string, kind: string, number: string) => ({
   updatedAt: '2026-11-15T12:30:00+05:30',
   status: 'unverified',
   synthetic: false,
   id,
   kind,
   number,
-  source,
+  source: OWNER_SOURCE,
   sourceUrl: null,
 });
 
@@ -375,8 +373,6 @@ const HELPLINES_ENTRY: ContentEntry = {
       ownerLine('women-181', 'women', '181'),
       ownerLine('distress-1091', 'distress', '1091'),
       ownerLine('tourist-1363', 'tourist', '1363'),
-      ownerLine('seva-control-1800', 'control', '1800-123-2027', PROVISIONAL),
-      ownerLine('rjy-control-0883', 'localControl', '0883-1234567', PROVISIONAL),
     ],
   },
   review: {
@@ -385,7 +381,7 @@ const HELPLINES_ENTRY: ContentEntry = {
     reviewedRevision: '92a74c4',
     reviewedOn: '2026-11-15',
     scope:
-      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages; every other number was supplied by the owner and is shown as unverified. The two Pushkaralu control-room numbers come from a 2027 portal and are provisional. The owner will recheck all numbers on the last day before the event.',
+      'Approved by the owner on 2026-11-15 against the sources named in each item. Emergency 112 and child 1098 cite official pages; every other number was supplied by the owner and is shown as unverified. The two provisional Pushkaralu control-room numbers were removed as directed by the owner on 2026-11-21; the owner re-confirmed the remaining items the same day. The owner will recheck all numbers on the last day before the event.',
   },
 };
 

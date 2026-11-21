@@ -162,25 +162,15 @@ describe('Emergency / Help', () => {
   it('shows the approved numbers, marks owner-supplied ones unverified, and never dials by itself', async () => {
     await load();
     const html = render(<HelpScreen />);
-    for (const number of [
-      '112',
-      '100',
-      '101',
-      '102',
-      '108',
-      '1073',
-      '181',
-      '1091',
-      '1098',
-      '1363',
-      '1800-123-2027',
-    ])
+    for (const number of ['112', '100', '101', '102', '108', '1073', '181', '1091', '1098', '1363'])
       expect(html).toContain(number);
     expect(html).toContain(t('state.unverified'));
+    expect(html).not.toContain('1800-123-2027');
+    expect(html).not.toContain('0883-1234567');
     expect(html).not.toContain('tel:');
     expect(html).not.toContain('call-confirm');
     const calls = html.match(/<button[^>]*helpline__call[^>]*>/g) ?? [];
-    expect(calls).toHaveLength(14);
+    expect(calls).toHaveLength(12);
     for (const call of calls) expect(call).toContain('aria-haspopup="dialog"');
     expect(html).toContain(t('help.kin.note'));
   });
