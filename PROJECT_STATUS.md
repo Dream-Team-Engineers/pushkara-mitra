@@ -6,6 +6,12 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Telugu and Hindi consent wording: language review recorded — 2026-11-21 (time not recorded)
+
+- **Who:** reviewer GKM Raju (Krishna Murthy Raju G, `gkmraju`, owner), owner statement: "Telugu and Hindi consent wording reviewed by GKM Raju on 21.11.2026". Recorded by Claude Code (agent). Independent reviewer: NONE.
+- **Outcome:** `docs/legal/consent-and-privacy-wording-draft-te-hi.md` status changed to native language review recorded, no corrections made; OQ-029, OQ-030 and OQ-041 notes updated. Text unchanged.
+- **Still open:** counsel review (OQ-024) of the English wording. The drafts were reviewed before counsel; any English change means re-translation and a fresh review of the changed sections. Not in the app yet. Not legal sign-off.
+
 ## Gate 2 worksheets: ghat coordinates (O7) and language review (O1) — 2026-11-21 (time not recorded)
 
 - **Who:** prepared by Claude Code (agent) at the owner's request ("finish as much as possible"). Accountable owner: Krishna Murthy Raju G (`gkmraju`). Independent reviewer: NONE. Documentation only: no app code or data changed, nothing deployed.
