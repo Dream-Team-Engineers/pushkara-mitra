@@ -76,6 +76,27 @@
       "approx": true
     },
     {
+      "name": "Purushottapatnam Ghat",
+      "area": "Purushottapatnam, Seethanagaram",
+      "lat": 17.2523,
+      "lng": 81.6628,
+      "approx": true
+    },
+    {
+      "name": "Vangalapudi Ghat",
+      "area": "Vangalapudi, Seethanagaram",
+      "lat": 17.1972,
+      "lng": 81.6729,
+      "approx": true
+    },
+    {
+      "name": "Narasapuram Ghat",
+      "area": "Narasapuram, West Godavari",
+      "lat": 16.4386,
+      "lng": 81.7015,
+      "approx": true
+    },
+    {
       "name": "Antarvedi Ghat",
       "area": "Antarvedi, Konaseema",
       "lat": 16.3333,
