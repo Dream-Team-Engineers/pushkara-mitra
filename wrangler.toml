@@ -64,6 +64,13 @@ class_name = "GroupLocation"
 [[env.staging.migrations]]
 tag = "v1"
 new_sqlite_classes = ["GroupLocation"]
+# D1 for staging (owner approval 2026-11-21): sessions, consent records, groups. No location.
+# Created in region APAC; Cloudflare gives no India residency guarantee (OQ-026).
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "pushkara-mitra-staging"
+database_id = "3bf2a0ec-4b67-4be5-b537-23fa5b9f5833"
+migrations_dir = "migrations"
 
 [env.production]
 name = "pushkara-mitra-production"

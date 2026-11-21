@@ -6,6 +6,12 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Staging D1 database created — 2026-11-21 (time not recorded)
+
+- **Who:** owner approval ("create the staging database"), Krishna Murthy Raju G (`gkmraju`); run by Claude Code (agent). Independent reviewer: NONE.
+- **Done:** `npx wrangler d1 create pushkara-mitra-staging` (region APAC, id `3bf2a0ec-4b67-4be5-b537-23fa5b9f5833`); bound as `DB` in `[env.staging]`; `npx wrangler d1 migrations apply pushkara-mitra-staging --env staging --remote` applied 0001, 0002 and 0003. Staging now stores sessions (pseudonymous ID, expiry), consent records and groups; never location. No India residency guarantee (OQ-026, pending counsel details).
+- **Rollback:** remove the `d1_databases` block and push (the Worker answers 503 for group, consent and SOS routes again); `npx wrangler d1 delete pushkara-mitra-staging` erases the data.
+
 ## My Group, real version (staging only) — 2026-11-21 (time not recorded)
 
 - **Who:** owner go-ahead ("YES"), Krishna Murthy Raju G (`gkmraju`); built by Claude Code (agent). Independent reviewer: NONE.
