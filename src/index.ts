@@ -30,6 +30,9 @@ export interface Env {
   /** Kill switches. A feature is on only when its variable is exactly `enabled` (see src/flags.ts). */
   FLAG_GROUPS?: string;
   FLAG_SOS?: string;
+  FLAG_CROWD?: string;
+  /** Worker secret: the bearer token that may report crowd levels. Without it the ingest route answers 503. */
+  CROWD_INGEST_TOKEN?: string;
 }
 
 function repositoryFor(env: Env): Repository | undefined {
@@ -42,6 +45,7 @@ async function route(request: Request, env: Env): Promise<Response> {
       env,
       repo: repositoryFor(env),
       sessionSecret: env.SESSION_SECRET,
+      crowdIngestToken: env.CROWD_INGEST_TOKEN,
     });
   }
 

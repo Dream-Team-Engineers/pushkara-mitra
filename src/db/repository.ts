@@ -8,6 +8,14 @@ import { randomId } from './ids';
 export type ConsentPurpose = 'sign-in' | 'group' | 'pass' | 'notifications';
 export type SosCategory = 'medical' | 'lost' | 'crowd' | 'other';
 
+export type CrowdLevel = 'low' | 'moderate' | 'high';
+
+export interface CrowdReading {
+  readonly ghatId: string;
+  readonly level: CrowdLevel;
+  readonly reportedAt: string;
+}
+
 export interface ConsentRecord {
   readonly purposeId: ConsentPurpose;
   readonly noticeVersion: string;
@@ -67,6 +75,15 @@ export interface Repository {
     category: SosCategory;
     createdAt: string;
   }): Promise<{ id: string; duplicate: boolean }>;
+
+  /** Keeps only the latest level per ghat. No history, no reporter, no location. */
+  upsertCrowdReading(input: {
+    ghatId: string;
+    level: CrowdLevel;
+    reportedAt: string;
+  }): Promise<void>;
+  /** Readings reported at or after `sinceIso`; older ones are not returned (the caller shows noData). */
+  listCrowdReadings(sinceIso: string): Promise<readonly CrowdReading[]>;
 
   /** Erasure: removes everything held for this subject. Returns row counts. */
   eraseSubject(subjectRef: string): Promise<{ sessions: number; consents: number; groups: number }>;
@@ -280,6 +297,24 @@ export function d1Repository(db: D1Database): Repository {
       const existing = rows[0]?.id;
       if (existing === undefined) throw new Error('sos insert failed');
       return { id: existing, duplicate: true };
+    },
+
+    async upsertCrowdReading({ ghatId, level, reportedAt }) {
+      await run(
+        `INSERT INTO crowd_reading (ghat_id, level, reported_at) VALUES (?, ?, ?)
+         ON CONFLICT (ghat_id) DO UPDATE SET level = excluded.level, reported_at = excluded.reported_at`,
+        ghatId,
+        level,
+        reportedAt,
+      );
+    },
+
+    async listCrowdReadings(sinceIso) {
+      const rows = await all<{ ghat_id: string; level: CrowdLevel; reported_at: string }>(
+        'SELECT ghat_id, level, reported_at FROM crowd_reading WHERE reported_at >= ? ORDER BY ghat_id',
+        sinceIso,
+      );
+      return rows.map((r) => ({ ghatId: r.ghat_id, level: r.level, reportedAt: r.reported_at }));
     },
 
     async eraseSubject(subjectRef) {

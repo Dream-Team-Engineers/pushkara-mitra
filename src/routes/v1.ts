@@ -1,5 +1,5 @@
 import { randomJoinCode, sha256Hex } from '../db/ids';
-import type { ConsentPurpose, Repository, SosCategory } from '../db/repository';
+import type { ConsentPurpose, CrowdLevel, Repository, SosCategory } from '../db/repository';
 import { envFlags } from '../flags';
 import { memoryRateLimiter, type RateLimiter } from '../security/rateLimit';
 import {
@@ -22,6 +22,8 @@ import {
  *   POST   /api/v1/groups/{id}/invite  owner issues another join code         [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
  *   POST   /api/v1/sos                 SOS intake, no sign-in, no location    [flag FLAG_SOS]
+ *   GET    /api/v1/crowd               latest crowd level per ghat, public    [flag FLAG_CROWD]
+ *   POST   /api/v1/crowd               report a level, bearer token only      [flag FLAG_CROWD]
  *
  * Everything fails closed: a flag that is not exactly `enabled` answers 404; a missing database or
  * session secret answers 503 and never pretends to have stored or sent anything. Ownership comes from
@@ -42,11 +44,16 @@ const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 const PURPOSES: readonly ConsentPurpose[] = ['sign-in', 'group', 'pass', 'notifications'];
 const SOS_CATEGORIES: readonly SosCategory[] = ['medical', 'lost', 'crowd', 'other'];
 const LOCALES = ['te', 'en', 'hi'] as const;
+const CROWD_LEVELS: readonly CrowdLevel[] = ['low', 'moderate', 'high'];
+const GHAT_ID = /^[a-z0-9][a-z0-9/-]{0,63}$/;
+/** A reading older than this is not shown: the app reports "No data" rather than a stale level. */
+export const CROWD_STALE_AFTER_SECONDS = 30 * 60;
 
 const MESSAGES = {
   INVALID_REQUEST: 'The request is not valid.',
   NOT_SIGNED_IN: 'Sign in is required.',
   FORBIDDEN: 'The request is not allowed.',
+  UNAUTHORIZED: 'A valid reporting token is required.',
   NOT_FOUND: 'Not found.',
   METHOD_NOT_ALLOWED: 'Method not allowed.',
   UNSUPPORTED_MEDIA_TYPE: 'Send JSON.',
@@ -73,6 +80,8 @@ export interface V1Deps {
   readonly env: object;
   readonly repo: Repository | undefined;
   readonly sessionSecret: string | undefined;
+  /** Bearer token allowed to report crowd levels. Unset means reporting is unavailable (503). */
+  readonly crowdIngestToken?: string | undefined;
   readonly sosLimiter?: RateLimiter;
   readonly limiter?: RateLimiter;
   readonly nowSeconds?: () => number;
@@ -151,6 +160,55 @@ async function sos(request: Request, repo: Repository, now: number): Promise<Res
   // "received" is all this route can honestly say: staff alerting and SMS are not wired (OQ-035,
   // provider undecided). The page must not show "confirmed" or "help is coming" from this reply.
   return ok({ status: 'received', reference: result.id }, 202);
+}
+
+/** Equal-length comparison that does not stop at the first different character. */
+function sameText(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+async function crowd(
+  request: Request,
+  deps: V1Deps,
+  repo: Repository,
+  now: number,
+): Promise<Response> {
+  if (request.method === 'GET') {
+    const since = iso(now - CROWD_STALE_AFTER_SECONDS);
+    const readings = await repo.listCrowdReadings(since);
+    return ok({
+      staleAfterSeconds: CROWD_STALE_AFTER_SECONDS,
+      ghats: Object.fromEntries(
+        readings.map((r) => [r.ghatId, { level: r.level, reportedAt: r.reportedAt }]),
+      ),
+    });
+  }
+  if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'GET, POST' });
+
+  const expected = deps.crowdIngestToken;
+  if (expected === undefined || expected === '') return fail('UNAVAILABLE', 503);
+  const header = request.headers.get('Authorization') ?? '';
+  const given = header.startsWith('Bearer ') ? header.slice('Bearer '.length) : '';
+  // Hash both sides so the comparison length never depends on the secret.
+  const matches = sameText(
+    await sha256Hex(`crowd.v1|${given}`),
+    await sha256Hex(`crowd.v1|${expected}`),
+  );
+  if (!matches) return fail('UNAUTHORIZED', 401, { 'WWW-Authenticate': 'Bearer' });
+
+  const body = await readJsonObject(request);
+  if (body instanceof Response) return body;
+  if (!hasOnlyKeys(body, ['ghatId', 'level'])) return fail('INVALID_REQUEST', 400);
+  const { ghatId, level } = body;
+  if (typeof ghatId !== 'string' || !GHAT_ID.test(ghatId)) return fail('INVALID_REQUEST', 400);
+  if (typeof level !== 'string' || !CROWD_LEVELS.includes(level as CrowdLevel)) {
+    return fail('INVALID_REQUEST', 400);
+  }
+  await repo.upsertCrowdReading({ ghatId, level: level as CrowdLevel, reportedAt: iso(now) });
+  return ok({ recorded: true }, 201);
 }
 
 async function me(
@@ -294,13 +352,15 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
   const now = (deps.nowSeconds ?? (() => Math.floor(Date.now() / 1000)))();
 
   const isSos = path === '/sos';
+  const isCrowd = path === '/crowd';
   const isGroups = path === '/groups' || path.startsWith('/groups/');
   const isMe = path === '/me' || path === '/me/consents';
   // Unknown paths are 404 before any flag, limiter, database or session is consulted.
   const knownGroups = path === '/groups' || path === '/groups/join' || GROUP_ACTION.test(path);
-  if (!isSos && !isMe && !(isGroups && knownGroups)) return fail('NOT_FOUND', 404);
+  if (!isSos && !isCrowd && !isMe && !(isGroups && knownGroups)) return fail('NOT_FOUND', 404);
   if (isSos && !flags.isEnabled('sos')) return fail('NOT_FOUND', 404);
   if (isGroups && !flags.isEnabled('groups')) return fail('NOT_FOUND', 404);
+  if (isCrowd && !flags.isEnabled('crowd')) return fail('NOT_FOUND', 404);
 
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   const limiter = isSos ? (deps.sosLimiter ?? defaultSosLimiter) : (deps.limiter ?? defaultLimiter);
@@ -313,6 +373,7 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
   if (repo === undefined) return fail('UNAVAILABLE', 503);
   try {
     if (isSos) return await sos(request, repo, now);
+    if (isCrowd) return await crowd(request, deps, repo, now);
     if (isGroups) return await groups(request, deps, repo, now, path.slice('/groups'.length));
     return await me(request, deps, repo, now, path.slice('/me'.length));
   } catch {

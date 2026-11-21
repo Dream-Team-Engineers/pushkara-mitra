@@ -7,6 +7,7 @@ export type KillSwitch =
   | 'group-location'
   | 'groups'
   | 'sos'
+  | 'crowd'
   | 'pilgrim-pass'
   | 'photo-upload'
   | 'payments'
@@ -22,6 +23,7 @@ export const FLAG_VARIABLES: Readonly<Record<KillSwitch, string>> = {
   'group-location': 'FLAG_GROUP_LOCATION',
   groups: 'FLAG_GROUPS',
   sos: 'FLAG_SOS',
+  crowd: 'FLAG_CROWD',
   'pilgrim-pass': 'FLAG_PILGRIM_PASS',
   'photo-upload': 'FLAG_PHOTO_UPLOAD',
   payments: 'FLAG_PAYMENTS',
