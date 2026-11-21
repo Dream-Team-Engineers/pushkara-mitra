@@ -43,6 +43,8 @@ export default defineConfig({
           name: 'repo-guards',
           environment: 'node',
           include: ['tests/guards/**/*.test.ts'],
+          // Several guards spawn shell scripts; on Windows with many workers the 5s default flakes.
+          testTimeout: 30_000,
         },
       },
     ],
