@@ -2,6 +2,7 @@ import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { GHATS } from '../../shared/data/fixtures';
+import { SHOW_SAMPLES } from '../../shared/flags/flags';
 import { t } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
@@ -77,73 +78,76 @@ export function VolunteerPanel() {
   const previewed = useSignal(false);
   return (
     <>
-      <section class="section" aria-labelledby="report-title">
-        <h2 id="report-title" class="section__title">
-          <Bi k="partners.report.title" />
-        </h2>
-        <div class="field field--flush">
-          <label for="report-ghat">
-            <Bi k="partners.report.ghat" />
-          </label>
-          <select
-            id="report-ghat"
-            value={ghat.value}
-            onChange={(event) => {
-              ghat.value = event.currentTarget.value;
-            }}
-          >
-            {GHATS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <ChipGroup
-          legend="partners.report.level"
-          options={LEVELS}
-          selected={level.value}
-          onSelect={(value) => {
-            level.value = value;
-          }}
-        />
-        <div class="field field--flush">
-          <label for="report-note">
-            <Bi k="partners.report.note.label" />
-          </label>
-          <textarea
-            id="report-note"
-            rows={3}
-            maxLength={200}
-            value={note.value}
-            onInput={(event) => {
-              note.value = event.currentTarget.value;
+      {/* The report form picks from sample ghats and does nothing yet: not in production (OQ-044). */}
+      {SHOW_SAMPLES ? (
+        <section class="section" aria-labelledby="report-title">
+          <h2 id="report-title" class="section__title">
+            <Bi k="partners.report.title" />
+          </h2>
+          <div class="field field--flush">
+            <label for="report-ghat">
+              <Bi k="partners.report.ghat" />
+            </label>
+            <select
+              id="report-ghat"
+              value={ghat.value}
+              onChange={(event) => {
+                ghat.value = event.currentTarget.value;
+              }}
+            >
+              {GHATS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <ChipGroup
+            legend="partners.report.level"
+            options={LEVELS}
+            selected={level.value}
+            onSelect={(value) => {
+              level.value = value;
             }}
           />
-        </div>
-        <div class="actions actions--flush">
-          <button
-            type="button"
-            class="button"
-            onClick={() => {
-              previewed.value = true;
-            }}
-          >
-            {t('partners.report.send')}
-          </button>
-        </div>
-        {previewed.value ? (
-          <p class="notice notice--flush" role="status">
-            {t('proto.notSent')}
-          </p>
-        ) : null}
-        <p class="note note--flush">{t('partners.report.note')}</p>
-      </section>
+          <div class="field field--flush">
+            <label for="report-note">
+              <Bi k="partners.report.note.label" />
+            </label>
+            <textarea
+              id="report-note"
+              rows={3}
+              maxLength={200}
+              value={note.value}
+              onInput={(event) => {
+                note.value = event.currentTarget.value;
+              }}
+            />
+          </div>
+          <div class="actions actions--flush">
+            <button
+              type="button"
+              class="button"
+              onClick={() => {
+                previewed.value = true;
+              }}
+            >
+              {t('partners.report.send')}
+            </button>
+          </div>
+          {previewed.value ? (
+            <p class="notice notice--flush" role="status">
+              {t('proto.notSent')}
+            </p>
+          ) : null}
+          <p class="note note--flush">{t('partners.report.note')}</p>
+        </section>
+      ) : null}
       <section class="section" aria-labelledby="shift-title">
         <h2 id="shift-title" class="section__title">
           <Bi k="partners.shift.title" />
         </h2>
-        <p class="card__meta">{t('partners.shift.sample')}</p>
+        {SHOW_SAMPLES ? <p class="card__meta">{t('partners.shift.sample')}</p> : null}
         <a class="button button--secondary" href={hrefFor('help')}>
           <Bi k="partners.emergency" />
         </a>
