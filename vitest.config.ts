@@ -28,6 +28,8 @@ export default defineConfig({
       {
         // Frontend logic and server-rendered component tests run on Node (no DOM library).
         plugins: [preact()],
+        // Tests render the labelled sample rows; only the production build hides them (OQ-044).
+        define: { 'import.meta.env.VITE_SHOW_SAMPLES': JSON.stringify('enabled') },
         test: {
           name: 'web',
           environment: 'node',

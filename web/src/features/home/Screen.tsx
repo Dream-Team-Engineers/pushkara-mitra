@@ -1,4 +1,5 @@
 import { useLiveNews } from '../../shared/data/news';
+import { SHOW_SAMPLES } from '../../shared/flags/flags';
 import { ADS, HEADLINES } from '../../shared/data/fixtures-home';
 import { countdown, EVENT, now } from '../../shared/data/time';
 import { formatNumber, pair, t, type MessageKey } from '../../shared/i18n/i18n';
@@ -178,29 +179,36 @@ function WeatherStrip() {
   );
 }
 
-/** Live headlines when the service has them; otherwise the labelled samples. */
+/** Live headlines when the service has them; otherwise the labelled samples (not in production). */
 function headlineItems(live: ReturnType<typeof useLiveNews>) {
-  return live === null || live.length === 0
-    ? HEADLINES
-    : live.map((item) => ({
-        id: item.id,
-        text: `${item.title} · ${item.source}`,
-        href: item.url,
-      }));
+  if (live !== null && live.length > 0) {
+    return live.map((item) => ({
+      id: item.id,
+      text: `${item.title} · ${item.source}`,
+      href: item.url,
+    }));
+  }
+  return SHOW_SAMPLES ? HEADLINES : [];
 }
 
 export default function HomeScreen() {
   const live = useLiveNews();
+  const headlines = headlineItems(live);
   return (
     <>
       <WeatherStrip />
-      <Marquee
-        tone="news"
-        badge={t('home.breakingNews')}
-        label={t('home.breakingNews')}
-        items={headlineItems(live)}
-      />
-      <Marquee tone="ad" badge={t('home.sponsored')} label={t('home.sponsored')} items={ADS} />
+      {headlines.length > 0 ? (
+        <Marquee
+          tone="news"
+          badge={t('home.breakingNews')}
+          label={t('home.breakingNews')}
+          items={headlines}
+        />
+      ) : null}
+      {/* The strip holds sample ads only; real sponsored content needs counsel and a source (OQ-044). */}
+      {SHOW_SAMPLES ? (
+        <Marquee tone="ad" badge={t('home.sponsored')} label={t('home.sponsored')} items={ADS} />
+      ) : null}
       <section class="hero">
         <img
           class="hero-logo"

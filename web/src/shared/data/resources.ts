@@ -5,6 +5,7 @@ import { fetchPublicContent } from './publicContent';
 import type { Locale } from '../i18n/i18n';
 import { fetchPublicInformation, type PublicInformation } from './publicInformation';
 import { GHATS, HELP_POINTS, HELPLINES, STAYS, TRAVEL, UPDATES } from './fixtures';
+import { SHOW_SAMPLES } from '../flags/flags';
 import { createResource, type Resource } from './resource';
 
 const MINUTE = 60_000;
@@ -12,12 +13,13 @@ const HOUR = 60 * MINUTE;
 
 /**
  * Approved data from the Worker when it exists; otherwise the built-in samples, each labelled
- * "Sample" on screen. A network or contract failure is an error (the resource keeps its last good
- * data), never a silent switch to samples.
+ * "Sample" on screen, outside production. The production build shows no samples: the screen's
+ * empty state appears instead (OQ-044). A network or contract failure is an error (the resource
+ * keeps its last good data), never a silent switch to samples.
  */
 function publishedOr<T extends PublicMeta>(kind: ContentKind, samples: readonly T[]) {
   return async (): Promise<readonly T[]> =>
-    (await fetchPublicContent<T>(kind)) ?? loadPublic(samples);
+    (await fetchPublicContent<T>(kind)) ?? (SHOW_SAMPLES ? loadPublic(samples) : []);
 }
 
 /** Stale thresholds come from docs/frontend/architecture-blueprint.md and are proposals pending owner review. */

@@ -10,7 +10,7 @@ import {
   type PlaceCategory,
 } from '../../shared/data/places';
 import { osmPointUrl, osmSearchUrl } from '../../shared/data/sourceLinks';
-import { FLAGS } from '../../shared/flags/flags';
+import { FLAGS, SHOW_SAMPLES } from '../../shared/flags/flags';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { offlineMapStatus, saveOfflineMap } from '../../shared/pwa/offlineMap';
 import {
@@ -522,31 +522,36 @@ export default function MapScreen() {
           <span class="visually-hidden">{t('links.opensNewTab')}</span>
         </span>
       </a>
-      <section class="section" aria-labelledby="map-members-title">
-        <h2 id="map-members-title" class="section__title">
-          <Bi k="map.members" />
-        </h2>
-        <ul class="card-list card-list--flush">
-          <li class="card">
-            <p class="card__title">{t('nav.me')}</p>
-            <p class="card__meta">{t('map.member.off')}</p>
-          </li>
-          <li class="card">
-            <p class="card__title">[Member 2]</p>
-            <p class="card__meta">{t('map.member.live')}</p>
-          </li>
-          <li class="card">
-            <p class="card__title">[Member 3]</p>
-            <p class="card__meta">{t('map.member.stale')}</p>
-          </li>
-        </ul>
-      </section>
-      <div class="field field--check">
-        <input id="map-only-group" type="checkbox" checked disabled />
-        <label for="map-only-group">
-          <Bi k="map.onlyGroup" />
-        </label>
-      </div>
+      {/* Placeholder members: not shown in production (OQ-044). */}
+      {SHOW_SAMPLES ? (
+        <>
+          <section class="section" aria-labelledby="map-members-title">
+            <h2 id="map-members-title" class="section__title">
+              <Bi k="map.members" />
+            </h2>
+            <ul class="card-list card-list--flush">
+              <li class="card">
+                <p class="card__title">{t('nav.me')}</p>
+                <p class="card__meta">{t('map.member.off')}</p>
+              </li>
+              <li class="card">
+                <p class="card__title">[Member 2]</p>
+                <p class="card__meta">{t('map.member.live')}</p>
+              </li>
+              <li class="card">
+                <p class="card__title">[Member 3]</p>
+                <p class="card__meta">{t('map.member.stale')}</p>
+              </li>
+            </ul>
+          </section>
+          <div class="field field--check">
+            <input id="map-only-group" type="checkbox" checked disabled />
+            <label for="map-only-group">
+              <Bi k="map.onlyGroup" />
+            </label>
+          </div>
+        </>
+      ) : null}
       <p class="note">{t('map.noHistory')}</p>
       <p class="note">{t('map.attribution')}</p>
       <div class="actions">

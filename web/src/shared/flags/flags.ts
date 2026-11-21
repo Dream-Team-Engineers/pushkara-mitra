@@ -15,6 +15,7 @@
 interface BuildEnv {
   readonly VITE_GOOGLE_CLIENT_ID?: string;
   readonly VITE_DEVICE_LOCATION?: string;
+  readonly VITE_SHOW_SAMPLES?: string;
 }
 const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
 const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
@@ -22,6 +23,14 @@ export const GOOGLE_CLIENT_ID: string | undefined =
   typeof CLIENT_ID === 'string' && CLIENT_ID.endsWith('.apps.googleusercontent.com')
     ? CLIENT_ID
     : undefined;
+
+/**
+ * Shows the built-in sample rows ("[Sample train 1]", sample headlines, the sample sponsored strip,
+ * placeholder group members). On in staging, development and tests so screens can be reviewed with
+ * content; off in the production build, where a screen with no approved data shows an honest empty
+ * state instead (OQ-044). Build-time constant, not read from the URL, storage or the network.
+ */
+export const SHOW_SAMPLES: boolean = BUILD_ENV.VITE_SHOW_SAMPLES === 'enabled';
 
 export const FLAGS = {
   /**

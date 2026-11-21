@@ -37,6 +37,8 @@ export default defineConfig(({ mode }) => ({
     ),
     // Device position on the map: staging build only (flags.ts, OQ-041).
     'import.meta.env.VITE_DEVICE_LOCATION': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
+    // Labelled sample rows and the sample sponsored strip: every build except production (OQ-044).
+    'import.meta.env.VITE_SHOW_SAMPLES': JSON.stringify(mode === 'production' ? '' : 'enabled'),
   },
   plugins: [
     preact(),

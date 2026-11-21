@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { SHOW_SAMPLES } from '../../shared/flags/flags';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import type { TravelFixture, TravelMode } from '../../shared/data/fixtures';
@@ -41,54 +42,59 @@ export default function TravelScreen() {
         <p class="note">{t('links.travel.note')}</p>
         <LinkCards links={TRAVEL_LINKS} />
       </section>
-      <ChipGroup
-        legend="travel.mode.legend"
-        options={MODES}
-        selected={mode.value}
-        onSelect={(value) => {
-          mode.value = value;
-        }}
-      />
-      <div class="field">
-        <label for="travel-from">
-          <Bi k="travel.from" />
-        </label>
-        <input
-          id="travel-from"
-          type="text"
-          autocomplete="off"
-          value={from.value}
-          onInput={(event) => {
-            from.value = event.currentTarget.value;
-          }}
-        />
-      </div>
-      <p class="note">{t('travel.sample')}</p>
-      <ResourceView
-        resource={travelResource}
-        render={(items) => {
-          const rows = filterTravel(items, mode.value, from.value);
-          return rows.length === 0 ? (
-            <p class="note">{t('travel.noRows')}</p>
-          ) : (
-            <ul class="card-list">
-              {rows.map((row) => (
-                <li key={row.id} class="card">
-                  <h2 class="card__title">{row.name}</h2>
-                  <p class="card__meta">
-                    {row.from} – {row.to}
-                  </p>
-                  <p class="card__meta">
-                    {t('travel.dep', { time: row.departs })} ·{' '}
-                    {t('travel.arr', { time: row.arrives })}
-                  </p>
-                  <SourceStamp meta={row} />
-                </li>
-              ))}
-            </ul>
-          );
-        }}
-      />
+      {/* The mode filter and rows hold samples only; production shows the official links instead (OQ-044). */}
+      {SHOW_SAMPLES ? (
+        <>
+          <ChipGroup
+            legend="travel.mode.legend"
+            options={MODES}
+            selected={mode.value}
+            onSelect={(value) => {
+              mode.value = value;
+            }}
+          />
+          <div class="field">
+            <label for="travel-from">
+              <Bi k="travel.from" />
+            </label>
+            <input
+              id="travel-from"
+              type="text"
+              autocomplete="off"
+              value={from.value}
+              onInput={(event) => {
+                from.value = event.currentTarget.value;
+              }}
+            />
+          </div>
+          <p class="note">{t('travel.sample')}</p>
+          <ResourceView
+            resource={travelResource}
+            render={(items) => {
+              const rows = filterTravel(items, mode.value, from.value);
+              return rows.length === 0 ? (
+                <p class="note">{t('travel.noRows')}</p>
+              ) : (
+                <ul class="card-list">
+                  {rows.map((row) => (
+                    <li key={row.id} class="card">
+                      <h2 class="card__title">{row.name}</h2>
+                      <p class="card__meta">
+                        {row.from} – {row.to}
+                      </p>
+                      <p class="card__meta">
+                        {t('travel.dep', { time: row.departs })} ·{' '}
+                        {t('travel.arr', { time: row.arrives })}
+                      </p>
+                      <SourceStamp meta={row} />
+                    </li>
+                  ))}
+                </ul>
+              );
+            }}
+          />
+        </>
+      ) : null}
       <section class="section" aria-labelledby="reach-title">
         <h2 id="reach-title" class="section__title">
           <Bi k="travel.reach.title" />

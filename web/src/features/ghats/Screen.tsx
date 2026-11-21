@@ -112,6 +112,7 @@ export default function GhatsScreen() {
       <ResourceView
         resource={ghatsResource}
         render={(items) => {
+          if (items.length === 0) return <p class="note">{t('state.empty')}</p>;
           const visible = filterGhats(items, filter.value);
           // Samples say they are samples; approved data says what the source does not cover.
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';

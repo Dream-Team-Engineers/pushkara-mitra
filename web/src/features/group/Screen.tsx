@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { SHOW_SAMPLES } from '../../shared/flags/flags';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { user } from '../../shared/auth/google';
@@ -24,6 +25,11 @@ export const SAMPLE_MEMBERS: readonly Member[] = [
   { id: 'm2', name: '[Member 2]', status: 'off' },
   { id: 'm3', name: '[Member 3]', status: 'off' },
 ];
+
+/** Production starts with only the signed-in person; the placeholder names are not shown (OQ-044). */
+export const INITIAL_MEMBERS: readonly Member[] = SHOW_SAMPLES
+  ? SAMPLE_MEMBERS
+  : SAMPLE_MEMBERS.filter((member) => member.name === null);
 
 export const MAX_MEMBERS = 10;
 const MAX_MEMBER_NAME = 40;
@@ -71,7 +77,7 @@ export default function GroupScreen() {
   const code = useSignal('');
   const created = useSignal(false);
   const joined = useSignal(false);
-  const members = useSignal<readonly Member[]>(SAMPLE_MEMBERS);
+  const members = useSignal<readonly Member[]>(INITIAL_MEMBERS);
   // The person starts in the sample group (themselves plus two members), and can be in only one.
   const inGroup = useSignal(true);
   const newName = useSignal('');
@@ -115,7 +121,7 @@ export default function GroupScreen() {
                 if (inGroup.value) return;
                 created.value = true;
                 inGroup.value = true;
-                members.value = SAMPLE_MEMBERS;
+                members.value = INITIAL_MEMBERS;
               }}
             >
               {t('group.create')}
