@@ -1,3 +1,5 @@
+import { randomId, sha256Hex } from '../db/ids';
+import type { Repository } from '../db/repository';
 import { googleKeyFetcher, verifyGoogleIdToken, type KeyFetcher } from '../security/googleIdToken';
 import {
   AUTH_WINDOW_SECONDS,
@@ -16,6 +18,8 @@ import {
   readNonce,
   readSessionToken,
   SESSION_COOKIE,
+  SESSION_MAX_AGE_SECONDS,
+  pseudonymFor,
   sessionCookie,
 } from '../security/session';
 
@@ -49,6 +53,8 @@ export interface AuthDeps {
   readonly getKeys?: KeyFetcher;
   readonly nowSeconds?: () => number;
   readonly limiter?: RateLimiter;
+  /** When present, sessions are recorded server-side so they can be revoked (sign-out, erasure). */
+  readonly repo?: Repository;
 }
 
 const defaultLimiter = memoryRateLimiter();
@@ -105,7 +111,21 @@ async function signIn(request: Request, deps: AuthDeps, now: number): Promise<Re
 
   const headers = new Headers(NO_STORE);
   if (remembered) {
-    headers.append('Set-Cookie', sessionCookie(await createSessionToken(user, secret, now)));
+    let sid: string | undefined;
+    if (deps.repo !== undefined) {
+      sid = randomId();
+      try {
+        await deps.repo.createSession({
+          idHash: await sha256Hex(sid),
+          subjectRef: await pseudonymFor(user.sub, secret),
+          createdAt: new Date(now * 1000).toISOString(),
+          expiresAt: new Date((now + SESSION_MAX_AGE_SECONDS) * 1000).toISOString(),
+        });
+      } catch {
+        return fail(503, 'unavailable'); // Never issue a cookie the server cannot revoke.
+      }
+    }
+    headers.append('Set-Cookie', sessionCookie(await createSessionToken(user, secret, now, sid)));
     headers.append('Set-Cookie', clearedNonceCookie());
   }
   return Response.json({ name: user.name, email: user.email, remembered }, { headers });
@@ -117,11 +137,41 @@ async function me(request: Request, deps: AuthDeps, now: number): Promise<Respon
   if (secret === undefined || secret === '' || token === null) return fail(401, 'not_signed_in');
   const session = await readSessionToken(token, secret, now);
   if (session === null) return fail(401, 'not_signed_in');
+  if (deps.repo !== undefined) {
+    // With a database, only a session the server still holds (and has not revoked) signs anyone in.
+    try {
+      const active =
+        session.sid !== undefined &&
+        (await deps.repo.isSessionActive(
+          await sha256Hex(session.sid),
+          session.id,
+          new Date(now * 1000).toISOString(),
+        ));
+      if (!active) return fail(401, 'not_signed_in');
+    } catch {
+      return fail(503, 'unavailable');
+    }
+  }
   return Response.json({ remembered: true, name: session.name }, { headers: NO_STORE });
 }
 
-function logout(request: Request): Response {
+async function logout(request: Request, deps: AuthDeps, now: number): Promise<Response> {
   if (!sameOrigin(request)) return fail(403, 'forbidden');
+  const secret = deps.sessionSecret;
+  const token = readCookie(request.headers.get('Cookie'), SESSION_COOKIE);
+  if (deps.repo !== undefined && secret !== undefined && secret !== '' && token !== null) {
+    const session = await readSessionToken(token, secret, now);
+    if (session?.sid !== undefined) {
+      try {
+        await deps.repo.revokeSession(
+          await sha256Hex(session.sid),
+          new Date(now * 1000).toISOString(),
+        );
+      } catch {
+        return fail(503, 'unavailable'); // Do not claim sign-out when the server-side record remains.
+      }
+    }
+  }
   const headers = new Headers(NO_STORE);
   headers.append('Set-Cookie', clearedSessionCookie());
   return new Response(null, { status: 204, headers });
@@ -154,7 +204,7 @@ export async function handleAuth(request: Request, deps: AuthDeps): Promise<Resp
   }
   if (pathname === `${AUTH_PREFIX}logout`) {
     return request.method === 'POST'
-      ? logout(request)
+      ? logout(request, deps, now)
       : fail(405, 'method_not_allowed', { Allow: 'POST' });
   }
   return new Response('Not Found', { status: 404, headers: NO_STORE });

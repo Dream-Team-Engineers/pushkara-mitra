@@ -1,14 +1,43 @@
 /**
- * Kill-switch interface (stub). Risky features must sit behind a flag that fails closed.
- * A real provider (for example Workers KV config or an env var) arrives with the first risky feature.
+ * Kill switches. Every risky feature sits behind a flag that fails closed: a flag is on only when the
+ * matching Worker variable is exactly `enabled`. A missing, empty or misspelt value means off.
+ * Flags are set per environment (wrangler.toml `[env.<name>.vars]` or the dashboard), never in code.
  */
-export type KillSwitch = 'group-location' | 'payments' | 'donations' | 'missing-person-reports';
+export type KillSwitch =
+  | 'group-location'
+  | 'groups'
+  | 'sos'
+  | 'pilgrim-pass'
+  | 'photo-upload'
+  | 'payments'
+  | 'donations'
+  | 'missing-person-reports';
 
 export interface FlagProvider {
   isEnabled(flag: KillSwitch): boolean;
 }
 
-/** Fails closed: every risky feature is off until a reviewed provider turns it on. */
+/** Worker variable that turns each switch on. */
+export const FLAG_VARIABLES: Readonly<Record<KillSwitch, string>> = {
+  'group-location': 'FLAG_GROUP_LOCATION',
+  groups: 'FLAG_GROUPS',
+  sos: 'FLAG_SOS',
+  'pilgrim-pass': 'FLAG_PILGRIM_PASS',
+  'photo-upload': 'FLAG_PHOTO_UPLOAD',
+  payments: 'FLAG_PAYMENTS',
+  donations: 'FLAG_DONATIONS',
+  'missing-person-reports': 'FLAG_MISSING_PERSON_REPORTS',
+};
+
+/** Fails closed: every risky feature is off. */
 export const failClosedFlags: FlagProvider = {
   isEnabled: () => false,
 };
+
+/** Reads switches from the Worker environment. Anything other than `enabled` is off. */
+export function envFlags(env: object): FlagProvider {
+  const vars = env as Record<string, unknown>;
+  return {
+    isEnabled: (flag) => vars[FLAG_VARIABLES[flag]] === 'enabled',
+  };
+}

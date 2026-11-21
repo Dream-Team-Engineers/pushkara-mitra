@@ -1,9 +1,11 @@
+import { d1Repository, type Repository } from './db/repository';
 import { GroupLocation } from './durable-objects/GroupLocation';
 import { AUTH_PREFIX, handleAuth } from './routes/googleAuth';
 import { handleMapArchive, MAP_ARCHIVE_PATH } from './routes/mapArchive';
 import { handlePublicNews, PUBLIC_NEWS_PATH } from './routes/news';
 import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicContent';
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
+import { handleV1, V1_PREFIX } from './routes/v1';
 import { withSecurityHeaders } from './security/headers';
 import { bindingRateLimiter, type RateLimitBinding } from './security/rateLimit';
 
@@ -23,13 +25,32 @@ export interface Env {
   SESSION_SECRET?: string;
   /** Optional Workers rate-limit binding for /api/auth/*; without it a per-isolate limiter applies. */
   AUTH_RATE_LIMIT?: RateLimitBinding;
+  /** D1 database (sessions, consent, groups, SOS). Created and bound by an owner; absent means no storage. */
+  DB?: D1Database;
+  /** Kill switches. A feature is on only when its variable is exactly `enabled` (see src/flags.ts). */
+  FLAG_GROUPS?: string;
+  FLAG_SOS?: string;
+}
+
+function repositoryFor(env: Env): Repository | undefined {
+  return env.DB === undefined ? undefined : d1Repository(env.DB);
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
+  if (new URL(request.url).pathname.startsWith(V1_PREFIX)) {
+    return handleV1(request, {
+      env,
+      repo: repositoryFor(env),
+      sessionSecret: env.SESSION_SECRET,
+    });
+  }
+
   if (new URL(request.url).pathname.startsWith(AUTH_PREFIX)) {
+    const repo = repositoryFor(env);
     return handleAuth(request, {
       clientId: env.GOOGLE_CLIENT_ID,
       sessionSecret: env.SESSION_SECRET,
+      ...(repo === undefined ? {} : { repo }),
       ...(env.AUTH_RATE_LIMIT === undefined
         ? {}
         : { limiter: bindingRateLimiter(env.AUTH_RATE_LIMIT) }),

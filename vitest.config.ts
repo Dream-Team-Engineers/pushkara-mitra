@@ -14,7 +14,12 @@ export default defineConfig({
     projects: [
       {
         // Worker code runs inside workerd via the Cloudflare pool.
-        plugins: [cloudflareTest({ wrangler: { configPath: './wrangler.toml' } })],
+        plugins: [
+          cloudflareTest({
+            wrangler: { configPath: './wrangler.toml' },
+            miniflare: { d1Databases: ['DB'] },
+          }),
+        ],
         test: {
           name: 'worker',
           include: ['tests/worker/**/*.test.ts'],

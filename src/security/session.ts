@@ -17,6 +17,8 @@ export interface SessionUser {
   readonly id: string;
   /** Display name for the header after a refresh. Never an email. Empty when the cookie has none. */
   readonly name: string;
+  /** Random session id, present when the cookie was issued with server-side revocation (a database). */
+  readonly sid?: string;
 }
 
 const MAX_NAME = 60;
@@ -28,6 +30,7 @@ const VERSION = 'v1';
 interface Claims {
   readonly s: string;
   readonly n?: string;
+  readonly j?: string;
   readonly iat: number;
   readonly exp: number;
 }
@@ -73,11 +76,13 @@ export async function createSessionToken(
   user: { readonly sub: string; readonly name?: string },
   secret: string,
   nowSeconds: number,
+  sid?: string,
 ): Promise<string> {
   const name = (user.name ?? '').trim().slice(0, MAX_NAME);
   const claims: Claims = {
     s: await pseudonymFor(user.sub, secret),
     ...(name === '' ? {} : { n: name }),
+    ...(sid === undefined ? {} : { j: sid }),
     iat: nowSeconds,
     exp: nowSeconds + SESSION_MAX_AGE_SECONDS,
   };
@@ -113,7 +118,8 @@ export async function readSessionToken(
     if (typeof claims.exp !== 'number' || claims.exp <= nowSeconds) return null;
     if (typeof claims.iat !== 'number' || claims.iat > nowSeconds + 60) return null;
     const name = typeof claims.n === 'string' ? claims.n.slice(0, MAX_NAME) : '';
-    return { id: claims.s, name };
+    const sid = typeof claims.j === 'string' && claims.j.length <= 64 ? claims.j : undefined;
+    return { id: claims.s, name, ...(sid === undefined ? {} : { sid }) };
   } catch {
     return null;
   }
