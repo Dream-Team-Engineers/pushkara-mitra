@@ -180,15 +180,16 @@ ws.onmessage = (message) => {
       `console.error: ${data.params.args.map((a) => a.value ?? a.description).join(' ')}`,
     );
   // This test serves only static files, with no Worker behind it, so the public content API
-  // (/api/public/...) answers 404 here, and it cannot be reached at all during the offline phase.
+  // (/api/public/...) and the crowd endpoint (/api/v1/crowd, off unless FLAG_CROWD is set) answer 404
+  // here, and they cannot be reached at all during the offline phase.
   // The app is built to handle both (it shows its draft or offline state) and the browser logs
-  // each as an error. Ignore exactly those two cases for that path; every other error, including
+  // each as an error. Ignore exactly those two cases for those paths; every other error, including
   // a failure for any other URL, still fails the test.
   if (
     data.method === 'Log.entryAdded' &&
     data.params.entry.level === 'error' &&
     !(
-      /\/api\/public\//.test(data.params.entry.url ?? '') &&
+      /\/api\/(?:public\/|v1\/crowd(?:\?|$))/.test(data.params.entry.url ?? '') &&
       /status of 404|ERR_INTERNET_DISCONNECTED/.test(data.params.entry.text ?? '')
     )
   )
