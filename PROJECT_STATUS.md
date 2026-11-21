@@ -6,6 +6,48 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Launch gates, suggested order — 2026-11-21 (time not recorded)
+
+- **Who:** order supplied by the owner (Krishna Murthy Raju G, `gkmraju`); written into this file by Claude Code (agent). Independent reviewer: NONE. Documentation only: no code changed, nothing run or deployed.
+- **Gates, in order:**
+  1. **Engage counsel (OQ-024), then settle consent and privacy wording** (OQ-030, OQ-041, OQ-029, OQ-019; see the blocker table below). Owner action.
+  2. **Finish the data (O7)** (ghat coordinates and confirmed positions) **and the language review (O1)** (native review of Hindi and Telugu strings). Owner action.
+  3. **Decide the scope of version 1:** browse-only, or including Group, SOS and Pass (SOS depends on OQ-035). Owner decision.
+  4. **Device and accessibility pass** (O2 real-phone location test; A1 light, dark and outdoor themes; 200% text size; unconfirmed zoom-button and contrast fixes). Owner on device, agent fixes findings.
+  5. **Move to a paid plan (OQ-028), then production deploy and monitoring.** `npm run ship:production` only after the owner explicitly approves that release; verify `/healthz`, record commit, time and rollback route.
+- **Status:** all five gates open. Engineering readiness and legal sign-off are reported separately; nothing here certifies compliance.
+- **Next:** owner engages counsel (gate 1); agent can prepare the consent and privacy wording drafts and the O7/O1 review lists for that.
+
+## Launch blockers: compliance and legal, none signed off — 2026-11-21 (time not recorded)
+
+- **Who:** list supplied by the owner (Krishna Murthy Raju G, `gkmraju`); written into this file by Claude Code (agent). Independent reviewer: NONE. Documentation only: no code changed, no command run beyond a search confirming each OQ ID below exists in `docs/decisions/OPEN_QUESTIONS.md`. Register wording was not re-verified against any source.
+- **Legal sign-off: zero.** Counsel is not engaged (OQ-024). Engineering readiness and legal sign-off are tracked separately; nothing here certifies compliance.
+
+| Blocker before production                                           | OQ     | Register status (as read 2026-11-21)                                                  |
+| ------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| Counsel engaged                                                     | OQ-024 | Open, no status                                                                       |
+| Data fiduciary and nodal officer identity                           | OQ-023 | Owner decided 2026-11-14 (individual); counsel review NEEDS REVIEW                    |
+| DPDP effective dates                                                | OQ-003 | OPEN                                                                                  |
+| Consent wording for sign-in, including under-18s                    | OQ-030 | OPEN; built on staging only, consent record and under-18 verification open            |
+| Device-location notice wording                                      | OQ-041 | Staging only; notice in three languages, counsel review and under-18 position pending |
+| SOS location handling versus "never persist location" (Hard Rule 1) | OQ-035 | Open, no status                                                                       |
+| Data residency (no India pinning on Cloudflare)                     | OQ-026 | DEFERRED 2026-11-15, v1 uses no D1                                                    |
+| Identity and personal data outside India (Clerk, Supabase)          | OQ-033 | Open, no status                                                                       |
+| Privacy notice in Telugu and Hindi (English draft only)             | OQ-029 | OPEN: DRAFT, NEEDS REVIEW                                                             |
+| Telugu government disclaimer                                        | OQ-019 | OPEN                                                                                  |
+| Headline-reuse terms for the news publishers                        | OQ-037 | Owner to confirm terms; unchecked                                                     |
+| OpenStreetMap licence and attribution review                        | OQ-036 | Open, no status                                                                       |
+| Map asset licences                                                  | OQ-043 | Open; sprite licence text not found, not shipped                                      |
+| Source licence for the repository                                   | OQ-008 | OPEN (`LICENSE` is a placeholder)                                                     |
+| CERT-In assessment                                                  | OQ-007 | OPEN                                                                                  |
+| Security and grievance emails                                       | OQ-005 | Owner decided 2026-11-14; counsel review of grievance process NEEDS REVIEW            |
+| Official-organiser outreach                                         | OQ-018 | OPEN                                                                                  |
+| Donations, children and missing-person law                          | OQ-016 | OPEN                                                                                  |
+| Attendance forecast for capacity                                    | OQ-025 | Open, no status                                                                       |
+
+- **Note:** OQ-023 and OQ-005 are listed because the owner's list names them; the register shows an owner decision with counsel review still outstanding, so they are not closed.
+- **Next:** owner engages counsel (OQ-024) with the question list in `docs/operations/LAUNCH_APPROVALS.md` step 2; agent updates this table as each OQ changes.
+
 ## Day close and starting point for next session — 2026-11-20 22:10:00 IST
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.
