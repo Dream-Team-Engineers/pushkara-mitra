@@ -1047,3 +1047,68 @@ main > a.link-card {
 .live-map .maplibregl-ctrl-top-right {
   top: 3.5rem;
 }
+
+/*
+ * Large text (A1, WCAG 1.4.4 and 1.4.10). The width is in rem, so this applies when zoom or the
+ * system text size makes a phone narrower than 18rem (a 375px phone at about 130% and up), and
+ * never changes the normal layout. Everything wraps instead of scrolling sideways: the header
+ * drops its buttons to a second row, the tab bar becomes a two-column grid, long words break.
+ */
+@media (max-width: 18rem) {
+  .app-header {
+    flex-wrap: wrap;
+    row-gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  .app-header__actions {
+    flex-wrap: wrap;
+  }
+
+  .bottom-bar {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .bottom-bar a {
+    flex: 1 1 40%;
+    min-width: 0;
+    min-height: 2.75rem;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  /* SOS first, on its own full row, so its label stays whole and it is the first thing reached. */
+  .bottom-bar a.is-danger {
+    flex: 1 1 100%;
+    flex-direction: row;
+    gap: var(--space-2);
+    order: -1;
+  }
+
+  main {
+    padding-block-end: calc(12rem + env(safe-area-inset-bottom));
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  li,
+  a,
+  button,
+  label,
+  .card__title,
+  .card__meta,
+  .weather__city,
+  .weather__status,
+  .helpline__name {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    min-width: 0;
+  }
+
+  .helpline-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

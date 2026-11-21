@@ -31,3 +31,25 @@ QA_ORIGIN=http://127.0.0.1:8912 SHELL_PUBLIC_DIR="$PWD/public" node scripts/test
 If Playwright is supplied outside this project, set `PLAYWRIGHT_MODULE` to its absolute module entry (for example a local `index.mjs`); set `CHROMIUM_EXECUTABLE` only for an explicitly installed browser. Set `QA_ARTIFACT_DIR` to choose an evidence directory; default is `/tmp/pushkara-public-browser-qa`. No paid service or application dependency is added. The target is restricted to loopback HTTP. The harness closes only its own synthetic HTTP fixture and browser; the operator owns/stops the primary Wrangler server.
 
 Executed final v6 QA:14 groups passed,0 failed;96 route/language/width/root-font layout states plus computed light/dark text contrast, keyboard/focus/history/filter behavior, six-resource current-controller readiness, actual offline/private-cache exclusions and synthetic failed/successful upgrades. A synthetic older worker may recreate an old public cache while completing an in-flight fetch; current-controller/version/completeness and current offline content are verified rather than claiming perpetual old-cache absence. These checks are not axe coverage, screen-reader testing, native-language approval, native browser-zoom certification or cross-browser/device conformance.
+
+## A1: contrast and 200% text size (2026-11-21)
+
+Run in the built-in browser against a production build (`npm run dev`), English, 14 screens (home, pass, group, map, ghats, stay, travel, help, updates, conditions, partners, settings, privacy, delete-account) in the light, dark and outdoor themes. This is a script-based check, not a Lighthouse or axe run, and it is not a substitute for a check on real devices.
+
+**Contrast (WCAG 1.4.3, text only).** A script computed the contrast of every visible text element against its real background (colour layers composited, gradient backgrounds checked at each colour stop, worst case taken), using 4.5:1 for normal text and 3:1 for large text.
+
+| Theme   | Text elements checked (14 screens) | Below threshold |
+| ------- | ---------------------------------- | --------------- |
+| light   | 887                                | 0               |
+| dark    | 887                                | 0               |
+| outdoor | 887                                | 0               |
+
+A control element (grey on white) was flagged at 1.92:1, so the check can fail. Not covered: icons, borders and other non-text contrast (1.4.11), hover and focus states, the map canvas and pins, text over photographs (none found), Hindi and Telugu pages (same colours, different text), and states that need live data (stale or error badges).
+
+**200% text size (WCAG 1.4.4, 1.4.10).** A 375px phone at 200% zoom is 188 CSS px wide at the normal font size, so the screens were measured at 188px wide, looking for sideways page scroll and text outside the viewport.
+
+- Before: every screen scrolled sideways by 98px or more (help 218px, ghats 139px). The language button, the "SOS/Emergency" and "Me" tab labels and the weather city name were cut off.
+- Fix: a `@media (max-width: 18rem)` block at the end of `web/src/shared/ui/glass.css` (applies only when text is large enough to make a phone narrower than 18rem; the normal layout is unchanged, checked at 375px). The header wraps, the tab bar becomes a grid with SOS first on its own row, long words break, and helplines show one column.
+- After: 42 of 42 screen and theme combinations have no sideways scroll and no text outside the viewport.
+
+Known limits: at 200% the tab bar takes about 38% of a 406px-tall screen (content stays reachable, the page keeps room under it). At any size the home quick-access subtitles end in an ellipsis (`qcard__sub`), so long subtitles are cut. Android system font-size scaling was not tested on a real phone.
