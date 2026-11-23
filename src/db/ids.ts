@@ -24,9 +24,22 @@ export async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** Human-typable join code: 8 characters from an alphabet without look-alikes, about 40 bits. */
-export function randomJoinCode(): string {
+/**
+ * The group's one join code, the same from creation until the group ends (owner decision 2026-11-23).
+ * Derived from the group id with a server secret (HMAC-SHA-256), so it is never stored: D1 keeps only
+ * its hash in `invitation`, and any member can be shown it again. Alphabet without look-alikes, about 40 bits.
+ */
+export async function groupJoinCode(secret: string, groupId: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(`join-code.v2|${secret}`),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const mac = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(groupId)),
+  );
   const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  const bytes = crypto.getRandomValues(new Uint8Array(8));
-  return [...bytes].map((b) => alphabet[b % alphabet.length]).join('');
+  return [...mac.slice(0, 8)].map((b) => alphabet[b % alphabet.length]).join('');
 }

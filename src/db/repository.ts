@@ -55,6 +55,7 @@ export interface Repository {
   listConsent(subjectRef: string): Promise<readonly ConsentRecord[]>;
 
   createGroup(
+    id: string,
     ownerRef: string,
     name: string | null,
     nowIso: string,
@@ -63,14 +64,13 @@ export interface Repository {
     inviteExpiresIso: string,
     uses: number,
   ): Promise<string>;
-  createInvitation(
-    subjectRef: string,
+  /** Makes sure the group's permanent code is accepted (older groups had random codes). */
+  ensureInvitation(
     groupId: string,
     codeHash: string,
     expiresIso: string,
     uses: number,
-    nowIso: string,
-  ): Promise<boolean>;
+  ): Promise<void>;
   joinWithCode(subjectRef: string, codeHash: string, nowIso: string): Promise<JoinResult>;
   leaveGroup(subjectRef: string, groupId: string): Promise<boolean>;
   /**
@@ -82,7 +82,7 @@ export interface Repository {
     groupId: string,
     nowIso: string,
   ): Promise<readonly string[] | null>;
-  /** Removes a non-owner member and revokes every open invite code of the group. */
+  /** Removes a non-owner member and blocks them from joining this group again with its code. */
   removeMember(groupId: string, subjectRef: string, nowIso: string): Promise<boolean>;
   listGroups(subjectRef: string, nowIso: string): Promise<readonly GroupSummary[]>;
   /** The person's role in this active, unexpired group, or null when they are not a member. */
@@ -192,8 +192,7 @@ export function d1Repository(db: D1Database): Repository {
       }));
     },
 
-    async createGroup(ownerRef, name, nowIso, expiresIso, codeHash, inviteExpiresIso, uses) {
-      const id = randomId();
+    async createGroup(id, ownerRef, name, nowIso, expiresIso, codeHash, inviteExpiresIso, uses) {
       await db.batch([
         db
           .prepare('INSERT INTO group_ (id, name, created_at, expires_at) VALUES (?, ?, ?, ?)')
@@ -212,21 +211,15 @@ export function d1Repository(db: D1Database): Repository {
       return id;
     },
 
-    async createInvitation(subjectRef, groupId, codeHash, expiresIso, uses, nowIso) {
-      // Only the owner of an active, unexpired group may invite. The check and the insert are one statement.
-      const result = await run(
-        `INSERT INTO invitation (code_hash, group_id, expires_at, uses_left)
-         SELECT ?, g.id, ?, ? FROM group_ g
-         JOIN membership m ON m.group_id = g.id AND m.subject_ref = ? AND m.role = 'owner'
-         WHERE g.id = ? AND g.state = 'active' AND g.expires_at > ?`,
+    async ensureInvitation(groupId, codeHash, expiresIso, uses) {
+      await run(
+        `INSERT OR IGNORE INTO invitation (code_hash, group_id, expires_at, uses_left)
+         VALUES (?, ?, ?, ?)`,
         codeHash,
+        groupId,
         expiresIso,
         uses,
-        subjectRef,
-        groupId,
-        nowIso,
       );
-      return result.meta.changes === 1;
     },
 
     async joinWithCode(subjectRef, codeHash, nowIso) {
@@ -246,6 +239,13 @@ export function d1Repository(db: D1Database): Repository {
         subjectRef,
       );
       if (existing.length > 0) return { ok: false, reason: 'already_member' };
+      // Removed by the leader: the same answer as a wrong code, so nothing is revealed.
+      const blocked = await all(
+        'SELECT 1 AS ok FROM group_block WHERE group_id = ? AND subject_ref = ?',
+        groupId,
+        subjectRef,
+      );
+      if (blocked.length > 0) return { ok: false, reason: 'invalid_code' };
       const counted = await all<{ n: number }>(
         'SELECT COUNT(*) AS n FROM membership WHERE group_id = ?',
         groupId,
@@ -317,11 +317,12 @@ export function d1Repository(db: D1Database): Repository {
         subjectRef,
       );
       if (removed.meta.changes !== 1) return false;
-      // Old codes stop working, so the removed person cannot simply join again.
+      // The code stays the same for the whole group, so the removed person is blocked instead.
       await run(
-        'UPDATE invitation SET revoked_at = ? WHERE group_id = ? AND revoked_at IS NULL',
-        nowIso,
+        'INSERT OR IGNORE INTO group_block (group_id, subject_ref, blocked_at) VALUES (?, ?, ?)',
         groupId,
+        subjectRef,
+        nowIso,
       );
       return true;
     },
@@ -411,6 +412,7 @@ export function d1Repository(db: D1Database): Repository {
         db.prepare('DELETE FROM session WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM consent_ledger WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM membership WHERE subject_ref = ?').bind(subjectRef),
+        db.prepare('DELETE FROM group_block WHERE subject_ref = ?').bind(subjectRef),
       ]);
       // Groups left with no members are removed; their invitations go with them.
       await run(

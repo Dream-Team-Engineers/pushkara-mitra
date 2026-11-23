@@ -17,14 +17,11 @@ import {
 const ROOT = join(import.meta.dirname, '..', '..', 'web', 'src');
 
 /**
- * Files allowed to touch browser storage (docs/compliance/data-inventory.md): language and theme
- * (DI-11), and the current group's join code until it expires (DI-18, owner decision 2026-11-23).
- * Everything stored there is validated on read and covered by the files' own tests. Never location.
+ * Files allowed to touch browser storage: language and theme preference only
+ * (docs/compliance/data-inventory.md). Everything stored there is validated on read and
+ * covered by web/src/shared/prefs/preferences.test.ts.
  */
-const STORAGE_ALLOW_LIST: readonly string[] = [
-  'shared/prefs/preferences.ts',
-  'shared/group/savedCode.ts',
-];
+const STORAGE_ALLOW_LIST: readonly string[] = ['shared/prefs/preferences.ts'];
 /** Files allowed to use the network. Public read-only content client, once it exists. */
 const NETWORK_ALLOW_LIST: readonly string[] = [];
 /**

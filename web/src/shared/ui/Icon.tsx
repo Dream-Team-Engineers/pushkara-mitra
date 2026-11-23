@@ -31,7 +31,9 @@ export type IconName =
   | 'news'
   | 'bed'
   | 'book'
-  | 'chevron';
+  | 'chevron'
+  | 'share'
+  | 'copy';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -70,6 +72,14 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
     'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z',
   ],
   check: ['M5 12l5 5 9-10'],
+  copy: ['M9 9h11v11H9z', 'M5 15H4V4h11v1'],
+  share: [
+    'M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z',
+    'M6 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z',
+    'M18 15a3 3 0 1 1 0 6 3 3 0 0 1 0-6z',
+    'M8.6 10.5l6.8-3.5',
+    'M8.6 13.5l6.8 3.5',
+  ],
   lock: ['M6 11h12v9H6z', 'M8 11V8a4 4 0 0 1 8 0v3'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
   train: [

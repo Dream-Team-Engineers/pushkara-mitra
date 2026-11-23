@@ -2,6 +2,7 @@ import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
 import core from '../../migrations/0002_backend_core.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
+import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import { parseMessage } from '../../src/durable-objects/GroupLocation';
@@ -125,7 +126,8 @@ async function createGroup(cookie: string): Promise<{ id: string; joinCode: stri
 }
 
 beforeAll(async () => {
-  for (const statement of `${core}\n\n${groupName}`.split(/;\s*\n\s*\n/)) {
+  const migration = [core, groupName, groupBlock].join('\n\n');
+  for (const statement of migration.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql === '') continue;
     try {
@@ -247,10 +249,10 @@ describe('member limit and removal', () => {
     const rows = await DB.prepare('SELECT uses_left FROM invitation WHERE group_id = ?')
       .bind(group.id)
       .all<{ uses_left: number }>();
-    expect(rows.results[0]?.uses_left).toBe(20 - 9);
+    expect(rows.results[0]?.uses_left).toBe(10_000 - 9);
   });
 
-  it('lets only the owner remove a member, closes their connection and revokes old codes', async () => {
+  it('lets only the owner remove a member, closes their connection and blocks their return', async () => {
     const ownerCookie = await signIn('owner-remove', 'Asha Rao');
     const memberCookie = await signIn('member-remove', 'Ravi Kumar');
     const otherCookie = await signIn('other-remove', 'Sita Devi');
@@ -282,12 +284,34 @@ describe('member limit and removal', () => {
     expect(await closed).toBe(4002);
     await owner.room.next((list) => list.length === 1);
     expect((await upgrade(group.id, memberCookie)).status).toBe(404);
-    // The old code no longer works, so the removed person cannot rejoin with it.
+    // The code is unchanged for everyone else, but the removed person cannot rejoin with it.
     expect((await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie)).status).toBe(
       400,
     );
     expect((await post(path, { member: ravi.id }, ownerCookie)).status).toBe(404);
+    const newcomer = await signIn('newcomer-remove', 'Gita');
+    expect((await post('/api/v1/groups/join', { code: group.joinCode }, newcomer)).status).toBe(
+      200,
+    );
     owner.socket.close(1000, 'done');
+  });
+});
+
+describe('permanent join code', () => {
+  it('shows every member the same code from creation, and invite returns it too', async () => {
+    const ownerCookie = await signIn('owner-code', 'Asha Rao');
+    const memberCookie = await signIn('member-code', 'Ravi Kumar');
+    const group = await createGroup(ownerCookie);
+    await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie);
+    for (const cookie of [ownerCookie, memberCookie]) {
+      const listed = await call('/api/v1/groups', { headers: { Cookie: cookie } });
+      const body: { groups: { id: string; joinCode?: string }[] } = await listed.json();
+      expect(body.groups.find((g) => g.id === group.id)?.joinCode).toBe(group.joinCode);
+    }
+    const again = await post(`/api/v1/groups/${group.id}/invite`, {}, ownerCookie);
+    expect(again.status).toBe(201);
+    expect(await again.json()).toEqual({ joinCode: group.joinCode });
+    expect((await post(`/api/v1/groups/${group.id}/invite`, {}, memberCookie)).status).toBe(404);
   });
 });
 

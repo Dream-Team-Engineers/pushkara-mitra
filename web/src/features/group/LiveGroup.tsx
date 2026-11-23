@@ -18,7 +18,6 @@ import {
   liveMembers,
   liveStatus,
   loadGroup,
-  newInviteCode,
   recordGroupConsent,
   removeMember,
   sharing,
@@ -28,13 +27,13 @@ import {
   type JoinOutcome,
   type LiveMember,
 } from '../../shared/group/groupClient';
-import { forgetCode, readSavedCode, saveCode } from '../../shared/group/savedCode';
 import { formatNumber, locale, t } from '../../shared/i18n/i18n';
 import {
   deviceLocation,
   startDeviceLocation,
   stopDeviceLocation,
 } from '../../shared/location/deviceLocation';
+import { Icon } from '../../shared/ui/Icon';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { theme } from '../../shared/ui/theme';
 import type { LiveMapProps, MapPerson } from '../map/LiveMap';
@@ -99,6 +98,26 @@ function ordered(members: readonly LiveMember[]): readonly LiveMember[] {
   );
 }
 
+/** The invitation text: group name, code and how to use it, in the person's language. */
+function shareText(name: string, code: string): string {
+  const url = `${window.location.origin}/${hrefFor('group')}`;
+  return t('group.live.shareText', { name, code, url });
+}
+
+/**
+ * Opens the phone's own share sheet (WhatsApp, SMS, Telegram, email, ...). Returns false when the
+ * browser has no share sheet, so the screen copies the invitation instead.
+ */
+async function openShareSheet(title: string, text: string): Promise<boolean> {
+  if (typeof navigator.share !== 'function') return false;
+  try {
+    await navigator.share({ title, text });
+  } catch {
+    // The person closed the sheet: nothing to do.
+  }
+  return true;
+}
+
 async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -113,8 +132,7 @@ export default function LiveGroup() {
   const code = useSignal('');
   const groupName = useSignal('');
   const nameInvalid = useSignal(false);
-  const savedCode = useSignal<string | null>(null);
-  const copied = useSignal<'yes' | 'failed' | null>(null);
+  const copied = useSignal<'code' | 'invite' | 'failed' | null>(null);
   const joinResult = useSignal<JoinOutcome | null>(null);
   const busy = useSignal(false);
   const actionFailed = useSignal(false);
@@ -143,7 +161,6 @@ export default function LiveGroup() {
   const groupId = current.status === 'in' ? current.group.id : null;
   useEffect(() => {
     if (groupId === null) return undefined;
-    savedCode.value = readSavedCode(groupId);
     connectLive(groupId);
     return () => {
       disconnectLive();
@@ -156,8 +173,6 @@ export default function LiveGroup() {
   useEffect(() => {
     if (ended !== 'removed') return;
     wasRemoved.value = true;
-    forgetCode();
-    savedCode.value = null;
     void refresh();
   }, [ended]);
 
@@ -271,7 +286,6 @@ export default function LiveGroup() {
                 void run(async () => {
                   const created = await createGroup(groupName.value);
                   if (created === null) return false;
-                  saveCode(created.id, created.joinCode);
                   groupName.value = '';
                   await refresh();
                   return true;
@@ -311,8 +325,7 @@ export default function LiveGroup() {
                   const result = await joinGroup(entered);
                   joinResult.value = result;
                   if (result === 'joined') {
-                    const after = await refresh();
-                    if (after.status === 'in') saveCode(after.group.id, entered);
+                    await refresh();
                     code.value = '';
                   }
                   return result !== 'error';
@@ -354,7 +367,8 @@ export default function LiveGroup() {
   const location = deviceLocation.value;
   const people = mapPeople(members);
   const GroupMap = liveMap.value;
-  const shownCode = savedCode.value;
+  const shownCode = group.joinCode;
+  const groupTitle = group.name ?? t('group.live.unnamed');
 
   return (
     <>
@@ -363,7 +377,7 @@ export default function LiveGroup() {
         <section class="group-panel" aria-labelledby="group-title">
           <div class="group-panel__row">
             <h2 id="group-title" class="group-panel__name">
-              {group.name ?? t('group.live.unnamed')}
+              {groupTitle}
             </h2>
             <span class={isLeader ? 'role-badge role-badge--leader' : 'role-badge'}>
               {t(isLeader ? 'group.live.roleLeader' : 'group.live.roleMember')}
@@ -378,58 +392,57 @@ export default function LiveGroup() {
             {t('group.live.online', { n: formatNumber(members.length) })}
           </p>
 
-          <div class="group-code">
-            <span class="group-code__label">{t('group.live.codeLabel')}</span>
-            {shownCode === null ? (
-              <span class="group-code__none">
-                {t(isLeader ? 'group.live.codeNoneLeader' : 'group.live.codeNoneMember')}
+          {shownCode === null ? null : (
+            <div class="code-ticket">
+              <span class="code-ticket__label">{t('group.live.codeLabel')}</span>
+              <span class="code-ticket__value" aria-label={shownCode.split('').join(' ')}>
+                {shownCode}
               </span>
-            ) : (
-              <>
-                <span class="group-code__value" aria-label={shownCode.split('').join(' ')}>
-                  {shownCode}
-                </span>
+              <span class="code-ticket__actions">
                 <button
                   type="button"
-                  class="button button--secondary button--compact"
+                  class="pill-button"
                   onClick={() =>
                     void copyText(shownCode).then((ok) => {
-                      copied.value = ok ? 'yes' : 'failed';
+                      copied.value = ok ? 'code' : 'failed';
                       setTimeout(() => {
                         copied.value = null;
                       }, 2500);
                     })
                   }
                 >
-                  {t(copied.value === 'yes' ? 'group.live.copied' : 'group.live.copy')}
+                  <Icon name={copied.value === 'code' ? 'check' : 'copy'} size={16} />
+                  {t(copied.value === 'code' ? 'group.live.copied' : 'group.live.copy')}
                 </button>
-              </>
-            )}
-            {isLeader ? (
-              <button
-                type="button"
-                class="button button--secondary button--compact"
-                disabled={busy.value}
-                onClick={() =>
-                  void run(async () => {
-                    const fresh = await newInviteCode(group.id);
-                    if (fresh === null) return false;
-                    saveCode(group.id, fresh);
-                    savedCode.value = fresh;
-                    return true;
-                  })
-                }
-              >
-                {t('group.live.newCode')}
-              </button>
-            ) : null}
-          </div>
+                <button
+                  type="button"
+                  class="pill-button pill-button--primary"
+                  onClick={() => {
+                    const text = shareText(groupTitle, shownCode);
+                    void openShareSheet(groupTitle, text).then(async (opened) => {
+                      if (opened) return;
+                      // No share sheet in this browser: copy the whole invitation instead.
+                      copied.value = (await copyText(text)) ? 'invite' : 'failed';
+                      setTimeout(() => {
+                        copied.value = null;
+                      }, 2500);
+                    });
+                  }}
+                >
+                  <Icon name="share" size={16} />
+                  {t('group.live.share')}
+                </button>
+              </span>
+            </div>
+          )}
           <p class="group-panel__hint" role="status">
             {copied.value === 'failed'
               ? t('group.live.copyFailed')
-              : shownCode === null
-                ? ''
-                : t('group.live.codeNote')}
+              : copied.value === 'invite'
+                ? t('group.live.inviteCopied')
+                : shownCode === null
+                  ? ''
+                  : t('group.live.codeNote')}
           </p>
         </section>
 
@@ -444,7 +457,10 @@ export default function LiveGroup() {
           </div>
           <ul class="member-list">
             {members.map((member) => (
-              <li key={member.id} class="member-row">
+              <li
+                key={member.id}
+                class={member.role === 'owner' ? 'member-row member-row--owner' : 'member-row'}
+              >
                 <span class="member-row__avatar" aria-hidden="true">
                   {memberLabel(member).slice(0, 1).toUpperCase()}
                 </span>
@@ -472,9 +488,6 @@ export default function LiveGroup() {
                               const removed = await removeMember(group.id, member.id);
                               if (!removed) return false;
                               confirmRemove.value = null;
-                              // The server revoked every earlier code; this phone's copy is dead too.
-                              forgetCode();
-                              savedCode.value = null;
                               await refresh();
                               return true;
                             })
@@ -606,8 +619,6 @@ export default function LiveGroup() {
                     const left = await leaveGroup(group.id);
                     if (!left) return false;
                     disconnectLive();
-                    forgetCode();
-                    savedCode.value = null;
                     confirmLeave.value = false;
                     await refresh();
                     return true;

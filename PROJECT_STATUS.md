@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Group: one permanent code, Copy and Share, "Group Owner", friendlier compact UI — 2026-11-23 (staging only)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for: one code for the life of the group; Copy and Share for the code; "Group Owner" instead of "Leader"; smaller, friendlier screen. Implementation by Claude Code (agent). Independent reviewer: NONE.
+- **What:** the join code is now derived from the group id with the server secret (HMAC-SHA-256), shown to every member via `GET /api/v1/groups` (`joinCode`), never stored (D1 keeps its hash; older groups get theirs on first load). Removal no longer revokes codes; the removed person is blocked (`group_block`, migration 0005, applied to staging D1 2026-11-23 before the push). `/invite` returns the same code. The phone-stored code (`pm.groupCode`) is removed again, and storage is back to language and theme only. The code shows as a ticket with Copy (code) and Share (the phone's share sheet with an invitation text; copies the invitation where no share sheet exists). New `copy` and `share` icons. Styles: smaller pills (36 px), softer cards, tinted avatars, uppercase section labels. DI-18 now describes the block list; ADR 0017 updated; O1 Part D regenerated (19 strings, review needed).
+- **Evidence:** `npm run check`: 787 passed, 24 skipped, lint, typecheck and format clean; `npm run gate`: budget within, 175 routing cases passed.
+- **Note:** if `SESSION_SECRET` is rotated, every group's code changes (the old one stops working; members see the new one).
+
 ## Group screen redesign, group name, Copy code; O1 Part C reviewed — 2026-11-23 (staging only)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for it after testing staging (copy button, group name, member count with leader, about 50% smaller) and chose: the leader types the group name (stored in D1), the code is remembered on the phone; name limited to 16 letters or digits. Implementation by Claude Code (agent). Independent reviewer: NONE.

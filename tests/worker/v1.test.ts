@@ -2,8 +2,7 @@ import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
 import core from '../../migrations/0002_backend_core.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
-
-const migration = `${core}\n\n${groupName}`;
+import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import worker, { type Env } from '../../src/index';
@@ -66,6 +65,7 @@ async function columnsOf(table: string): Promise<string> {
 }
 
 beforeAll(async () => {
+  const migration = [core, groupName, groupBlock].join('\n\n');
   for (const statement of migration.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql !== '') await DB.prepare(sql).run();

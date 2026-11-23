@@ -33,7 +33,14 @@ describe('group client: groups API', () => {
     };
     expect(await loadGroup(fake(200, active).request)).toEqual({
       status: 'in',
-      group: { id: GROUP_ID, name: null, role: 'owner', memberCount: 3, expiresAt: '2027-07-07' },
+      group: {
+        id: GROUP_ID,
+        name: null,
+        joinCode: null,
+        role: 'owner',
+        memberCount: 3,
+        expiresAt: '2027-07-07',
+      },
     });
     expect(await loadGroup(fake(200, { groups: [] }).request)).toEqual({ status: 'none' });
     expect(await loadGroup(fake(404).request)).toEqual({ status: 'unavailable' });

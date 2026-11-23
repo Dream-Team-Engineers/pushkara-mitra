@@ -1,4 +1,4 @@
-import { randomJoinCode, sha256Hex } from '../db/ids';
+import { groupJoinCode, randomId, sha256Hex } from '../db/ids';
 import type { ConsentPurpose, CrowdLevel, Repository, SosCategory } from '../db/repository';
 import { envFlags } from '../flags';
 import { memoryRateLimiter, type RateLimiter } from '../security/rateLimit';
@@ -19,7 +19,7 @@ import {
  *   GET    /api/v1/groups              groups the person belongs to           [flag FLAG_GROUPS]
  *   POST   /api/v1/groups              create a group (optional name), code   [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/join         join with a code                       [flag FLAG_GROUPS]
- *   POST   /api/v1/groups/{id}/invite  owner issues another join code         [flag FLAG_GROUPS]
+ *   POST   /api/v1/groups/{id}/invite  owner gets the group's (permanent) code [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
@@ -37,8 +37,8 @@ export const V1_PREFIX = '/api/v1/';
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 const MAX_BODY_BYTES = 2048;
 const GROUP_LIFETIME_SECONDS = 14 * 24 * 60 * 60; // PROPOSAL: should match the event window (BF-08).
-const INVITE_LIFETIME_SECONDS = 24 * 60 * 60;
-const INVITE_USES = 20;
+/** One code per group for its whole life (owner decision 2026-11-23); the 10-member limit caps joins. */
+const INVITE_USES = 10_000;
 const GROUP_ID = /^[a-z2-7]{26}$/;
 const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove)$/;
 const MEMBER_HANDLE = /^[a-f0-9]{16}$/;
@@ -395,9 +395,30 @@ async function groups(
   const signed = await requireSession(request, deps, repo, now);
   if (signed instanceof Response) return signed;
 
+  const secret = deps.sessionSecret ?? '';
+  /** The group's permanent code, made acceptable to the join route if it is not yet. */
+  const codeFor = async (groupId: string, expiresIso: string): Promise<string> => {
+    const code = await groupJoinCode(secret, groupId);
+    await repo.ensureInvitation(
+      groupId,
+      await sha256Hex(`join.v1|${code}`),
+      expiresIso,
+      INVITE_USES,
+    );
+    return code;
+  };
+
   if (rest === '') {
     if (request.method === 'GET') {
-      return ok({ groups: await repo.listGroups(signed.subjectRef, iso(now)) });
+      const list = await repo.listGroups(signed.subjectRef, iso(now));
+      const withCodes = await Promise.all(
+        list.map(async (group) =>
+          group.state === 'active'
+            ? { ...group, joinCode: await codeFor(group.id, group.expiresAt) }
+            : group,
+        ),
+      );
+      return ok({ groups: withCodes });
     }
     if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'GET, POST' });
     if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
@@ -409,14 +430,17 @@ async function groups(
     }
     const name = cleanGroupName(body['name']);
     if (name === undefined) return fail('INVALID_NAME', 400);
-    const code = randomJoinCode();
-    const id = await repo.createGroup(
+    const id = randomId();
+    const code = await groupJoinCode(secret, id);
+    const expires = iso(now + GROUP_LIFETIME_SECONDS);
+    await repo.createGroup(
+      id,
       signed.subjectRef,
       name,
       iso(now),
-      iso(now + GROUP_LIFETIME_SECONDS),
+      expires,
       await sha256Hex(`join.v1|${code}`),
-      iso(now + INVITE_LIFETIME_SECONDS),
+      expires,
       INVITE_USES,
     );
     return ok({ id, joinCode: code }, 201);
@@ -456,17 +480,12 @@ async function groups(
       return new Response(null, { status: 204, headers: NO_STORE });
     }
     if (match[2] === 'remove') return removeMember(request, deps, repo, now, signed, id);
-    const code = randomJoinCode();
-    const created = await repo.createInvitation(
-      signed.subjectRef,
-      id,
-      await sha256Hex(`join.v1|${code}`),
-      iso(now + INVITE_LIFETIME_SECONDS),
-      INVITE_USES,
-      iso(now),
-    );
-    // Not the owner, or the group is closed or gone: the same answer, so ids cannot be probed.
-    return created ? ok({ joinCode: code }, 201) : fail('NOT_FOUND', 404);
+    // The group keeps one code; the owner just gets it again. Not the owner, or the group is closed
+    // or gone: the same answer, so ids cannot be probed.
+    const groups = await repo.listGroups(signed.subjectRef, iso(now));
+    const mine = groups.find((g) => g.id === id && g.role === 'owner' && g.state === 'active');
+    if (mine === undefined) return fail('NOT_FOUND', 404);
+    return ok({ joinCode: await codeFor(id, mine.expiresAt) }, 201);
   }
   return fail('NOT_FOUND', 404);
 }

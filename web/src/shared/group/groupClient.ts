@@ -29,6 +29,8 @@ export interface LiveMember {
 export interface MyGroup {
   readonly id: string;
   readonly name: string | null;
+  /** The group's one join code, the same from creation until the group ends. */
+  readonly joinCode: string | null;
   readonly role: 'owner' | 'member';
   readonly memberCount: number;
   readonly expiresAt: string;
@@ -47,6 +49,7 @@ const TIMEOUT_MS = 10_000;
 export const SEND_INTERVAL_MS = 10_000;
 const RECONNECT_MS = 5000;
 const GROUP_ID = /^[a-z2-7]{26}$/;
+const CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 export const GROUP_NOTICE_VERSION = 'group-1';
 
 type Fetch = typeof fetch;
@@ -83,7 +86,7 @@ export async function loadGroup(request: Fetch = defaultFetch): Promise<GroupLoa
       isRecord(row) && row['state'] === 'active' && typeof row['id'] === 'string',
   );
   if (active === undefined) return { status: 'none' };
-  const { id, name, role, memberCount, expiresAt } = active;
+  const { id, name, role, memberCount, expiresAt, joinCode } = active;
   if (
     (name !== null && name !== undefined && typeof name !== 'string') ||
     typeof id !== 'string' ||
@@ -96,11 +99,16 @@ export async function loadGroup(request: Fetch = defaultFetch): Promise<GroupLoa
   }
   return {
     status: 'in',
-    group: { id, name: typeof name === 'string' ? name : null, role, memberCount, expiresAt },
+    group: {
+      id,
+      name: typeof name === 'string' ? name : null,
+      joinCode: typeof joinCode === 'string' && CODE.test(joinCode) ? joinCode : null,
+      role,
+      memberCount,
+      expiresAt,
+    },
   };
 }
-
-const CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 
 /** Group names: up to 16 letters or digits (any script) and single spaces; the server checks too. */
 export const GROUP_NAME_MAX = 16;

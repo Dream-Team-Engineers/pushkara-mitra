@@ -1718,16 +1718,17 @@ details.note summary {
 }
 
 /*
- * My Group, compact layout (owner request 2026-11-23: about half the earlier size). Text stays at or
- * above the 14px caption token; inline buttons are 40px tall, still well above the 24px WCAG 2.5.8
- * minimum. Group name, role, count and code come first, then members, then sharing.
+ * My Group, compact and friendly (owner requests 2026-11-23: much smaller, softer). Text stays at or
+ * above the 14px caption token; pill buttons are 36px tall, above the 24px WCAG 2.5.8 minimum.
+ * Group card (name, role, count, code ticket with Copy and Share), then members, then sharing.
  */
 .group-compact {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0.625rem;
   padding: 0 var(--space-3) var(--space-3);
   font-size: var(--text-caption);
+  line-height: 1.4;
 }
 
 .group-compact .note,
@@ -1738,17 +1739,18 @@ details.note summary {
 .group-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-input);
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  background: linear-gradient(160deg, var(--primary-soft), var(--surface) 70%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
 }
 
 .group-panel__row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 0.375rem;
   align-items: center;
   justify-content: space-between;
 }
@@ -1756,7 +1758,7 @@ details.note summary {
 .group-panel__name {
   margin: 0;
   font-size: var(--text-body);
-  line-height: 1.3;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
@@ -1777,52 +1779,84 @@ details.note summary {
 
 .role-badge {
   display: inline-block;
-  padding: 0 var(--space-2);
-  background: var(--ground);
-  color: var(--text);
-  border: 1px solid var(--line-strong);
+  padding: 0 0.5rem;
+  background: var(--primary-soft);
+  color: var(--primary);
   border-radius: 999px;
   font-size: var(--text-caption);
   font-weight: 700;
-  line-height: 1.6;
+  line-height: 1.5;
   white-space: nowrap;
 }
 
 .role-badge--leader {
   background: var(--accent-soft);
   color: var(--accent-text);
-  border-color: transparent;
 }
 
 .member-row__name .role-badge {
-  margin-inline-start: var(--space-2);
+  margin-inline-start: 0.375rem;
+  vertical-align: middle;
 }
 
-.group-code {
+/* The group code as a little ticket: dashed edge, code in the middle, Copy and Share pills. */
+.code-ticket {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 0.375rem 0.5rem;
   align-items: center;
+  padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+  background: var(--surface);
+  border: 2px dashed var(--line-strong);
+  border-radius: 14px;
 }
 
-.group-code__label {
+.code-ticket__label {
+  color: var(--text-muted);
   font-weight: 700;
 }
 
-.group-code__value {
+.code-ticket__value {
+  flex: 1;
   font-size: var(--text-body);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   font-variant-numeric: tabular-nums;
 }
 
-.group-code__none {
-  color: var(--text-muted);
+.code-ticket__actions {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.pill-button {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  background: var(--surface);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pill-button--primary {
+  background: var(--primary-fill);
+  color: var(--on-primary);
+}
+
+.pill-button:active {
+  transform: scale(0.96);
 }
 
 .button--compact {
-  min-height: 2.5rem;
-  padding: var(--space-1) var(--space-3);
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
   font-size: var(--text-caption);
 }
 
@@ -1833,17 +1867,17 @@ details.note summary {
 .group-field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 0.25rem;
   font-weight: 700;
 }
 
 .group-field input {
-  min-height: 2.5rem;
-  padding: var(--space-1) var(--space-2);
+  min-height: 2.25rem;
+  padding: 0.25rem 0.625rem;
   background: var(--surface);
   color: var(--text);
-  border: 2px solid var(--line-strong);
-  border-radius: var(--radius-input);
+  border: 1.5px solid var(--line-strong);
+  border-radius: 10px;
   font: inherit;
   font-weight: 400;
 }
@@ -1855,34 +1889,39 @@ details.note summary {
 .group-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 0.375rem;
 }
 
 .group-section__title {
   margin: 0;
-  font-size: var(--text-body);
+  font-size: var(--text-caption);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .member-list {
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0;
+  padding: 0.125rem 0;
   list-style: none;
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-input);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
 }
 
 .member-row {
   display: flex;
-  gap: var(--space-2);
+  gap: 0.5rem;
   align-items: center;
-  padding: var(--space-2) var(--space-3);
+  padding: 0.4375rem 0.75rem;
 }
 
 .member-row + .member-row {
-  border-top: 1px solid var(--line);
+  border-top: 1px dashed var(--line);
 }
 
 .member-row__avatar {
@@ -1890,12 +1929,17 @@ details.note summary {
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background: var(--primary);
-  color: #fff;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: var(--primary-soft);
+  color: var(--primary);
   border-radius: 50%;
-  font-weight: 700;
+  font-weight: 800;
+}
+
+.member-row--owner .member-row__avatar {
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
 
 .member-row__body {
@@ -1917,7 +1961,7 @@ details.note summary {
 .member-row__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: 0.25rem;
   justify-content: flex-end;
 }
 
@@ -1926,35 +1970,37 @@ details.note summary {
 }
 
 .group-compact .switch {
-  margin: 0 var(--space-2) 0 0;
+  margin: 0 0.5rem 0 0;
 }
 
 .group-help {
-  padding: var(--space-1) var(--space-3);
+  padding: 0 0.75rem;
   color: var(--text-muted);
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius-input);
+  border-radius: var(--radius-card);
 }
 
 .group-help summary {
-  min-height: 2.5rem;
-  padding-block: var(--space-2);
+  min-height: 2.25rem;
+  padding-block: 0.5rem;
   color: var(--text);
   font-weight: 700;
   cursor: pointer;
 }
 
 .group-help p {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 0.5rem;
 }
 
 .group-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 0.375rem;
 }
 
 .group-compact .group-map .live-map {
-  height: 13rem;
-  margin: var(--space-1) 0 0;
+  height: 12rem;
+  margin: 0.25rem 0 0;
+  border-radius: var(--radius-card);
 }
