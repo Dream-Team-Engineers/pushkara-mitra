@@ -1,6 +1,7 @@
 import { groupJoinCode, randomId, sha256Hex } from '../db/ids';
 import type { ConsentPurpose, CrowdLevel, Repository, SosCategory } from '../db/repository';
 import { envFlags } from '../flags';
+import { istPeriods } from '../http/istTime';
 import { memoryRateLimiter, type RateLimiter } from '../security/rateLimit';
 import {
   clearedSessionCookie,
@@ -23,6 +24,7 @@ import {
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
+ *   POST   /api/v1/ping                count one app open or install         [flag FLAG_METRICS]
  *   POST   /api/v1/sos                 SOS intake, no sign-in, no location    [flag FLAG_SOS]
  *   GET    /api/v1/crowd               latest crowd level per ghat, public    [flag FLAG_CROWD]
  *   POST   /api/v1/crowd               report a level, bearer token only      [flag FLAG_CROWD]
@@ -165,6 +167,25 @@ async function requireSession(
   const active = await repo.isSessionActive(await sha256Hex(session.sid), session.id, iso(now));
   if (!active) return fail('NOT_SIGNED_IN', 401);
   return { subjectRef: session.id, name: session.name };
+}
+
+/** Counts one app open or install. Nothing about the person or device is kept (ADR 0018). */
+async function ping(request: Request, repo: Repository, now: number): Promise<Response> {
+  if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'POST' });
+  if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
+  const body = await readJsonObject(request);
+  if (body instanceof Response) return body;
+  const { event, locale } = body;
+  if (
+    !hasOnlyKeys(body, ['event', 'locale']) ||
+    (event !== 'open' && event !== 'install') ||
+    typeof locale !== 'string' ||
+    !(LOCALES as readonly string[]).includes(locale)
+  ) {
+    return fail('INVALID_REQUEST', 400);
+  }
+  await repo.countMetric(istPeriods(now), event, locale as 'te' | 'en' | 'hi');
+  return new Response(null, { status: 204, headers: NO_STORE });
 }
 
 async function sos(request: Request, repo: Repository, now: number): Promise<Response> {
@@ -497,12 +518,16 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
   const now = (deps.nowSeconds ?? (() => Math.floor(Date.now() / 1000)))();
 
   const isSos = path === '/sos';
+  const isPing = path === '/ping';
   const isCrowd = path === '/crowd';
   const isGroups = path === '/groups' || path.startsWith('/groups/');
   const isMe = path === '/me' || path === '/me/consents';
   // Unknown paths are 404 before any flag, limiter, database or session is consulted.
   const knownGroups = path === '/groups' || path === '/groups/join' || GROUP_ACTION.test(path);
-  if (!isSos && !isCrowd && !isMe && !(isGroups && knownGroups)) return fail('NOT_FOUND', 404);
+  if (!isSos && !isPing && !isCrowd && !isMe && !(isGroups && knownGroups)) {
+    return fail('NOT_FOUND', 404);
+  }
+  if (isPing && !flags.isEnabled('metrics')) return fail('NOT_FOUND', 404);
   if (isSos && !flags.isEnabled('sos')) return fail('NOT_FOUND', 404);
   if (isGroups && !flags.isEnabled('groups')) return fail('NOT_FOUND', 404);
   if (isCrowd && !flags.isEnabled('crowd')) return fail('NOT_FOUND', 404);
@@ -518,6 +543,7 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
   if (repo === undefined) return fail('UNAVAILABLE', 503);
   try {
     if (isSos) return await sos(request, repo, now);
+    if (isPing) return await ping(request, repo, now);
     if (isCrowd) return await crowd(request, deps, repo, now);
     if (isGroups) return await groups(request, deps, repo, now, path.slice('/groups'.length));
     return await me(request, deps, repo, now, path.slice('/me'.length));

@@ -1,0 +1,24 @@
+# Staff admin dashboard Worker (ADR 0018). Separate from the public app Worker in wrangler.toml.
+# The whole Worker sits behind Cloudflare Access; the Access policy names the three admins (their
+# emails live only in that policy, never here). The Worker verifies the Access token itself and
+# answers 503 until ACCESS_TEAM_DOMAIN and ACCESS_AUD are set. Read-only use of the app's D1.
+name = "pushkara-mitra-admin"
+main = "src/admin/index.ts"
+compatibility_date = "2026-08-22"
+workers_dev = false
+
+[env.staging]
+name = "pushkara-mitra-admin-staging"
+workers_dev = true
+
+[env.staging.vars]
+ENVIRONMENT_NAME = "staging"
+# Set after the owner creates the Access application (not secrets):
+# ACCESS_TEAM_DOMAIN = "https://<team>.cloudflareaccess.com"
+# ACCESS_AUD = "<application AUD tag>"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "pushkara-mitra-staging"
+database_id = "3bf2a0ec-4b67-4be5-b537-23fa5b9f5833"
+migrations_dir = "migrations"

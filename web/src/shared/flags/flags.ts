@@ -17,6 +17,7 @@ interface BuildEnv {
   readonly VITE_DEVICE_LOCATION?: string;
   readonly VITE_SHOW_SAMPLES?: string;
   readonly VITE_GROUPS?: string;
+  readonly VITE_METRICS?: string;
 }
 const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
 const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
@@ -32,6 +33,12 @@ export const GOOGLE_CLIENT_ID: string | undefined =
  * state instead (OQ-044). Build-time constant, not read from the URL, storage or the network.
  */
 export const SHOW_SAMPLES: boolean = BUILD_ENV.VITE_SHOW_SAMPLES === 'enabled';
+
+/**
+ * Counts app opens and installs for the staff dashboard (ADR 0018): the event and the language
+ * only, no identifier. Staging build only. Build-time constant, not read from the URL or storage.
+ */
+export const COUNT_OPENS: boolean = BUILD_ENV.VITE_METRICS === 'enabled';
 
 export const FLAGS = {
   /**

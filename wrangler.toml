@@ -53,6 +53,8 @@ DEVICE_LOCATION = "enabled"
 # (DB) the group routes answer 503 and the app says groups are not available yet.
 FLAG_GROUPS = "enabled"
 FLAG_GROUP_LOCATION = "enabled"
+# App-open counters for the staff dashboard (ADR 0018): counts only, no identifiers.
+FLAG_METRICS = "enabled"
 [env.staging.assets]
 directory = "./dist/web"
 binding = "ASSETS"

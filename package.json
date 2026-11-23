@@ -12,6 +12,7 @@
   "scripts": {
     "ship": "npm run ship:staging",
     "ship:staging": "npm run gate && npm run build:web:staging && npx wrangler deploy --env staging",
+    "ship:admin:staging": "npm run check && npx wrangler deploy -c wrangler.admin.toml --env staging",
     "ship:production": "npm run gate && npm run build:web && npx wrangler deploy --env production",
     "dev": "vite build && wrangler dev",
     "dev:web": "vite",

@@ -108,6 +108,13 @@ export interface Repository {
   /** Readings reported at or after `sinceIso`; older ones are not returned (the caller shows noData). */
   listCrowdReadings(sinceIso: string): Promise<readonly CrowdReading[]>;
 
+  /** Adds one to each period's counter (ADR 0018). Counts only: no person, device or address. */
+  countMetric(
+    periods: readonly string[],
+    metric: 'open' | 'install',
+    locale: 'te' | 'en' | 'hi',
+  ): Promise<void>;
+
   /** Erasure: removes everything held for this subject. Returns row counts. */
   eraseSubject(subjectRef: string): Promise<{ sessions: number; consents: number; groups: number }>;
 }
@@ -399,6 +406,19 @@ export function d1Repository(db: D1Database): Repository {
         sinceIso,
       );
       return rows.map((r) => ({ ghatId: r.ghat_id, level: r.level, reportedAt: r.reported_at }));
+    },
+
+    async countMetric(periods, metric, locale) {
+      await db.batch(
+        periods.map((period) =>
+          db
+            .prepare(
+              `INSERT INTO daily_metric (period, metric, locale, n) VALUES (?, ?, ?, 1)
+               ON CONFLICT (period, metric, locale) DO UPDATE SET n = n + 1`,
+            )
+            .bind(period, metric, locale),
+        ),
+      );
     },
 
     async eraseSubject(subjectRef) {

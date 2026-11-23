@@ -33,6 +33,8 @@ export interface Env {
   FLAG_GROUP_LOCATION?: string;
   FLAG_SOS?: string;
   FLAG_CROWD?: string;
+  /** App-open counters for the staff dashboard (ADR 0018). */
+  FLAG_METRICS?: string;
   /** Worker secret: the bearer token that may report crowd levels. Without it the ingest route answers 503. */
   CROWD_INGEST_TOKEN?: string;
 }
