@@ -13,6 +13,7 @@
 - **Language:** O1 Part C (35 `group.live.*` strings) marked reviewed on the owner's statement of 2026-11-23 ("Native review done. Mark it as done"); `reviewedBy` updated in te/hi. 16 new strings listed as Part D, review needed.
 - **Evidence:** `npm run check` and `npm run gate` passed (791 passed, 24 skipped; budget within; 175 routing cases). A first test run failed to load 50 files with a test-runner start-up error and passed unchanged on rerun.
 - **Open:** expired groups are not purged automatically (affects DI-17 retention); other members' phones may still show a code after the leader removes someone (it no longer works).
+- **Deployed (staging):** `a5d4d43` pushed to `main`; CI, Security, Supply chain, Scorecard and Deploy staging passed; staging `/healthz` ok and the bundle carries build `a5d4d43`. Rollback: `git revert a5d4d43` and push (migration 0004 is expand-only and can stay), or `npx wrangler rollback <version> --env staging`. Production not deployed.
 - **Owner direction 2026-11-23:** do not ask for counsel details until launch day.
 
 ## Group follow-ups: member limit, owner removes a member, member map — 2026-11-23 (staging only)
