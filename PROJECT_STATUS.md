@@ -6,6 +6,29 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Day close and job card for next session — 2026-11-23 23:10 IST
+
+- **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.
+- **State now:** `main` at `498c28b`, pushed. Last push: CI, Security (secrets scan green again), Supply chain, Scorecard passed; Deploy staging passed on re-run of the failed job (the flaky map-font smoke check again). Staging app `/healthz` ok. Staff dashboard `https://pushkara-mitra-admin-staging.dreamteamtech.workers.dev` behind Cloudflare Access (302 to sign-in when not signed in; the owner signed in with One-time PIN). Production **not deployed**. Last local `npm run check`: 1079 passed, 24 skipped.
+- **Done today (13 commits from `07a439a`):**
+  - My Group: server 10-member limit; owner removes a member; member map inside the Group screen; group name (16 letters or digits, any script, migration 0004); one permanent code per group (HMAC, never stored, migration 0005 blocks removed members); Copy and Share (phone share sheet); "Group Owner" label; compact, friendlier screen.
+  - Staff admin dashboard phase 1 (ADR 0018): separate admin Worker, Access-verified, read-only counts; tabs Growth, Live, Groups, Partners, More; green colours; app-open and install counters (migration 0006, flag `FLAG_METRICS`, staging only).
+  - App header: four colour choices (Godavari green, kumkum saffron, river blue, turmeric gold) with contrast tests for all 12 combinations; L/D switch; dark only when chosen; language button moved to the strip; "Breaking news" now "News".
+  - O1 Part C marked reviewed (owner statement 2026-11-23). Secrets-scan false positive (Access AUD) cleared with an owner-approved `.gitleaksignore` entry.
+  - Owner direction: do not ask for counsel details until launch day.
+- **Staging D1 migrations applied today:** 0004 (group name), 0005 (group block), 0006 (daily metric).
+- **Job card for next session:**
+  1. **Owner (10 min):** on staging, try the new header (each colour, L/D, language) and the Group screen on two phones: create with a name, Share the code (WhatsApp), join, both share position, owner removes the other phone, removed phone tries the code again (should fail), leave. Report anything odd with a screenshot.
+  2. **Agent:** fix anything from item 1.
+  3. **Agent:** Partners, phase 2 (ADR 0018 section 7): data-inventory rows and threat model first; then partner request (Google sign-in, "I am a priest / volunteer"), approval by one of the three admins on the dashboard, availability switch for partners, nudges through an in-app inbox (crowd level, river level, free food), partner updates shown to pilgrims marked "from a volunteer", admin can hide an update. Staging only.
+  4. **Agent:** fix the flaky smoke check (404 for map font `Noto Sans Medium/0-255.pbf` on the Map screen), so deploys stop needing re-runs.
+  5. **Agent:** add the admin Worker to the staging deploy workflow (it is deployed by hand today with `npm run ship:admin:staging`).
+  6. **Owner, when ready:** native review of O1 Parts D (19 Group strings) and E (7 header strings) in `docs/content/language-review-o1.md`.
+  7. **Later:** phase 3 nudges by phone notification (Web Push); clean-up job for expired groups (group names stay stored past expiry until it exists); Pass; SOS design (OQ-035).
+- **Needs the owner:** item 1 test; Parts D and E language review; production paid plan before release (OQ-028).
+- **Rollback points:** `git revert <commit>` then push (staging redeploys), or `npx wrangler rollback <version> --env staging`; the admin Worker: `npx wrangler rollback -c wrangler.admin.toml --env staging` or delete it; stop counting by removing `FLAG_METRICS` from `[env.staging.vars]`. Migrations 0004 to 0006 are expand-only and can stay.
+- **Legal:** no sign-off recorded. Engineering readiness and legal sign-off are reported separately.
+
 ## App header redesign: four colours, L/D switch, News label — 2026-11-23 (all builds)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for: four colour choices; dark only when chosen, with a horizontal toggle; header row one with the logo, large app name and account letter; a second strip with colours (left), Light/Dark (middle) and language (right); "Breaking news" shortened. Implementation by Claude Code (agent). Independent reviewer: NONE.
