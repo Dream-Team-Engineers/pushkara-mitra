@@ -27,6 +27,7 @@ interface Position {
 interface Peer {
   readonly handle: string;
   readonly name: string;
+  readonly role: 'owner' | 'member';
   pos: Position | null;
   lastUpdate: number;
 }
@@ -114,6 +115,7 @@ export class GroupLocation implements DurableObject {
     this.peers.set(server, {
       handle,
       name: cleanName(request.headers.get('X-PM-Name')),
+      role: request.headers.get('X-PM-Role') === 'owner' ? 'owner' : 'member',
       pos: null,
       lastUpdate: 0,
     });
@@ -177,6 +179,7 @@ export class GroupLocation implements DurableObject {
     const rows = [...byHandle.values()].map((peer) => ({
       id: peer.handle,
       name: peer.name,
+      role: peer.role,
       pos:
         peer.pos === null
           ? null

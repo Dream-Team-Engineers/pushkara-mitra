@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cleanGroupName,
   createGroup,
   distanceM,
   joinGroup,
@@ -32,7 +33,7 @@ describe('group client: groups API', () => {
     };
     expect(await loadGroup(fake(200, active).request)).toEqual({
       status: 'in',
-      group: { id: GROUP_ID, role: 'owner', memberCount: 3, expiresAt: '2027-07-07' },
+      group: { id: GROUP_ID, name: null, role: 'owner', memberCount: 3, expiresAt: '2027-07-07' },
     });
     expect(await loadGroup(fake(200, { groups: [] }).request)).toEqual({ status: 'none' });
     expect(await loadGroup(fake(404).request)).toEqual({ status: 'unavailable' });
@@ -43,7 +44,8 @@ describe('group client: groups API', () => {
 
   it('sends cookies only to its own origin and never puts a position in a request', async () => {
     const { request, calls } = fake(201, { id: GROUP_ID, joinCode: 'ABCD2345' });
-    expect(await createGroup(request)).toEqual({ id: GROUP_ID, joinCode: 'ABCD2345' });
+    expect(await createGroup('', request)).toEqual({ id: GROUP_ID, joinCode: 'ABCD2345' });
+    expect(calls[0]?.init?.body).toBe('{}');
     expect(calls[0]?.init?.credentials).toBe('same-origin');
     expect(calls[0]?.init?.body as string).not.toMatch(/lat|lng/);
   });
@@ -84,6 +86,17 @@ describe('group client: groups API', () => {
 });
 
 describe('group client: live room', () => {
+  it('sends a cleaned group name and refuses a bad one without a request', async () => {
+    const named = fake(201, { id: GROUP_ID, joinCode: 'ABCD2345' });
+    expect(await createGroup('  Raju   Family ', named.request)).not.toBeNull();
+    expect(named.calls[0]?.init?.body).toBe('{"name":"Raju Family"}');
+    const bad = fake(201, { id: GROUP_ID, joinCode: 'ABCD2345' });
+    expect(await createGroup('Raju-Family!', bad.request)).toBeNull();
+    expect(bad.calls).toHaveLength(0);
+    expect(cleanGroupName('a'.repeat(17))).toBeNull();
+    expect(cleanGroupName('రాజు కుటుంబం')).toBe('రాజు కుటుంబం');
+  });
+
   it('starts with sharing off', () => {
     expect(sharing.value).toBe(false);
   });

@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Group screen redesign, group name, Copy code; O1 Part C reviewed — 2026-11-23 (staging only)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for it after testing staging (copy button, group name, member count with leader, about 50% smaller) and chose: the leader types the group name (stored in D1), the code is remembered on the phone; name limited to 16 letters or digits. Implementation by Claude Code (agent). Independent reviewer: NONE.
+- **What:** migration `0004_group_name.sql` (nullable `group_.name`, at most 16 characters), applied to staging D1 on 2026-11-23 before the push; `POST /api/v1/groups` takes an optional `name` (letters and digits in any script, single spaces; `INVALID_NAME` otherwise); erasure clears the name of groups the person leads; the live room labels the leader. Group screen rebuilt compact: group card (name, Leader/Member, "N of 10 members · M online", code with Copy and New invite code), member rows with avatar and Leader badge, sharing, explanations folded into "How sharing works". Join code kept in browser storage on this phone only (`pm.groupCode`, removed at expiry, on leave and on removal); privacy guard allow-list extended. Data inventory DI-17 and DI-18 added; ADR 0017 updated.
+- **Language:** O1 Part C (35 `group.live.*` strings) marked reviewed on the owner's statement of 2026-11-23 ("Native review done. Mark it as done"); `reviewedBy` updated in te/hi. 16 new strings listed as Part D, review needed.
+- **Evidence:** `npm run check` and `npm run gate` passed (791 passed, 24 skipped; budget within; 175 routing cases). A first test run failed to load 50 files with a test-runner start-up error and passed unchanged on rerun.
+- **Open:** expired groups are not purged automatically (affects DI-17 retention); other members' phones may still show a code after the leader removes someone (it no longer works).
+- **Owner direction 2026-11-23:** do not ask for counsel details until launch day.
+
 ## Group follow-ups: member limit, owner removes a member, member map — 2026-11-23 (staging only)
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`) set the work (day-close item 3); implementation by Claude Code (agent). Independent reviewer: NONE.

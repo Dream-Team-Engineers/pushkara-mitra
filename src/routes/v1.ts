@@ -17,7 +17,7 @@ import {
  *   GET    /api/v1/me/consents         consent history
  *   POST   /api/v1/me/consents         record a grant or withdrawal (append-only)
  *   GET    /api/v1/groups              groups the person belongs to           [flag FLAG_GROUPS]
- *   POST   /api/v1/groups              create a group, returns a join code    [flag FLAG_GROUPS]
+ *   POST   /api/v1/groups              create a group (optional name), code   [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/join         join with a code                       [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/invite  owner issues another join code         [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
@@ -42,6 +42,26 @@ const INVITE_USES = 20;
 const GROUP_ID = /^[a-z2-7]{26}$/;
 const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove)$/;
 const MEMBER_HANDLE = /^[a-f0-9]{16}$/;
+/** Group name: letters and digits in any script (with their combining marks), single spaces, 16 max. */
+const GROUP_NAME = /^[\p{L}\p{M}\p{N}]+(?: [\p{L}\p{M}\p{N}]+)*$/u;
+export const GROUP_NAME_MAX = 16;
+
+/** Characters as SQLite's length() counts them (Unicode code points). */
+function codePoints(text: string): number {
+  let count = 0;
+  for (const char of text) if (char !== '') count++;
+  return count;
+}
+
+/** The cleaned group name, null for none, or undefined when it is not allowed. */
+export function cleanGroupName(raw: unknown): string | null | undefined {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw !== 'string') return undefined;
+  const name = raw.normalize('NFC').trim().replaceAll(/\s+/g, ' ');
+  if (name === '') return null;
+  if (codePoints(name) > GROUP_NAME_MAX || !GROUP_NAME.test(name)) return undefined;
+  return name;
+}
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 const PURPOSES: readonly ConsentPurpose[] = ['sign-in', 'group', 'pass', 'notifications'];
@@ -66,6 +86,7 @@ const MESSAGES = {
   INVALID_CODE: 'The code is not valid or has expired.',
   ALREADY_MEMBER: 'Already a member.',
   GROUP_FULL: 'The group is full.',
+  INVALID_NAME: 'Use up to 16 letters or digits.',
 } as const;
 type ErrorCode = keyof typeof MESSAGES;
 
@@ -320,9 +341,8 @@ async function live(
   }
   if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
   // Not a member, or the group is closed or gone: the same answer, so ids cannot be probed.
-  if (!(await repo.isActiveMember(signed.subjectRef, groupId, iso(now)))) {
-    return fail('NOT_FOUND', 404);
-  }
+  const role = await repo.memberRole(signed.subjectRef, groupId, iso(now));
+  if (role === null) return fail('NOT_FOUND', 404);
   const ns = deps.groupLocation;
   if (ns === undefined) return fail('UNAVAILABLE', 503);
   // A fresh request: nothing the client sent is forwarded except the upgrade itself.
@@ -331,6 +351,7 @@ async function live(
       Upgrade: 'websocket',
       'X-PM-Member': await memberHandle(groupId, signed.subjectRef),
       'X-PM-Name': signed.name,
+      'X-PM-Role': role,
     },
   });
 }
@@ -380,9 +401,18 @@ async function groups(
     }
     if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'GET, POST' });
     if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
+    const body = await readJsonObject(request);
+    if (body instanceof Response) return body;
+    const keys = Object.keys(body);
+    if (keys.length > 1 || (keys.length === 1 && keys[0] !== 'name')) {
+      return fail('INVALID_REQUEST', 400);
+    }
+    const name = cleanGroupName(body['name']);
+    if (name === undefined) return fail('INVALID_NAME', 400);
     const code = randomJoinCode();
     const id = await repo.createGroup(
       signed.subjectRef,
+      name,
       iso(now),
       iso(now + GROUP_LIFETIME_SECONDS),
       await sha256Hex(`join.v1|${code}`),

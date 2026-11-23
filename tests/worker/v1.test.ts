@@ -1,6 +1,9 @@
 import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import migration from '../../migrations/0002_backend_core.sql?raw';
+import core from '../../migrations/0002_backend_core.sql?raw';
+import groupName from '../../migrations/0004_group_name.sql?raw';
+
+const migration = `${core}\n\n${groupName}`;
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import worker, { type Env } from '../../src/index';

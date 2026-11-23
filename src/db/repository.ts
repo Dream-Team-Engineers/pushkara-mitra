@@ -1,7 +1,8 @@
 /**
  * The only module that talks to D1. Routes never contain SQL; every statement is parameterised and
  * ownership always comes from the verified session, never from an id the client supplies.
- * No coordinate, name, email or phone column exists (ADR 0004, ADR 0006).
+ * No coordinate, person name, email or phone column exists (ADR 0004, ADR 0006). The only free text
+ * is the group name the leader types (16 characters at most, ADR 0017, data inventory DI-17).
  */
 import { randomId } from './ids';
 
@@ -26,6 +27,7 @@ export interface ConsentRecord {
 
 export interface GroupSummary {
   readonly id: string;
+  readonly name: string | null;
   readonly role: 'owner' | 'member';
   readonly state: 'active' | 'closed';
   readonly expiresAt: string;
@@ -54,6 +56,7 @@ export interface Repository {
 
   createGroup(
     ownerRef: string,
+    name: string | null,
     nowIso: string,
     expiresIso: string,
     codeHash: string,
@@ -82,8 +85,12 @@ export interface Repository {
   /** Removes a non-owner member and revokes every open invite code of the group. */
   removeMember(groupId: string, subjectRef: string, nowIso: string): Promise<boolean>;
   listGroups(subjectRef: string, nowIso: string): Promise<readonly GroupSummary[]>;
-  /** True when the person is a member of this active, unexpired group. */
-  isActiveMember(subjectRef: string, groupId: string, nowIso: string): Promise<boolean>;
+  /** The person's role in this active, unexpired group, or null when they are not a member. */
+  memberRole(
+    subjectRef: string,
+    groupId: string,
+    nowIso: string,
+  ): Promise<'owner' | 'member' | null>;
 
   /** Idempotent on the request hash: a retry returns the original id with `duplicate: true`. */
   insertSos(input: {
@@ -185,12 +192,12 @@ export function d1Repository(db: D1Database): Repository {
       }));
     },
 
-    async createGroup(ownerRef, nowIso, expiresIso, codeHash, inviteExpiresIso, uses) {
+    async createGroup(ownerRef, name, nowIso, expiresIso, codeHash, inviteExpiresIso, uses) {
       const id = randomId();
       await db.batch([
         db
-          .prepare('INSERT INTO group_ (id, created_at, expires_at) VALUES (?, ?, ?)')
-          .bind(id, nowIso, expiresIso),
+          .prepare('INSERT INTO group_ (id, name, created_at, expires_at) VALUES (?, ?, ?, ?)')
+          .bind(id, name, nowIso, expiresIso),
         db
           .prepare(
             "INSERT INTO membership (group_id, subject_ref, role, joined_at) VALUES (?, ?, 'owner', ?)",
@@ -322,12 +329,13 @@ export function d1Repository(db: D1Database): Repository {
     async listGroups(subjectRef, nowIso) {
       const rows = await all<{
         id: string;
+        name: string | null;
         role: 'owner' | 'member';
         state: 'active' | 'closed';
         expires_at: string;
         member_count: number;
       }>(
-        `SELECT g.id, m.role, g.state, g.expires_at,
+        `SELECT g.id, g.name, m.role, g.state, g.expires_at,
                 (SELECT COUNT(*) FROM membership x WHERE x.group_id = g.id) AS member_count
          FROM membership m JOIN group_ g ON g.id = m.group_id
          WHERE m.subject_ref = ? AND g.expires_at > ? ORDER BY g.created_at, g.id`,
@@ -336,6 +344,7 @@ export function d1Repository(db: D1Database): Repository {
       );
       return rows.map((r) => ({
         id: r.id,
+        name: r.name,
         role: r.role,
         state: r.state,
         expiresAt: r.expires_at,
@@ -343,15 +352,15 @@ export function d1Repository(db: D1Database): Repository {
       }));
     },
 
-    async isActiveMember(subjectRef, groupId, nowIso) {
-      const rows = await all<{ ok: number }>(
-        `SELECT 1 AS ok FROM membership m JOIN group_ g ON g.id = m.group_id
+    async memberRole(subjectRef, groupId, nowIso) {
+      const rows = await all<{ role: 'owner' | 'member' }>(
+        `SELECT m.role FROM membership m JOIN group_ g ON g.id = m.group_id
          WHERE m.group_id = ? AND m.subject_ref = ? AND g.state = 'active' AND g.expires_at > ?`,
         groupId,
         subjectRef,
         nowIso,
       );
-      return rows.length > 0;
+      return rows[0]?.role ?? null;
     },
 
     async insertSos({ requestHash, category, createdAt }) {
@@ -392,6 +401,12 @@ export function d1Repository(db: D1Database): Repository {
     },
 
     async eraseSubject(subjectRef) {
+      // The leader typed the group name: it goes with their account, even if the group continues.
+      await run(
+        `UPDATE group_ SET name = NULL WHERE id IN
+           (SELECT group_id FROM membership WHERE subject_ref = ? AND role = 'owner')`,
+        subjectRef,
+      );
       const [sessions, consents, memberships] = await db.batch([
         db.prepare('DELETE FROM session WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM consent_ledger WHERE subject_ref = ?').bind(subjectRef),

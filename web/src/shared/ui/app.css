@@ -1696,10 +1696,6 @@ details.note summary {
 }
 
 /* My Group: members who are sharing, drawn on the small map in the Group screen (ADR 0017). */
-.group-map .live-map {
-  height: 16rem;
-}
-
 .person-dot {
   display: flex;
   align-items: center;
@@ -1719,4 +1715,246 @@ details.note summary {
   width: 1.125rem;
   height: 1.125rem;
   background: var(--focus);
+}
+
+/*
+ * My Group, compact layout (owner request 2026-11-23: about half the earlier size). Text stays at or
+ * above the 14px caption token; inline buttons are 40px tall, still well above the 24px WCAG 2.5.8
+ * minimum. Group name, role, count and code come first, then members, then sharing.
+ */
+.group-compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: var(--text-caption);
+}
+
+.group-compact .note,
+.group-compact .notice {
+  margin: 0;
+}
+
+.group-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-input);
+}
+
+.group-panel__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-panel__name {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.group-panel__meta,
+.group-panel__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.group-panel__hint:empty {
+  display: none;
+}
+
+.group-panel__hint--alert {
+  color: var(--danger);
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  background: var(--ground);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: var(--text-caption);
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.role-badge--leader {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+
+.member-row__name .role-badge {
+  margin-inline-start: var(--space-2);
+}
+
+.group-code {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.group-code__label {
+  font-weight: 700;
+}
+
+.group-code__value {
+  font-size: var(--text-body);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.group-code__none {
+  color: var(--text-muted);
+}
+
+.button--compact {
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-caption);
+}
+
+.group-panel .button--compact {
+  align-self: flex-start;
+}
+
+.group-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-weight: 700;
+}
+
+.group-field input {
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-input);
+  font: inherit;
+  font-weight: 400;
+}
+
+.group-field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.group-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.group-section__title {
+  margin: 0;
+  font-size: var(--text-body);
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-input);
+}
+
+.member-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+}
+
+.member-row + .member-row {
+  border-top: 1px solid var(--line);
+}
+
+.member-row__avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.member-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-row__name {
+  margin: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.member-row__meta {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.member-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+.group-compact .consent-line {
+  margin: 0;
+}
+
+.group-compact .switch {
+  margin: 0 var(--space-2) 0 0;
+}
+
+.group-help {
+  padding: var(--space-1) var(--space-3);
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-input);
+}
+
+.group-help summary {
+  min-height: 2.5rem;
+  padding-block: var(--space-2);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.group-help p {
+  margin: 0 0 var(--space-2);
+}
+
+.group-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.group-compact .group-map .live-map {
+  height: 13rem;
+  margin: var(--space-1) 0 0;
 }

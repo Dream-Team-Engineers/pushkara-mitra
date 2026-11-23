@@ -21,12 +21,14 @@ export interface MemberPosition {
 export interface LiveMember {
   readonly id: string;
   readonly name: string;
+  readonly role: 'owner' | 'member';
   readonly you: boolean;
   readonly pos: MemberPosition | null;
 }
 
 export interface MyGroup {
   readonly id: string;
+  readonly name: string | null;
   readonly role: 'owner' | 'member';
   readonly memberCount: number;
   readonly expiresAt: string;
@@ -81,8 +83,9 @@ export async function loadGroup(request: Fetch = defaultFetch): Promise<GroupLoa
       isRecord(row) && row['state'] === 'active' && typeof row['id'] === 'string',
   );
   if (active === undefined) return { status: 'none' };
-  const { id, role, memberCount, expiresAt } = active;
+  const { id, name, role, memberCount, expiresAt } = active;
   if (
+    (name !== null && name !== undefined && typeof name !== 'string') ||
     typeof id !== 'string' ||
     !GROUP_ID.test(id) ||
     (role !== 'owner' && role !== 'member') ||
@@ -91,16 +94,40 @@ export async function loadGroup(request: Fetch = defaultFetch): Promise<GroupLoa
   ) {
     throw new Error('Groups do not match their contract');
   }
-  return { status: 'in', group: { id, role, memberCount, expiresAt } };
+  return {
+    status: 'in',
+    group: { id, name: typeof name === 'string' ? name : null, role, memberCount, expiresAt },
+  };
 }
 
 const CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 
+/** Group names: up to 16 letters or digits (any script) and single spaces; the server checks too. */
+export const GROUP_NAME_MAX = 16;
+const GROUP_NAME = /^[\p{L}\p{M}\p{N}]+(?: [\p{L}\p{M}\p{N}]+)*$/u;
+
+/** Characters as SQLite's length() counts them (Unicode code points). */
+function codePoints(text: string): number {
+  let count = 0;
+  for (const char of text) if (char !== '') count++;
+  return count;
+}
+
+/** The cleaned name, '' for none, or null when it is not allowed. */
+export function cleanGroupName(raw: string): string | null {
+  const name = raw.normalize('NFC').trim().replaceAll(/\s+/g, ' ');
+  if (name === '') return '';
+  return codePoints(name) <= GROUP_NAME_MAX && GROUP_NAME.test(name) ? name : null;
+}
+
 /** Creates a group. The join code is shown once; the server keeps only its hash. */
 export async function createGroup(
+  name = '',
   request: Fetch = defaultFetch,
 ): Promise<{ id: string; joinCode: string } | null> {
-  const response = await send(request, BASE, 'POST', {});
+  const clean = cleanGroupName(name);
+  if (clean === null) return null;
+  const response = await send(request, BASE, 'POST', clean === '' ? {} : { name: clean });
   if (response.status !== 201) return null;
   const body: unknown = await response.json();
   if (!isRecord(body)) return null;
@@ -195,8 +222,9 @@ export function parseRoomState(raw: unknown): readonly LiveMember[] | null {
     if (!isRecord(row)) return null;
     const { id, name, you, pos } = row;
     if (typeof id !== 'string' || typeof name !== 'string' || typeof you !== 'boolean') return null;
+    const role = row['role'] === 'owner' ? 'owner' : 'member';
     if (pos === null) {
-      members.push({ id, name, you, pos: null });
+      members.push({ id, name, role, you, pos: null });
       continue;
     }
     if (!isRecord(pos)) return null;
@@ -209,7 +237,7 @@ export function parseRoomState(raw: unknown): readonly LiveMember[] | null {
     ) {
       return null;
     }
-    members.push({ id, name, you, pos: { lat, lng, acc, ageS } });
+    members.push({ id, name, role, you, pos: { lat, lng, acc, ageS } });
   }
   return members;
 }

@@ -1,9 +1,11 @@
 import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import migration from '../../migrations/0002_backend_core.sql?raw';
+import core from '../../migrations/0002_backend_core.sql?raw';
+import groupName from '../../migrations/0004_group_name.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import { parseMessage } from '../../src/durable-objects/GroupLocation';
+import { cleanGroupName } from '../../src/routes/v1';
 import worker, { type Env } from '../../src/index';
 import { createSessionToken, pseudonymFor, SESSION_COOKIE } from '../../src/security/session';
 
@@ -67,6 +69,7 @@ async function signIn(sub: string, name: string): Promise<string> {
 interface Row {
   id: string;
   name: string;
+  role: 'owner' | 'member';
   you: boolean;
   pos: { lat: number; lng: number; acc: number; ageS: number } | null;
 }
@@ -122,13 +125,14 @@ async function createGroup(cookie: string): Promise<{ id: string; joinCode: stri
 }
 
 beforeAll(async () => {
-  for (const statement of migration.split(/;\s*\n\s*\n/)) {
+  for (const statement of `${core}\n\n${groupName}`.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql === '') continue;
     try {
       await DB.prepare(sql).run();
     } catch (error) {
-      if (!String(error).includes('already exists')) throw error;
+      const text = String(error);
+      if (!text.includes('already exists') && !text.includes('duplicate column')) throw error;
     }
   }
 });
@@ -180,7 +184,7 @@ describe('live room sharing', () => {
 
     const owner = await connect(group.id, ownerCookie);
     const first = await owner.room.next((rows) => rows.length === 1);
-    expect(first[0]).toMatchObject({ name: 'Asha', you: true, pos: null });
+    expect(first[0]).toMatchObject({ name: 'Asha', role: 'owner', you: true, pos: null });
 
     const member = await connect(group.id, memberCookie);
     await owner.room.next((rows) => rows.length === 2);
@@ -193,6 +197,7 @@ describe('live room sharing', () => {
     );
     const ravi = shared.find((row) => row.name === 'Ravi');
     expect(ravi?.you).toBe(false);
+    expect(ravi?.role).toBe('member');
     expect(ravi?.pos).toMatchObject({ lat: 17.00841, lng: 81.76695, acc: 12 });
     expect(ravi?.id).toMatch(/^[a-f0-9]{16}$/);
 
@@ -283,6 +288,48 @@ describe('member limit and removal', () => {
     );
     expect((await post(path, { member: ravi.id }, ownerCookie)).status).toBe(404);
     owner.socket.close(1000, 'done');
+  });
+});
+
+describe('group name', () => {
+  it('keeps up to 16 letters or digits in any script, with single spaces', () => {
+    expect(cleanGroupName(undefined)).toBeNull();
+    expect(cleanGroupName('   ')).toBeNull();
+    expect(cleanGroupName('  Raju   Family ')).toBe('Raju Family');
+    expect(cleanGroupName('Rao2027')).toBe('Rao2027');
+    expect(cleanGroupName('రాజు కుటుంబం')).toBe('రాజు కుటుంబం');
+    expect(cleanGroupName('राजू परिवार')).toBe('राजू परिवार');
+    expect(cleanGroupName('a'.repeat(16))).toBe('a'.repeat(16));
+    for (const bad of ['a'.repeat(17), 'Raju-Family', '<b>x</b>', 'Raju!', 'x\u0000y', 42, ['x']]) {
+      expect(cleanGroupName(bad)).toBeUndefined();
+    }
+  });
+
+  it('stores the name, shows it to members, refuses a bad one and clears it on erasure', async () => {
+    const ownerCookie = await signIn('owner-name', 'Asha Rao');
+    const memberCookie = await signIn('member-name', 'Ravi Kumar');
+    expect((await post('/api/v1/groups', { name: 'Raju-Family!' }, ownerCookie)).status).toBe(400);
+    expect((await post('/api/v1/groups', { name: 'x', extra: 1 }, ownerCookie)).status).toBe(400);
+    const made = await post('/api/v1/groups', { name: ' Raju  Family ' }, ownerCookie);
+    expect(made.status).toBe(201);
+    const group: { id: string; joinCode: string } = await made.json();
+    await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie);
+    const listed = await call('/api/v1/groups', { headers: { Cookie: memberCookie } });
+    const body: { groups: { id: string; name: string | null; role: string }[] } =
+      await listed.json();
+    expect(body.groups.find((g) => g.id === group.id)).toMatchObject({
+      name: 'Raju Family',
+      role: 'member',
+    });
+    const erased = await call('/api/v1/me', {
+      method: 'DELETE',
+      headers: { Origin: ORIGIN, Cookie: ownerCookie },
+    });
+    expect(erased.status).toBe(200);
+    const row = await DB.prepare('SELECT name FROM group_ WHERE id = ?')
+      .bind(group.id)
+      .first<{ name: string | null }>();
+    expect(row?.name).toBeNull();
   });
 });
 
