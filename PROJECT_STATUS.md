@@ -6,6 +6,16 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Staff admin dashboard, phase 1 — 2026-11-23 (staging only)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) chose the tabs (Growth, Live, Groups, Partners, More; no SOS), the Growth headline (app opens, new sign-ins, groups created), no anonymous visitor tracking, access for the owner and two developers only (emails go only into the Cloudflare Access policy), and the partner design for phase 2 (Google sign-in + admin approval; inbox and Web Push nudges; updates shown at once, marked as from a volunteer). Implementation by Claude Code (agent). Independent reviewer: NONE.
+- **What:** ADR 0018. Separate admin Worker `pushkara-mitra-admin-staging` (`src/admin/`, `wrangler.admin.toml`, `npm run ship:admin:staging`), server-rendered, no client script, read-only on the staging D1; verifies the Cloudflare Access token on every request and fails closed. App-open and install counters: `POST /api/v1/ping` (flag `FLAG_METRICS`, staging build only), migration `0006_daily_metric.sql` applied to staging D1 2026-11-23; counts only (DI-19). Access guard now allows the verifier only in `src/admin/`, never in the public Worker, and checks the admin code is read-only.
+- **Evidence:** `npm run check`: 800 passed, 24 skipped, lint, typecheck, format clean; `npm run gate` passed. Push `73d33a9`: CI, Security, Supply chain, Scorecard and Deploy staging passed; staging `/healthz` ok; `POST /api/v1/ping` answers 204 (one synthetic "en" open was counted by this check). Admin Worker deployed manually (version `ff327888-456e-44bb-ac38-af8ac5a88c90`), `https://pushkara-mitra-admin-staging.dreamteamtech.workers.dev` answers 503 "not available" as designed until Access is configured. The CI deploy does not deploy the admin Worker yet.
+- **Needs the owner:** create the Cloudflare Access application for the admin Worker with a policy for the three admins, and send the team domain and AUD tag (not secrets).
+- **Next (agent):** set `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD`, redeploy, verify sign-in; then phase 2 (partners) after its data-inventory rows and threat model.
+- **Rollback:** delete the admin Worker in the dashboard or `npx wrangler delete -c wrangler.admin.toml --env staging`; remove `FLAG_METRICS` from `[env.staging.vars]` to stop counting.
+- **Legal:** no sign-off recorded. Engineering readiness and legal sign-off are reported separately.
+
 ## Group: one permanent code, Copy and Share, "Group Owner", friendlier compact UI — 2026-11-23 (staging only)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for: one code for the life of the group; Copy and Share for the code; "Group Owner" instead of "Leader"; smaller, friendlier screen. Implementation by Claude Code (agent). Independent reviewer: NONE.
