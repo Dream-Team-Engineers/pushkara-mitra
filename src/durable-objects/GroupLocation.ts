@@ -92,7 +92,9 @@ export class GroupLocation implements DurableObject {
     if (!HANDLE.test(handle)) return new Response('Bad Request', { status: 400 });
 
     if (pathname === '/kick' && request.method === 'POST') {
-      this.kick(handle);
+      // 4001: the person left. 4002: the owner removed them. The app tells the two apart.
+      const removed = new URL(request.url).searchParams.get('reason') === 'removed';
+      this.kick(handle, removed ? 4002 : 4001, removed ? 'removed' : 'left');
       return new Response(null, { status: 204 });
     }
     if (pathname !== '/live' || request.method !== 'GET') {
@@ -148,12 +150,12 @@ export class GroupLocation implements DurableObject {
     if (this.peers.delete(socket)) this.broadcast();
   }
 
-  private kick(handle: string): void {
+  private kick(handle: string, code: number, reason: string): void {
     for (const [socket, peer] of this.peers) {
       if (peer.handle !== handle) continue;
       this.peers.delete(socket);
       try {
-        socket.close(4001, 'left');
+        socket.close(code, reason);
       } catch {
         // Already closed.
       }

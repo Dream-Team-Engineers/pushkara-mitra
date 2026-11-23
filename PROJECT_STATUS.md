@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Group follow-ups: member limit, owner removes a member, member map — 2026-11-23 (staging only)
+
+- **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`) set the work (day-close item 3); implementation by Claude Code (agent). Independent reviewer: NONE.
+- **What:** server-side 10-member limit (join refused with `GROUP_FULL`, code use not spent, re-checked inside the insert); `POST /api/v1/groups/{id}/remove` (owner only, member named by per-group handle; closes their live connection with code 4002 and revokes all open invite codes); Remove button with confirmation for the owner; the removed person sees "The group owner removed you"; a small map inside the Group screen shows members who are sharing (not on the Map tab, so positions still flow only while the Group screen is open). ADR 0017 updated. 7 new strings in en/te/hi; all 35 `group.live.*` strings added to the O1 list as Part C (day-close item 5, native review needed).
+- **Evidence:** `npm run check`: 783 passed, 24 skipped, lint, typecheck and format clean. `npm run gate`: build within budget, 175 routing cases passed. New worker tests in `tests/worker/group-live.test.ts` (limit, removal access rules, close code 4002, revoked code).
+- **Not done:** the owner's two-phone test (day-close item 1) is still open; it should now also cover Remove. A member who never opens the Group screen cannot be removed from the app yet (they also see nothing). Pass and SOS not started.
+- **Legal:** no sign-off recorded. Engineering readiness and legal sign-off are reported separately.
+
 ## Day close and starting point for next session — 2026-11-21 22:49:00 IST
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.

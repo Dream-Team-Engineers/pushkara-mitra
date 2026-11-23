@@ -1694,3 +1694,29 @@ details.note summary {
   color: inherit;
   text-decoration: underline;
 }
+
+/* My Group: members who are sharing, drawn on the small map in the Group screen (ADR 0017). */
+.group-map .live-map {
+  height: 16rem;
+}
+
+.person-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: var(--primary);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+.person-dot--you {
+  width: 1.125rem;
+  height: 1.125rem;
+  background: var(--focus);
+}

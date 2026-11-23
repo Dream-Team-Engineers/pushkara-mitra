@@ -7,6 +7,7 @@ import {
   parseRoomState,
   positionMessage,
   recordGroupConsent,
+  removeMember,
   sharing,
 } from './groupClient';
 
@@ -16,6 +17,7 @@ function fake(status: number, body: unknown = {}) {
   const calls: { url: string; init: RequestInit | undefined }[] = [];
   const request = ((input: RequestInfo | URL, init?: RequestInit) => {
     calls.push({ url: input instanceof Request ? input.url : input.toString(), init });
+    if (status === 204) return Promise.resolve(new Response(null, { status }));
     return Promise.resolve(Response.json(body, { status }));
   }) as typeof fetch;
   return { request, calls };
@@ -52,8 +54,21 @@ describe('group client: groups API', () => {
     expect(bad.calls).toHaveLength(0);
     expect(await joinGroup('abcd-2345', fake(200, { id: GROUP_ID }).request)).toBe('joined');
     expect(await joinGroup('ABCD2345', fake(409).request)).toBe('already');
+    const full = { error: { code: 'GROUP_FULL', message: 'The group is full.' } };
+    expect(await joinGroup('ABCD2345', fake(409, full).request)).toBe('full');
     expect(await joinGroup('ABCD2345', fake(400).request)).toBe('invalid');
     expect(await joinGroup('ABCD2345', fake(503).request)).toBe('error');
+  });
+
+  it('removes a member by handle only, and only reports success on 204', async () => {
+    const bad = fake(204);
+    expect(await removeMember(GROUP_ID, 'Ravi', bad.request)).toBe(false);
+    expect(bad.calls).toHaveLength(0);
+    const good = fake(204);
+    expect(await removeMember(GROUP_ID, '0123456789abcdef', good.request)).toBe(true);
+    expect(good.calls[0]?.url).toBe(`/api/v1/groups/${GROUP_ID}/remove`);
+    expect(good.calls[0]?.init?.body).toBe('{"member":"0123456789abcdef"}');
+    expect(await removeMember(GROUP_ID, '0123456789abcdef', fake(404).request)).toBe(false);
   });
 
   it('records group consent with the notice version and locale', async () => {

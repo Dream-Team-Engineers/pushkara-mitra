@@ -34,7 +34,10 @@ export interface GroupSummary {
 
 export type JoinResult =
   | { readonly ok: true; readonly groupId: string }
-  | { readonly ok: false; readonly reason: 'invalid_code' | 'already_member' };
+  | { readonly ok: false; readonly reason: 'invalid_code' | 'already_member' | 'full' };
+
+/** Most people one group may hold, owner included (ADR 0017). */
+export const MAX_GROUP_MEMBERS = 10;
 
 export interface Repository {
   createSession(input: {
@@ -67,6 +70,17 @@ export interface Repository {
   ): Promise<boolean>;
   joinWithCode(subjectRef: string, codeHash: string, nowIso: string): Promise<JoinResult>;
   leaveGroup(subjectRef: string, groupId: string): Promise<boolean>;
+  /**
+   * The pseudonyms of the other (non-owner) members, only when `ownerRef` owns this active,
+   * unexpired group; otherwise null. Used to match a per-group handle for removal.
+   */
+  listMembersForOwner(
+    ownerRef: string,
+    groupId: string,
+    nowIso: string,
+  ): Promise<readonly string[] | null>;
+  /** Removes a non-owner member and revokes every open invite code of the group. */
+  removeMember(groupId: string, subjectRef: string, nowIso: string): Promise<boolean>;
   listGroups(subjectRef: string, nowIso: string): Promise<readonly GroupSummary[]>;
   /** True when the person is a member of this active, unexpired group. */
   isActiveMember(subjectRef: string, groupId: string, nowIso: string): Promise<boolean>;
@@ -225,6 +239,11 @@ export function d1Repository(db: D1Database): Repository {
         subjectRef,
       );
       if (existing.length > 0) return { ok: false, reason: 'already_member' };
+      const counted = await all<{ n: number }>(
+        'SELECT COUNT(*) AS n FROM membership WHERE group_id = ?',
+        groupId,
+      );
+      if ((counted[0]?.n ?? 0) >= MAX_GROUP_MEMBERS) return { ok: false, reason: 'full' };
       // Spend a use atomically; if another person took the last one, the update changes nothing.
       const spent = await run(
         `UPDATE invitation SET uses_left = uses_left - 1
@@ -233,12 +252,21 @@ export function d1Repository(db: D1Database): Repository {
         nowIso,
       );
       if (spent.meta.changes !== 1) return { ok: false, reason: 'invalid_code' };
-      await run(
-        "INSERT OR IGNORE INTO membership (group_id, subject_ref, role, joined_at) VALUES (?, ?, 'member', ?)",
+      // The limit is checked again in the insert itself, so two people joining at once cannot pass it.
+      const inserted = await run(
+        `INSERT OR IGNORE INTO membership (group_id, subject_ref, role, joined_at)
+         SELECT ?, ?, 'member', ?
+         WHERE (SELECT COUNT(*) FROM membership WHERE group_id = ?) < ?`,
         groupId,
         subjectRef,
         nowIso,
+        groupId,
+        MAX_GROUP_MEMBERS,
       );
+      if (inserted.meta.changes !== 1) {
+        await run('UPDATE invitation SET uses_left = uses_left + 1 WHERE code_hash = ?', codeHash);
+        return { ok: false, reason: 'full' };
+      }
       return { ok: true, groupId };
     },
 
@@ -253,6 +281,39 @@ export function d1Repository(db: D1Database): Repository {
       await run(
         'DELETE FROM group_ WHERE id = ? AND NOT EXISTS (SELECT 1 FROM membership WHERE group_id = ?)',
         groupId,
+        groupId,
+      );
+      return true;
+    },
+
+    async listMembersForOwner(ownerRef, groupId, nowIso) {
+      const owner = await all(
+        `SELECT 1 AS ok FROM membership m JOIN group_ g ON g.id = m.group_id
+         WHERE m.group_id = ? AND m.subject_ref = ? AND m.role = 'owner'
+           AND g.state = 'active' AND g.expires_at > ?`,
+        groupId,
+        ownerRef,
+        nowIso,
+      );
+      if (owner.length !== 1) return null;
+      const rows = await all<{ subject_ref: string }>(
+        "SELECT subject_ref FROM membership WHERE group_id = ? AND role = 'member'",
+        groupId,
+      );
+      return rows.map((r) => r.subject_ref);
+    },
+
+    async removeMember(groupId, subjectRef, nowIso) {
+      const removed = await run(
+        "DELETE FROM membership WHERE group_id = ? AND subject_ref = ? AND role = 'member'",
+        groupId,
+        subjectRef,
+      );
+      if (removed.meta.changes !== 1) return false;
+      // Old codes stop working, so the removed person cannot simply join again.
+      await run(
+        'UPDATE invitation SET revoked_at = ? WHERE group_id = ? AND revoked_at IS NULL',
+        nowIso,
         groupId,
       );
       return true;

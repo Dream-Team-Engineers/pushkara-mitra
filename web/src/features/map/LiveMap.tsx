@@ -1,5 +1,6 @@
 import {
   addProtocol,
+  LngLatBounds,
   Map as MapLibreMap,
   Marker,
   NavigationControl,
@@ -66,6 +67,15 @@ function toGeoJson(places: readonly Place[]) {
   };
 }
 
+/** A group member who is sharing, drawn as a labelled dot (ADR 0017). Memory only. */
+export interface MapPerson {
+  readonly id: string;
+  readonly label: string;
+  readonly lat: number;
+  readonly lng: number;
+  readonly you: boolean;
+}
+
 export interface LiveMapProps {
   readonly flavor: MapFlavor;
   readonly position: DevicePosition | null;
@@ -75,6 +85,8 @@ export interface LiveMapProps {
   readonly placeLabel?: (place: Place) => string;
   readonly selectedId?: string | null;
   readonly onSelect?: (id: string) => void;
+  /** Group members who are sharing. The map fits them into view the first time they appear. */
+  readonly people?: readonly MapPerson[];
 }
 
 export function LiveMap({
@@ -85,12 +97,15 @@ export function LiveMap({
   placeLabel = (place) => place.name,
   selectedId = null,
   onSelect,
+  people = [],
 }: LiveMapProps) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<MapLibreMap | null>(null);
   const dot = useRef<Marker | null>(null);
   const pins = useRef<Map<string, { marker: Marker; element: HTMLButtonElement }>>(new Map());
   const centred = useRef(false);
+  const personMarkers = useRef<Map<string, { marker: Marker; element: HTMLDivElement }>>(new Map());
+  const fitted = useRef(false);
   const styledWith = useRef(flavor);
   // The latest props, read by map event handlers that are registered once.
   const latest = useRef({ places, placeLabel, selectedId, onSelect });
@@ -228,6 +243,9 @@ export function LiveMap({
       dot.current = null;
       for (const pin of pins.current.values()) pin.marker.remove();
       pins.current.clear();
+      for (const person of personMarkers.current.values()) person.marker.remove();
+      personMarkers.current.clear();
+      fitted.current = false;
       instance.remove();
       map.current = null;
       centred.current = false;
@@ -276,6 +294,41 @@ export function LiveMap({
       });
     }
   }, [position, onOutside]);
+
+  // Group members: one marker each, moved in place, removed when they stop sharing.
+  useEffect(() => {
+    const instance = map.current;
+    if (instance === null) return;
+    const shown = people.filter((person) => isInsideMapArea({ ...person, accuracyM: 0 }));
+    const ids = new Set(shown.map((person) => person.id));
+    for (const [id, entry] of personMarkers.current) {
+      if (ids.has(id)) continue;
+      entry.marker.remove();
+      personMarkers.current.delete(id);
+    }
+    for (const person of shown) {
+      let entry = personMarkers.current.get(person.id);
+      if (entry === undefined) {
+        const element = document.createElement('div');
+        element.className = person.you ? 'person-dot person-dot--you' : 'person-dot';
+        element.setAttribute('role', 'img');
+        const marker = new Marker({ element }).setLngLat([person.lng, person.lat]).addTo(instance);
+        entry = { marker, element };
+        personMarkers.current.set(person.id, entry);
+      } else {
+        entry.marker.setLngLat([person.lng, person.lat]);
+      }
+      entry.element.textContent = person.you ? '' : person.label.slice(0, 1).toUpperCase();
+      entry.element.setAttribute('aria-label', person.label);
+      entry.element.title = person.label;
+    }
+    if (!fitted.current && shown.length > 0) {
+      fitted.current = true;
+      const bounds = new LngLatBounds();
+      for (const person of shown) bounds.extend([person.lng, person.lat]);
+      instance.fitBounds(bounds, { padding: 60, maxZoom: 17, duration: 0 });
+    }
+  }, [people]);
 
   // A different set of places (a category chip): replace the data and let the map redraw the pins.
   useEffect(() => {

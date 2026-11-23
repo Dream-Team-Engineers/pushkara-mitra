@@ -225,6 +225,67 @@ describe('live room sharing', () => {
   });
 });
 
+describe('member limit and removal', () => {
+  it('refuses the eleventh person and does not spend a code use for them', async () => {
+    const ownerCookie = await signIn('owner-full', 'Asha Rao');
+    const group = await createGroup(ownerCookie);
+    for (let i = 1; i < 10; i++) {
+      const cookie = await signIn(`member-full-${String(i)}`, 'Ravi');
+      expect((await post('/api/v1/groups/join', { code: group.joinCode }, cookie)).status).toBe(
+        200,
+      );
+    }
+    const late = await signIn('member-full-late', 'Late');
+    const refused = await post('/api/v1/groups/join', { code: group.joinCode }, late);
+    expect(refused.status).toBe(409);
+    expect(await refused.json()).toMatchObject({ error: { code: 'GROUP_FULL' } });
+    const rows = await DB.prepare('SELECT uses_left FROM invitation WHERE group_id = ?')
+      .bind(group.id)
+      .all<{ uses_left: number }>();
+    expect(rows.results[0]?.uses_left).toBe(20 - 9);
+  });
+
+  it('lets only the owner remove a member, closes their connection and revokes old codes', async () => {
+    const ownerCookie = await signIn('owner-remove', 'Asha Rao');
+    const memberCookie = await signIn('member-remove', 'Ravi Kumar');
+    const otherCookie = await signIn('other-remove', 'Sita Devi');
+    const group = await createGroup(ownerCookie);
+    await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie);
+    await post('/api/v1/groups/join', { code: group.joinCode }, otherCookie);
+
+    const owner = await connect(group.id, ownerCookie);
+    const member = await connect(group.id, memberCookie);
+    const closed = new Promise<number>((resolve) => {
+      member.socket.addEventListener('close', (event) => {
+        resolve(event.code);
+      });
+    });
+    const rows = await owner.room.next((list) => list.length === 2);
+    const ravi = rows.find((row) => row.name === 'Ravi');
+    const asha = rows.find((row) => row.you);
+    if (ravi === undefined || asha === undefined) throw new Error('rows missing');
+    const path = `/api/v1/groups/${group.id}/remove`;
+
+    // A member cannot remove anyone; nobody can remove the owner; bad bodies are refused.
+    expect((await post(path, { member: ravi.id }, otherCookie)).status).toBe(404);
+    expect((await post(path, { member: asha.id }, ownerCookie)).status).toBe(404);
+    expect((await post(path, { member: 'nothex' }, ownerCookie)).status).toBe(400);
+    expect((await post(path, { member: ravi.id, x: 1 }, ownerCookie)).status).toBe(400);
+    expect((await post(path, { member: 'f'.repeat(16) }, ownerCookie)).status).toBe(404);
+
+    expect((await post(path, { member: ravi.id }, ownerCookie)).status).toBe(204);
+    expect(await closed).toBe(4002);
+    await owner.room.next((list) => list.length === 1);
+    expect((await upgrade(group.id, memberCookie)).status).toBe(404);
+    // The old code no longer works, so the removed person cannot rejoin with it.
+    expect((await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie)).status).toBe(
+      400,
+    );
+    expect((await post(path, { member: ravi.id }, ownerCookie)).status).toBe(404);
+    owner.socket.close(1000, 'done');
+  });
+});
+
 describe('room message parser', () => {
   it('accepts only exact position and stop messages within range', () => {
     expect(parseMessage('{"t":"stop"}')).toEqual({ t: 'stop' });

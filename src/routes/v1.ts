@@ -21,6 +21,7 @@ import {
  *   POST   /api/v1/groups/join         join with a code                       [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/invite  owner issues another join code         [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
+ *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
  *   POST   /api/v1/sos                 SOS intake, no sign-in, no location    [flag FLAG_SOS]
  *   GET    /api/v1/crowd               latest crowd level per ghat, public    [flag FLAG_CROWD]
@@ -39,7 +40,8 @@ const GROUP_LIFETIME_SECONDS = 14 * 24 * 60 * 60; // PROPOSAL: should match the 
 const INVITE_LIFETIME_SECONDS = 24 * 60 * 60;
 const INVITE_USES = 20;
 const GROUP_ID = /^[a-z2-7]{26}$/;
-const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live)$/;
+const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove)$/;
+const MEMBER_HANDLE = /^[a-f0-9]{16}$/;
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 const PURPOSES: readonly ConsentPurpose[] = ['sign-in', 'group', 'pass', 'notifications'];
@@ -63,6 +65,7 @@ const MESSAGES = {
   UNAVAILABLE: 'The service is not available.',
   INVALID_CODE: 'The code is not valid or has expired.',
   ALREADY_MEMBER: 'Already a member.',
+  GROUP_FULL: 'The group is full.',
 } as const;
 type ErrorCode = keyof typeof MESSAGES;
 
@@ -282,14 +285,19 @@ function roomFor(ns: DurableObjectNamespace, groupId: string): DurableObjectStub
   return ns.get(ns.idFromName(groupId));
 }
 
-/** Closes the leaver's live connections at once. Best effort: the room is memory only. */
-async function kickFromRoom(deps: V1Deps, groupId: string, subjectRef: string): Promise<void> {
+/** Closes a leaver's or removed member's live connections at once. Best effort: memory only. */
+async function kickFromRoom(
+  deps: V1Deps,
+  groupId: string,
+  handle: string,
+  reason: 'left' | 'removed',
+): Promise<void> {
   const ns = deps.groupLocation;
   if (ns === undefined) return;
   try {
-    await roomFor(ns, groupId).fetch('https://room/kick', {
+    await roomFor(ns, groupId).fetch(`https://room/kick?reason=${reason}`, {
       method: 'POST',
-      headers: { 'X-PM-Member': await memberHandle(groupId, subjectRef) },
+      headers: { 'X-PM-Member': handle },
     });
   } catch {
     // The room may not exist; nothing is stored there either way.
@@ -325,6 +333,35 @@ async function live(
       'X-PM-Name': signed.name,
     },
   });
+}
+
+/** The owner removes a member, named by their per-group handle as shown in the live room. */
+async function removeMember(
+  request: Request,
+  deps: V1Deps,
+  repo: Repository,
+  now: number,
+  signed: Signed,
+  groupId: string,
+): Promise<Response> {
+  const body = await readJsonObject(request);
+  if (body instanceof Response) return body;
+  const handle = body['member'];
+  if (!hasOnlyKeys(body, ['member']) || typeof handle !== 'string' || !MEMBER_HANDLE.test(handle)) {
+    return fail('INVALID_REQUEST', 400);
+  }
+  // Not the owner, the group is closed or gone, or no such member: the same answer every time.
+  const refs = await repo.listMembersForOwner(signed.subjectRef, groupId, iso(now));
+  if (refs === null) return fail('NOT_FOUND', 404);
+  let target: string | undefined;
+  for (const ref of refs) {
+    if ((await memberHandle(groupId, ref)) === handle) target = ref;
+  }
+  if (target === undefined || !(await repo.removeMember(groupId, target, iso(now)))) {
+    return fail('NOT_FOUND', 404);
+  }
+  await kickFromRoom(deps, groupId, handle, 'removed');
+  return new Response(null, { status: 204, headers: NO_STORE });
 }
 
 async function groups(
@@ -371,12 +408,12 @@ async function groups(
       iso(now),
     );
     if (result.ok) return ok({ id: result.groupId });
-    return result.reason === 'already_member'
-      ? fail('ALREADY_MEMBER', 409)
-      : fail('INVALID_CODE', 400);
+    if (result.reason === 'already_member') return fail('ALREADY_MEMBER', 409);
+    if (result.reason === 'full') return fail('GROUP_FULL', 409);
+    return fail('INVALID_CODE', 400);
   }
 
-  const match = /^\/([a-z2-7]{26})\/(invite|leave|live)$/.exec(rest);
+  const match = /^\/([a-z2-7]{26})\/(invite|leave|live|remove)$/.exec(rest);
   if (match !== null) {
     const id = match[1] ?? '';
     if (!GROUP_ID.test(id)) return fail('NOT_FOUND', 404);
@@ -385,9 +422,10 @@ async function groups(
     if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
     if (match[2] === 'leave') {
       if (!(await repo.leaveGroup(signed.subjectRef, id))) return fail('NOT_FOUND', 404);
-      await kickFromRoom(deps, id, signed.subjectRef);
+      await kickFromRoom(deps, id, await memberHandle(id, signed.subjectRef), 'left');
       return new Response(null, { status: 204, headers: NO_STORE });
     }
+    if (match[2] === 'remove') return removeMember(request, deps, repo, now, signed, id);
     const code = randomJoinCode();
     const created = await repo.createInvitation(
       signed.subjectRef,

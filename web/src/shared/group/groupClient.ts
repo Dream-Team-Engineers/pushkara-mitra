@@ -110,14 +110,28 @@ export async function createGroup(
     : null;
 }
 
-export type JoinOutcome = 'joined' | 'invalid' | 'already' | 'error';
+export type JoinOutcome = 'joined' | 'invalid' | 'already' | 'full' | 'error';
+
+/** The error code in the fixed error envelope, or null. */
+async function errorCode(response: Response): Promise<string | null> {
+  try {
+    const body: unknown = await response.json();
+    const error = isRecord(body) ? body['error'] : undefined;
+    const code = isRecord(error) ? error['code'] : undefined;
+    return typeof code === 'string' ? code : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function joinGroup(code: string, request: Fetch = defaultFetch): Promise<JoinOutcome> {
   const clean = code.toUpperCase().replaceAll(/[\s-]/g, '');
   if (!CODE.test(clean)) return 'invalid';
   const response = await send(request, `${BASE}/join`, 'POST', { code: clean });
   if (response.status === 200) return 'joined';
-  if (response.status === 409) return 'already';
+  if (response.status === 409) {
+    return (await errorCode(response)) === 'GROUP_FULL' ? 'full' : 'already';
+  }
   if (response.status === 400) return 'invalid';
   return 'error';
 }
@@ -136,6 +150,19 @@ export async function newInviteCode(
 
 export async function leaveGroup(groupId: string, request: Fetch = defaultFetch): Promise<boolean> {
   const response = await send(request, `${BASE}/${groupId}/leave`, 'POST', {});
+  return response.status === 204;
+}
+
+const HANDLE = /^[a-f0-9]{16}$/;
+
+/** The owner removes a member, named by the handle the live room shows. True when removed. */
+export async function removeMember(
+  groupId: string,
+  handle: string,
+  request: Fetch = defaultFetch,
+): Promise<boolean> {
+  if (!HANDLE.test(handle)) return false;
+  const response = await send(request, `${BASE}/${groupId}/remove`, 'POST', { member: handle });
   return response.status === 204;
 }
 
@@ -210,6 +237,8 @@ export function distanceM(
 
 export const liveMembers = signal<readonly LiveMember[]>([]);
 export const liveStatus = signal<LiveStatus>('off');
+/** Why the room closed this person's connection: they left, or the owner removed them. */
+export const liveEnded = signal<'left' | 'removed' | null>(null);
 /** Off every time the screen opens; only a tap by the person turns it on. */
 export const sharing = signal(false);
 
@@ -248,8 +277,16 @@ function open(groupId: string): void {
     if (socket !== ws) return;
     socket = null;
     liveMembers.value = [];
-    // 4001: this person left the group. Otherwise reconnect while the screen still wants it.
-    if (event.code === 4001 || wanted === null) {
+    // 4001: this person left the group; 4002: the owner removed them. Otherwise reconnect while
+    // the screen still wants it.
+    if (event.code === 4001 || event.code === 4002) {
+      liveEnded.value = event.code === 4002 ? 'removed' : 'left';
+      wanted = null;
+      sharing.value = false;
+      liveStatus.value = 'off';
+      return;
+    }
+    if (wanted === null) {
       liveStatus.value = 'off';
       return;
     }
@@ -265,6 +302,7 @@ function open(groupId: string): void {
 export function connectLive(groupId: string): void {
   if (!GROUP_ID.test(groupId) || wanted === groupId) return;
   disconnectLive();
+  liveEnded.value = null;
   wanted = groupId;
   open(groupId);
   stopEffect = effect(() => {

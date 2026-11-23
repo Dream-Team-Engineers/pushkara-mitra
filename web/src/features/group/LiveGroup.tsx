@@ -1,7 +1,9 @@
 import { useSignal } from '@preact/signals';
+import type { ComponentType } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { hrefFor } from '../../app/router';
 import { user } from '../../shared/auth/google';
+import { tilesAvailable } from '../../shared/data/mapArchive';
 import { FLAGS } from '../../shared/flags/flags';
 import {
   connectLive,
@@ -10,11 +12,13 @@ import {
   distanceM,
   joinGroup,
   leaveGroup,
+  liveEnded,
   liveMembers,
   liveStatus,
   loadGroup,
   newInviteCode,
   recordGroupConsent,
+  removeMember,
   sharing,
   startSharing,
   stopSharing,
@@ -30,6 +34,9 @@ import {
 } from '../../shared/location/deviceLocation';
 import { Bi } from '../../shared/ui/Bi';
 import { ScreenHeader } from '../../shared/ui/Layout';
+import { theme } from '../../shared/ui/theme';
+import type { LiveMapProps, MapPerson } from '../map/LiveMap';
+import { flavorFor } from '../map/mapStyle';
 
 /**
  * My Group, real version (flag `myGroup`, staging build only; ADR 0017). Groups and join codes come
@@ -56,6 +63,23 @@ function memberLine(member: LiveMember, me: LiveMember | undefined): string {
   return parts.join(' · ');
 }
 
+/** Members who are sharing, as map markers. Positions stay in memory, as everywhere on this screen. */
+function mapPeople(members: readonly LiveMember[]): readonly MapPerson[] {
+  return members.flatMap((member) =>
+    member.pos === null
+      ? []
+      : [
+          {
+            id: member.id,
+            label: member.you ? t('group.live.you') : member.name || t('group.live.member'),
+            lat: member.pos.lat,
+            lng: member.pos.lng,
+            you: member.you,
+          },
+        ],
+  );
+}
+
 export default function LiveGroup() {
   const load = useSignal<Load>({ status: 'loading' });
   const code = useSignal('');
@@ -66,6 +90,9 @@ export default function LiveGroup() {
   const agreed = useSignal(false);
   const consentRecorded = useSignal(false);
   const confirmLeave = useSignal(false);
+  const confirmRemove = useSignal<string | null>(null);
+  const wasRemoved = useSignal(false);
+  const liveMap = useSignal<ComponentType<LiveMapProps> | null>(null);
 
   const refresh = async () => {
     try {
@@ -90,6 +117,35 @@ export default function LiveGroup() {
       stopDeviceLocation();
     };
   }, [groupId]);
+
+  // The owner removed this person: the room closed the connection; show the screen without a group.
+  const ended = liveEnded.value;
+  useEffect(() => {
+    if (ended !== 'removed') return;
+    wasRemoved.value = true;
+    joinCode.value = null;
+    void refresh();
+  }, [ended]);
+
+  // The small map loads only once somebody is sharing and the regional map is on this site.
+  const anyoneSharing = liveMembers.value.some((member) => member.pos !== null);
+  useEffect(() => {
+    if (!anyoneSharing || liveMap.value !== null) return undefined;
+    const mounted = { current: true };
+    const isMounted = (): boolean => mounted.current;
+    void tilesAvailable().then(async (available) => {
+      if (!available || !isMounted()) return;
+      try {
+        const module = await import('../map/LiveMap');
+        if (isMounted()) liveMap.value = module.LiveMap;
+      } catch {
+        // The member list with distances is the fallback; the map is an enhancement.
+      }
+    });
+    return () => {
+      mounted.current = false;
+    };
+  }, [anyoneSharing]);
 
   const run = async (action: () => Promise<boolean>) => {
     busy.value = true;
@@ -138,6 +194,11 @@ export default function LiveGroup() {
     return (
       <>
         {header}
+        {wasRemoved.value ? (
+          <p class="notice" role="status">
+            {t('group.live.removed')}
+          </p>
+        ) : null}
         <p class="note">{t('group.none')}</p>
         <div class="actions">
           <button
@@ -191,9 +252,17 @@ export default function LiveGroup() {
             {t('group.live.join')}
           </button>
         </div>
-        {joinResult.value === 'invalid' || joinResult.value === 'already' ? (
+        {joinResult.value === 'invalid' ||
+        joinResult.value === 'already' ||
+        joinResult.value === 'full' ? (
           <p class="notice" role="alert">
-            {t(joinResult.value === 'invalid' ? 'group.live.badCode' : 'group.already')}
+            {t(
+              joinResult.value === 'invalid'
+                ? 'group.live.badCode'
+                : joinResult.value === 'full'
+                  ? 'group.live.full'
+                  : 'group.already',
+            )}
           </p>
         ) : null}
         {actionFailed.value ? (
@@ -210,6 +279,8 @@ export default function LiveGroup() {
   const members = liveMembers.value;
   const me = members.find((member) => member.you);
   const location = deviceLocation.value;
+  const people = mapPeople(members);
+  const GroupMap = liveMap.value;
 
   return (
     <>
@@ -259,10 +330,70 @@ export default function LiveGroup() {
                 </p>
                 <p class="card__meta">{memberLine(member, me)}</p>
               </div>
+              {group.role === 'owner' && !member.you ? (
+                <div class="member__actions">
+                  {confirmRemove.value === member.id ? (
+                    <>
+                      <button
+                        type="button"
+                        class="button button--danger"
+                        disabled={busy.value}
+                        onClick={() =>
+                          void run(async () => {
+                            const removed = await removeMember(group.id, member.id);
+                            if (!removed) return false;
+                            confirmRemove.value = null;
+                            // The server revoked the old codes; hide the one on screen.
+                            joinCode.value = null;
+                            await refresh();
+                            return true;
+                          })
+                        }
+                      >
+                        {t('group.live.removeConfirm')}
+                      </button>
+                      <button
+                        type="button"
+                        class="button button--secondary"
+                        onClick={() => {
+                          confirmRemove.value = null;
+                        }}
+                      >
+                        {t('group.live.cancel')}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      class="button button--secondary"
+                      aria-label={t('group.live.removeNamed', {
+                        name: member.name || t('group.live.member'),
+                      })}
+                      onClick={() => {
+                        confirmRemove.value = member.id;
+                      }}
+                    >
+                      {t('group.live.remove')}
+                    </button>
+                  )}
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>
         <p class="note">{t('group.live.onlyOpen')}</p>
+        {group.role === 'owner' ? <p class="note">{t('group.live.removeNote')}</p> : null}
+        {GroupMap !== null && people.length > 0 ? (
+          <div class="group-map">
+            <GroupMap
+              flavor={flavorFor(theme.value)}
+              position={null}
+              onOutside={() => undefined}
+              people={people}
+            />
+            <p class="note">{t('group.live.mapNote')}</p>
+          </div>
+        ) : null}
       </section>
 
       {FLAGS.geolocation ? (
