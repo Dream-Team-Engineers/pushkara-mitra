@@ -26,6 +26,7 @@
   --line: #e3dccb;
   --line-strong: #857d6e;
   --header-bg: #12304a;
+  --header-glow: #1b6b74;
   --header-text: #ffffff;
   --header-text-muted: #c9d6e2;
   --focus: #0b5fd3;
@@ -51,6 +52,7 @@
   --line: #2c4254;
   --line-strong: #8497a6;
   --header-bg: #0a141d;
+  --header-glow: #123a44;
   --header-text: #ffffff;
   --header-text-muted: #c9d6e2;
   --focus: #8ab4ff;
@@ -76,9 +78,141 @@
   --line: #5b6b78;
   --line-strong: #12304a;
   --header-bg: #06141f;
+  --header-glow: #06141f;
   --header-text: #ffffff;
   --header-text-muted: #e6edf3;
   --focus: #0b3fa8;
+}
+
+/*
+ * Colour choices (owner request 2026-11-23): four accents, each tuned for every theme. The app
+ * sets data-accent on <html>; without it the base theme colours above apply. In the dark theme each
+ * accent also tints the ground, surface and lines (the "night" look of the staff dashboard).
+ * Every combination is contrast-tested by tests/guards/design-tokens.test.ts.
+ */
+
+/* light · Godavari green (default) */
+[data-theme='light'][data-accent='green'] {
+  --primary: #166534;
+  --primary-fill: #166534;
+  --primary-soft: #e3f3e8;
+  --header-bg: #0f3d24;
+  --header-glow: #1d6b40;
+}
+
+/* light · kumkum saffron */
+[data-theme='light'][data-accent='saffron'] {
+  --primary: #9a3412;
+  --primary-fill: #9a3412;
+  --primary-soft: #fdeee4;
+  --header-bg: #5c1d08;
+  --header-glow: #9a3412;
+}
+
+/* light · river blue */
+[data-theme='light'][data-accent='blue'] {
+  --primary: #1d4ed8;
+  --primary-fill: #1d4ed8;
+  --primary-soft: #e5edfc;
+  --header-bg: #12304a;
+  --header-glow: #1e4f8a;
+}
+
+/* light · turmeric gold */
+[data-theme='light'][data-accent='gold'] {
+  --primary: #7c5200;
+  --primary-fill: #7c5200;
+  --primary-soft: #fbf1d9;
+  --header-bg: #4a3300;
+  --header-glow: #7c5200;
+}
+
+/* dark · Godavari green (default) */
+[data-theme='dark'][data-accent='green'] {
+  --ground: #061a12;
+  --surface: #0d2a1e;
+  --primary: #4ade80;
+  --primary-fill: #15803d;
+  --primary-soft: #123d2a;
+  --header-bg: #04140d;
+  --header-glow: #0d3323;
+  --line: #1f3d30;
+  --line-strong: #6f9a85;
+}
+
+/* dark · kumkum saffron */
+[data-theme='dark'][data-accent='saffron'] {
+  --ground: #1c0e07;
+  --surface: #2b170e;
+  --primary: #fdba74;
+  --primary-fill: #c2410c;
+  --primary-soft: #4a2412;
+  --header-bg: #140904;
+  --header-glow: #3a1c0c;
+  --line: #47291b;
+  --line-strong: #a2806e;
+}
+
+/* dark · river blue */
+[data-theme='dark'][data-accent='blue'] {
+  --ground: #0b1424;
+  --surface: #13213a;
+  --primary: #93c5fd;
+  --primary-fill: #1d4ed8;
+  --primary-soft: #1a3358;
+  --header-bg: #070d18;
+  --header-glow: #14284a;
+  --line: #26385a;
+  --line-strong: #7f93b5;
+}
+
+/* dark · turmeric gold */
+[data-theme='dark'][data-accent='gold'] {
+  --ground: #17120a;
+  --surface: #272011;
+  --primary: #fcd34d;
+  --primary-fill: #854d0e;
+  --primary-soft: #463812;
+  --header-bg: #100c05;
+  --header-glow: #33280c;
+  --line: #423920;
+  --line-strong: #a39672;
+}
+
+/* outdoor · Godavari green (default) */
+[data-theme='outdoor'][data-accent='green'] {
+  --primary: #14532d;
+  --primary-fill: #14532d;
+  --primary-soft: #e3f3e8;
+  --header-bg: #052e16;
+  --header-glow: #052e16;
+}
+
+/* outdoor · kumkum saffron */
+[data-theme='outdoor'][data-accent='saffron'] {
+  --primary: #7c2d12;
+  --primary-fill: #7c2d12;
+  --primary-soft: #fdeee4;
+  --header-bg: #431407;
+  --header-glow: #431407;
+}
+
+/* outdoor · river blue */
+[data-theme='outdoor'][data-accent='blue'] {
+  --primary: #1e3a8a;
+  --primary-fill: #1e3a8a;
+  --primary-soft: #e5edfc;
+  --header-bg: #0b1a3f;
+  --header-glow: #0b1a3f;
+}
+
+/* outdoor · turmeric gold */
+[data-theme='outdoor'][data-accent='gold'] {
+  --primary: #5c3b00;
+  --primary-fill: #5c3b00;
+  --primary-soft: #fbf1d9;
+  --header-bg: #2e1d00;
+  --header-glow: #2e1d00;
 }
 
 :root {

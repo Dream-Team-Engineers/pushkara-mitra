@@ -33,7 +33,8 @@ export type IconName =
   | 'book'
   | 'chevron'
   | 'share'
-  | 'copy';
+  | 'copy'
+  | 'person';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -72,6 +73,7 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
     'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z',
   ],
   check: ['M5 12l5 5 9-10'],
+  person: ['M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8z', 'M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'],
   copy: ['M9 9h11v11H9z', 'M5 15H4V4h11v1'],
   share: [
     'M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z',

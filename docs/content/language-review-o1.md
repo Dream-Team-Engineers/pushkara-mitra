@@ -142,6 +142,20 @@ Added or changed after the Part C review: group name, Group Owner/Member labels,
 | 18  | Group  | `group.live.codeNote`     | The code stays the same until the group ends. Up to 10 people can be in a group.             | బృందం ముగిసే వరకు కోడ్ మారదు. ఒక బృందంలో గరిష్ఠంగా 10 మంది ఉండవచ్చు.                    | समूह समाप्त होने तक कोड नहीं बदलता। एक समूह में अधिकतम 10 लोग हो सकते हैं।          |                      |
 | 19  | Group  | `group.live.removeNote`   | A removed person cannot rejoin with the group code.                                          | తొలగించిన వ్యక్తి బృందం కోడ్‌తో మళ్లీ చేరలేరు.                                            | हटाया गया व्यक्ति समूह कोड से फिर नहीं जुड़ सकता।                                |                      |
 
+## Part E — header colours and News label, added 2026-11-23 (7 strings, review needed)
+
+The new header strip: colour names (read aloud by screen readers on the colour buttons), the dark-theme switch, and "Breaking news" shortened to "News". Look hardest at the colour names.
+
+| #   | Screen | Key                    | English        | Telugu      | Hindi       | Correction (te / hi) |
+| --- | ------ | ---------------------- | -------------- | ----------- | ----------- | -------------------- |
+| 1   | Header | `home.breakingNews`    | News           | వార్తలు       | समाचार      |                      |
+| 2   | Header | `theme.colour`         | Colour         | రంగు        | रंग          |                      |
+| 3   | Header | `theme.accent.green`   | Godavari green | గోదావరి ఆకుపచ్చ | गोदावरी हरा |                      |
+| 4   | Header | `theme.accent.saffron` | Kumkum saffron | కుంకుమ కాషాయం | कुमकुम केसरिया |                      |
+| 5   | Header | `theme.accent.blue`    | River blue     | నది నీలం      | नदी नीला    |                      |
+| 6   | Header | `theme.accent.gold`    | Turmeric gold  | పసుపు బంగారు | हल्दी सुनहरा  |                      |
+| 7   | Header | `theme.darkSwitch`     | Dark theme     | ముదురు థీమ్   | गहरी थीम    |                      |
+
 ## Also waiting for native review (not in the app yet)
 
 - [consent-and-privacy-wording-draft-te-hi.md](../legal/consent-and-privacy-wording-draft-te-hi.md): Telugu and Hindi consent and privacy wording, agent translation, not native-reviewed and not legally reviewed (OQ-029, OQ-030, OQ-041). Review it **after** counsel settles the English wording, otherwise it will need a second pass.

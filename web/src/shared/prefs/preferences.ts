@@ -1,7 +1,7 @@
 import { isLocale, type Locale } from '../i18n/i18n';
 
 /**
- * The only browser storage the app may use: language and theme (docs/compliance/data-inventory.md).
+ * The only browser storage the app may use: language, theme and colour (docs/compliance/data-inventory.md).
  * Values are validated on read, storage failures are ignored, and nothing else is ever stored.
  * tests/guards/frontend-privacy.test.ts allows storage in this file only.
  */
@@ -10,6 +10,15 @@ export type Theme = (typeof THEMES)[number];
 
 export const LOCALE_KEY = 'pm.locale';
 export const THEME_KEY = 'pm.theme';
+export const ACCENT_KEY = 'pm.accent';
+
+/** Colour choices (owner request 2026-11-23). Green is the default. */
+export const ACCENTS = ['green', 'saffron', 'blue', 'gold'] as const;
+export type Accent = (typeof ACCENTS)[number];
+
+export function isAccent(value: unknown): value is Accent {
+  return typeof value === 'string' && (ACCENTS as readonly string[]).includes(value);
+}
 
 export interface PreferenceStore {
   getItem(key: string): string | null;
@@ -19,6 +28,7 @@ export interface PreferenceStore {
 export interface Preferences {
   readonly locale: Locale | null;
   readonly theme: Theme | null;
+  readonly accent: Accent | null;
 }
 
 export function isTheme(value: unknown): value is Theme {
@@ -37,19 +47,21 @@ export function readPreferences(store: PreferenceStore | undefined): Preferences
   try {
     const storedLocale = store?.getItem(LOCALE_KEY) ?? null;
     const storedTheme = store?.getItem(THEME_KEY) ?? null;
+    const storedAccent = store?.getItem(ACCENT_KEY) ?? null;
     return {
       locale: isLocale(storedLocale) ? storedLocale : null,
       theme: isTheme(storedTheme) ? storedTheme : null,
+      accent: isAccent(storedAccent) ? storedAccent : null,
     };
   } catch {
-    return { locale: null, theme: null };
+    return { locale: null, theme: null, accent: null };
   }
 }
 
 export function writePreference(
   store: PreferenceStore | undefined,
-  key: typeof LOCALE_KEY | typeof THEME_KEY,
-  value: Locale | Theme,
+  key: typeof LOCALE_KEY | typeof THEME_KEY | typeof ACCENT_KEY,
+  value: Locale | Theme | Accent,
 ): void {
   try {
     store?.setItem(key, value);

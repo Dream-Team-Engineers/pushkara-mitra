@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { initialTheme } from './theme';
 
 describe('initialTheme', () => {
-  it('prefers a stored choice over the device setting', () => {
-    expect(initialTheme('outdoor', true)).toBe('outdoor');
-    expect(initialTheme('light', true)).toBe('light');
+  it('uses a stored choice', () => {
+    expect(initialTheme('outdoor')).toBe('outdoor');
+    expect(initialTheme('dark')).toBe('dark');
   });
 
-  it('follows the device dark preference when nothing is stored', () => {
-    expect(initialTheme(null, true)).toBe('dark');
-    expect(initialTheme(null, false)).toBe('light');
+  it('starts light when nothing is chosen: dark only when the person picks it', () => {
+    expect(initialTheme(null)).toBe('light');
   });
 });

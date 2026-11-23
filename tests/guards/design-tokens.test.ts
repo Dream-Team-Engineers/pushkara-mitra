@@ -15,6 +15,8 @@ const CSS = readFileSync(
 
 const THEMES = ['light', 'dark', 'outdoor'] as const;
 type Theme = (typeof THEMES)[number];
+/** Colour choices (owner request 2026-11-23); each overrides some tokens of every theme. */
+const ACCENTS = ['green', 'saffron', 'blue', 'gold'] as const;
 
 const TEXT_PAIRS: readonly (readonly [string, string])[] = [
   ['--text', '--ground'],
@@ -33,6 +35,7 @@ const TEXT_PAIRS: readonly (readonly [string, string])[] = [
   ['--danger', '--danger-soft'],
   ['--on-danger', '--danger-fill'],
   ['--header-text', '--header-bg'],
+  ['--header-text', '--header-glow'],
   ['--header-text-muted', '--header-bg'],
 ];
 
@@ -50,6 +53,20 @@ function themeTokens(theme: Theme): Map<string, string> {
     const [, name, value] = match;
     if (name !== undefined && value !== undefined) tokens.set(name, value);
   }
+  return tokens;
+}
+
+/** The theme's tokens with one accent's overrides applied, as the browser would combine them. */
+function accentTokens(theme: Theme, accent: string): Map<string, string> {
+  const tokens = themeTokens(theme);
+  const block = new RegExp(
+    `\\[data-theme='${theme}'\\]\\[data-accent='${accent}'\\]\\s*\\{([^}]*)\\}`,
+  ).exec(CSS);
+  const overrides = [...(block?.[1] ?? '').matchAll(/(--[a-z-]+):\s*(#[0-9a-f]{6});/g)];
+  for (const [, name, value] of overrides) {
+    if (name !== undefined && value !== undefined) tokens.set(name, value);
+  }
+  tokens.set('__overrides', String(overrides.length));
   return tokens;
 }
 
@@ -97,6 +114,27 @@ describe.each(THEMES)('%s theme', (theme) => {
     expect(ratio(tokens, foreground, background)).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe.each(THEMES.flatMap((theme) => ACCENTS.map((accent) => [theme, accent] as const)))(
+  '%s theme with the %s accent',
+  (theme, accent) => {
+    const tokens = accentTokens(theme, accent);
+    const textMinimum = theme === 'outdoor' ? 7 : 4.5;
+
+    it('exists and changes the primary colour', () => {
+      expect(Number(tokens.get('__overrides'))).toBeGreaterThanOrEqual(4);
+      expect(tokens.get('--primary')).not.toBe(themeTokens(theme).get('--primary'));
+    });
+
+    it.each(TEXT_PAIRS)(`%s on %s meets ${String(textMinimum)}:1`, (foreground, background) => {
+      expect(ratio(tokens, foreground, background)).toBeGreaterThanOrEqual(textMinimum);
+    });
+
+    it.each(NON_TEXT_PAIRS)('%s against %s meets 3:1', (foreground, background) => {
+      expect(ratio(tokens, foreground, background)).toBeGreaterThanOrEqual(3);
+    });
+  },
+);
 
 describe('size tokens', () => {
   it('keeps the 48px touch target and 16px body text', () => {

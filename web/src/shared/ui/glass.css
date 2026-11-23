@@ -1112,3 +1112,208 @@ main > a.link-card {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/*
+ * Header, two rows (owner request 2026-11-23). Row one: logo, app name in large type, account
+ * letter. Row two: four colour buttons with a sliding ring (left), the L/D switch (middle) and the
+ * language button (right). The header colours follow the chosen accent (tokens.css).
+ */
+.app-header {
+  display: block;
+  min-height: 0;
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  background: linear-gradient(
+    135deg,
+    var(--header-glow) 0%,
+    var(--header-bg) 60%,
+    var(--header-glow) 100%
+  );
+}
+
+[data-theme='outdoor'] .app-header {
+  background: var(--header-bg);
+}
+
+.app-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.app-header__brand {
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.account-link {
+  justify-content: center;
+  min-width: var(--target-min);
+  padding: 0;
+}
+
+.account-link__avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1rem;
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.6);
+}
+
+.account-link__avatar--empty {
+  background: rgb(255 255 255 / 0.16);
+  color: var(--header-text);
+}
+
+.account-link__avatar--empty svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.theme-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid rgb(255 255 255 / 0.15);
+}
+
+.accent-picker {
+  position: relative;
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: rgb(255 255 255 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 999px;
+}
+
+/* The ring that slides to the chosen colour. */
+.accent-picker::before {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgb(0 0 0 / 0.35);
+  content: '';
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+.accent-picker--saffron::before {
+  transform: translateX(2rem);
+}
+
+.accent-picker--blue::before {
+  transform: translateX(4rem);
+}
+
+.accent-picker--gold::before {
+  transform: translateX(6rem);
+}
+
+.accent-swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 2px solid rgb(255 255 255 / 0.55);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.accent-swatch--green {
+  background: #16a34a;
+}
+
+.accent-swatch--saffron {
+  background: #ea580c;
+}
+
+.accent-swatch--blue {
+  background: #2563eb;
+}
+
+.accent-swatch--gold {
+  background: #ca8a04;
+}
+
+.accent-swatch[aria-checked='true'] {
+  border-color: #fff;
+}
+
+.mode-toggle {
+  position: relative;
+  width: 4.75rem;
+  height: 2.25rem;
+  padding: 0;
+  background: rgb(255 255 255 / 0.14);
+  color: var(--header-text);
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--text-caption);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mode-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+  transition: transform 0.2s ease;
+}
+
+.mode-toggle.is-dark .mode-toggle__thumb {
+  transform: translateX(calc(4.75rem - 1.75rem - 8px));
+}
+
+.mode-toggle__label {
+  position: absolute;
+  top: 3px;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  line-height: 1;
+}
+
+.mode-toggle__label--l {
+  left: 3px;
+}
+
+.mode-toggle__label--d {
+  right: 3px;
+}
+
+/* The letter on the white thumb is dark; the other letter stays light on the header. */
+.mode-toggle:not(.is-dark) .mode-toggle__label--l,
+.mode-toggle.is-dark .mode-toggle__label--d {
+  color: #12304a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accent-picker::before,
+  .mode-toggle__thumb {
+    transition: none;
+  }
+}
+
+@media (max-width: 18rem) {
+  .app-header__brand {
+    font-size: 1.25rem;
+  }
+}
