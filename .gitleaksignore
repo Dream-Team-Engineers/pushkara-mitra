@@ -1,2 +1,6 @@
 # Test fixture in the history (replaced with an obviously fake value); not a credential.
 348e10aedd61ae854f29648785b150008bc16ce3:tests/worker/auth-hardening.test.ts:generic-api-key:16
+# Cloudflare Access application AUD tag for the staff admin Worker (ADR 0018). An identifier, not a
+# credential: Access tokens are signed by Cloudflare's keys; knowing the AUD grants nothing.
+# Owner approved this entry on 2026-11-23.
+d4fb3fb8f80d0305a2e47c4b3a5f43aceab3790c:wrangler.admin.toml:generic-api-key:19
