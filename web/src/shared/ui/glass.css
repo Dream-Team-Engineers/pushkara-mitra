@@ -1317,3 +1317,109 @@ main > a.link-card {
     font-size: 1.25rem;
   }
 }
+
+/* Ghat list: compact cards (about 70px closed) so four or five fit on a phone screen; tap for details */
+.ghat-card {
+  padding: var(--space-2) var(--space-3);
+  gap: 0;
+}
+
+.ghat-card__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  list-style: none;
+  padding-inline-end: 1.25rem;
+  position: relative;
+}
+
+.ghat-card__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ghat-card__summary::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0.15rem;
+  inset-block-start: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-inline-end: 2px solid var(--text-muted);
+  border-block-end: 2px solid var(--text-muted);
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.ghat-card[open] > .ghat-card__summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.ghat-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ghat-card__name {
+  min-width: 0;
+  font-size: var(--text-body);
+}
+
+.ghat-card__meta {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ghat-card .volunteer-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-block-start: var(--space-1);
+}
+
+.ghat-card__more {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--line);
+}
+
+.ghat-card__more .card__link {
+  align-self: flex-start;
+  padding-inline: 0;
+}
+
+/* Conditions: one compact card per ghat with crowd and river level */
+.cond-card {
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1);
+}
+
+.cond-card .card__title {
+  font-size: var(--text-body);
+}
+
+.cond-card .meter-row {
+  margin-block-start: var(--space-1);
+  padding-block-start: var(--space-2);
+}
+
+.cond-card .meter__bar {
+  width: 1.25rem;
+}
+
+.cond-card__note {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.cond-card__source > summary {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  cursor: pointer;
+}

@@ -5,6 +5,7 @@ import {
   PARTNER_KINDS,
   volunteerUpdatesResource,
   type PartnerKind,
+  type VolunteerUpdate,
 } from '../../shared/partners/partnersClient';
 
 /** Label for each reported value, by kind. Crowd reuses the crowd words pilgrims already know. */
@@ -43,23 +44,37 @@ export function VolunteerUpdatesLoader() {
 }
 
 /**
- * The pilgrim-facing "From a volunteer" strip for one ghat (ADR 0019 section 5). Shows the latest
- * unhidden report per kind, only while it is under three hours old, with its age and a plain line
- * that it is not an official figure. River reports add the official-bulletin line (wording NEEDS
- * REVIEW, OQ-045). It never says who reported and never replaces the official crowd reading. The
- * data is read from the shared resource that `VolunteerUpdatesLoader` refreshes.
+ * The newest volunteer report of one kind for one ghat, or null. Reads the shared resource that
+ * `VolunteerUpdatesLoader` refreshes (the server already leaves out anything over three hours old,
+ * hidden reports and suspended partners; the client drops stale ones again).
  */
-export function VolunteerStrip({ ghatId }: { readonly ghatId: string }) {
+export function latestVolunteer(kind: PartnerKind, ghatId: string): VolunteerUpdate | null {
   const state = volunteerUpdatesResource.state.value;
   if (state.status !== 'ready' || state.data === null) return null;
-  const mine = state.data.updates.filter((update) => update.ghatId === ghatId);
-  if (mine.length === 0) return null;
+  const mine = state.data.updates.filter(
+    (update) => update.kind === kind && update.ghatId === ghatId,
+  );
+  return mine.sort((a, b) => Date.parse(b.reportedAt) - Date.parse(a.reportedAt))[0] ?? null;
+}
+
+/**
+ * The pilgrim-facing "From a volunteer" strip for one ghat (ADR 0019 section 5): the latest report
+ * per kind with its age and a plain line that it is not an official figure. It never says who
+ * reported and never replaces the official crowd reading. River reports add the official-bulletin
+ * line (wording NEEDS REVIEW, OQ-045), unless `compact` (the ghat list), which shows that line in
+ * the card's details instead.
+ */
+export function VolunteerStrip({
+  ghatId,
+  compact = false,
+}: {
+  readonly ghatId: string;
+  readonly compact?: boolean;
+}) {
   const rows = PARTNER_KINDS.flatMap((kind) => {
-    const latest = mine
-      .filter((update) => update.kind === kind)
-      .sort((a, b) => Date.parse(b.reportedAt) - Date.parse(a.reportedAt))[0];
-    const label = latest === undefined ? null : valueLabel(kind, latest.value);
-    return latest === undefined || label === null ? [] : [{ kind, latest, label }];
+    const latest = latestVolunteer(kind, ghatId);
+    const label = latest === null ? null : valueLabel(kind, latest.value);
+    return latest === null || label === null ? [] : [{ kind, latest, label }];
   });
   if (rows.length === 0) return null;
   return (
@@ -75,7 +90,7 @@ export function VolunteerStrip({ ghatId }: { readonly ghatId: string }) {
           </li>
         ))}
       </ul>
-      {rows.some((row) => row.kind === 'river') ? (
+      {!compact && rows.some((row) => row.kind === 'river') ? (
         <p class="note note--flush">{t('pv.strip.river')}</p>
       ) : null}
     </section>

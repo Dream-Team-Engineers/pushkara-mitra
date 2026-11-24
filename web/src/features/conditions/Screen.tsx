@@ -1,9 +1,15 @@
+import { useLiveCrowd } from '../../shared/data/crowd';
 import { crowdResource } from '../../shared/data/resources';
+import { FLAGS } from '../../shared/flags/flags';
+import { ageMinutes } from '../../shared/partners/partnersClient';
+import { latestVolunteer, valueLabel, VolunteerUpdatesLoader } from '../partners/VolunteerStrip';
 import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
 import { SourceStamp } from '../../shared/ui/Status';
+import type { GhatFixture } from '../../shared/data/fixtures';
+import type { LiveCrowd } from '../../shared/data/crowd';
 
 const TILES: readonly { readonly id: string; readonly title: MessageKey }[] = [
   { id: 'weather', title: 'conditions.weather' },
@@ -22,7 +28,15 @@ const LEVEL_TEXT = {
 const LEVEL_BARS: Readonly<Record<Level, number>> = { low: 1, moderate: 2, high: 3, noData: 0 };
 
 /** A small heat bar (3 steps) with its name and the level in words, so colour is never the only signal. */
-function Meter({ label, level }: { readonly label: MessageKey; readonly level: Level }) {
+function Meter({
+  label,
+  level,
+  text = LEVEL_TEXT[level],
+}: {
+  readonly label: MessageKey;
+  readonly level: Level;
+  readonly text?: MessageKey;
+}) {
   const bars = LEVEL_BARS[level];
   return (
     <div class={'meter meter--' + level}>
@@ -32,19 +46,79 @@ function Meter({ label, level }: { readonly label: MessageKey; readonly level: L
           <span key={step} class={step <= bars ? 'meter__bar is-on' : 'meter__bar'} />
         ))}
       </span>
-      <span class="meter__text">{t(LEVEL_TEXT[level])}</span>
+      <span class="meter__text">{t(text)}</span>
     </div>
   );
 }
 
+/** Volunteer river words on the same three-step bar: normal, rising, high. */
+const RIVER_LEVEL: Readonly<Record<string, Level>> = {
+  normal: 'low',
+  rising: 'moderate',
+  high: 'high',
+};
+
+function GhatConditions({
+  ghat,
+  live,
+}: {
+  readonly ghat: GhatFixture;
+  readonly live: LiveCrowd | null;
+}) {
+  const volunteerCrowd = FLAGS.partners ? latestVolunteer('crowd', ghat.id) : null;
+  const volunteerRiver = FLAGS.partners ? latestVolunteer('river', ghat.id) : null;
+  const official = live?.[ghat.id];
+  // The official reading wins for crowd; a volunteer report fills in when there is none.
+  const crowd: Level =
+    official ??
+    (volunteerCrowd !== null && volunteerCrowd.value in LEVEL_BARS
+      ? (volunteerCrowd.value as Level)
+      : ghat.crowd);
+  const crowdFromVolunteer =
+    official === undefined && crowd !== ghat.crowd && volunteerCrowd !== null;
+  const river: Level =
+    volunteerRiver === null ? 'noData' : (RIVER_LEVEL[volunteerRiver.value] ?? 'noData');
+  const riverText = volunteerRiver === null ? null : valueLabel('river', volunteerRiver.value);
+  const newest = [crowdFromVolunteer ? volunteerCrowd : null, volunteerRiver]
+    .flatMap((update) => (update === null ? [] : [Date.parse(update.reportedAt)]))
+    .sort((x, y) => y - x)[0];
+  return (
+    <li class="card cond-card">
+      <h3 class="card__title">{ghat.name}</h3>
+      <div class="meter-row">
+        <Meter label="meter.crowd" level={crowd} />
+        <Meter
+          label="meter.river"
+          level={river}
+          {...(riverText === null ? {} : { text: riverText })}
+        />
+      </div>
+      {newest === undefined ? null : (
+        <p class="cond-card__note">
+          {t('pv.strip.title')} ·{' '}
+          {t('pv.strip.age', { minutes: ageMinutes(new Date(newest).toISOString()) })} ·{' '}
+          {t('pv.strip.notOfficial')}
+        </p>
+      )}
+      <details class="cond-card__source">
+        <summary>{t('conditions.sourceMore')}</summary>
+        <SourceStamp meta={ghat} />
+      </details>
+    </li>
+  );
+}
+
 /**
- * No real feed is connected, so the tiles say "no data" instead of showing placeholder numbers
- * that could be read as live conditions. Crowd levels are estimates and never safety instructions.
+ * Crowd and river level per ghat come from staff readings and, when switched on, from volunteer
+ * reports (marked "From a volunteer", never an official figure). With no report the meter says "No data"
+ * instead of a made-up level. Crowd levels are estimates and never safety instructions.
  */
 export default function ConditionsScreen() {
+  const live = useLiveCrowd();
   return (
     <>
       <ScreenHeader titleKey="module.conditions.title" subtitleKey="module.conditions.subtitle" />
+      {FLAGS.partners ? <VolunteerUpdatesLoader /> : null}
       <section class="section" aria-labelledby="crowd-title">
         <h2 id="crowd-title" class="section__title">
           <Bi k="conditions.crowd" />
@@ -53,19 +127,14 @@ export default function ConditionsScreen() {
         <ResourceView
           resource={crowdResource}
           render={(items) => (
-            <ul class="card-list">
-              {items.map((ghat) => (
-                <li key={ghat.id} class="card">
-                  <h3 class="card__title">{ghat.name}</h3>
-                  <SourceStamp meta={ghat} />
-                  <div class="meter-row">
-                    <Meter label="meter.crowd" level={ghat.crowd} />
-                    {/* No traffic feed exists yet: always "No data", never a made-up level. */}
-                    <Meter label="meter.traffic" level="noData" />
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul class="card-list">
+                {items.map((ghat) => (
+                  <GhatConditions key={ghat.id} ghat={ghat} live={live} />
+                ))}
+              </ul>
+              {FLAGS.partners ? <p class="note">{t('pv.strip.river')}</p> : null}
+            </>
           )}
         />
       </section>

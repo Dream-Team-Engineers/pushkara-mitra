@@ -6,7 +6,11 @@ import type { District, Facility, GhatFixture } from '../../shared/data/fixtures
 import { FLAGS } from '../../shared/flags/flags';
 import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { ghatsResource } from '../../shared/data/resources';
-import { VolunteerStrip, VolunteerUpdatesLoader } from '../partners/VolunteerStrip';
+import {
+  latestVolunteer,
+  VolunteerStrip,
+  VolunteerUpdatesLoader,
+} from '../partners/VolunteerStrip';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, CrowdChip, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -53,51 +57,58 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
   const local = localName(ghat);
   // A fresh staff report wins; otherwise the record's own level, which is "No data" for approved ghats.
   const crowd = live?.[ghat.id] ?? ghat.crowd;
+  const riverReported = FLAGS.partners && latestVolunteer('river', ghat.id) !== null;
+  // Compact by default so four or five ghats fit on a screen; tap a card for facilities, source and directions.
   return (
-    <li class="card">
-      <div class="card__head">
-        <h2 class="card__title">
-          {local === null ? (
-            ghat.name
-          ) : (
-            <span class="bi bi--stacked">
-              <span lang={locale.value}>{local}</span>
-              <span class="bi__sec" lang="en">
-                {ghat.name}
-              </span>
-            </span>
+    <li>
+      <details class="card ghat-card">
+        <summary class="ghat-card__summary">
+          <span class="ghat-card__top">
+            <h2 class="card__title ghat-card__name">
+              {local === null ? (
+                ghat.name
+              ) : (
+                <span class="bi bi--stacked">
+                  <span lang={locale.value}>{local}</span>
+                  <span class="bi__sec" lang="en">
+                    {ghat.name}
+                  </span>
+                </span>
+              )}
+            </h2>
+            <CrowdChip level={crowd} />
+          </span>
+          <span class="card__meta ghat-card__meta">
+            {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
+          </span>
+        </summary>
+        {FLAGS.partners ? <VolunteerStrip ghatId={ghat.id} compact /> : null}
+        <div class="ghat-card__more">
+          {ghat.facilities.length === 0 ? null : (
+            <ul class="tags" aria-label={t('ghats.facilities')}>
+              {ghat.facilities.map((facility) => (
+                <li key={facility}>{t(FACILITY_LABELS[facility])}</li>
+              ))}
+            </ul>
           )}
-        </h2>
-        <CrowdChip level={crowd} />
-      </div>
-      <div class="card__row">
-        <p class="card__meta">
-          {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
-        </p>
-        {ghat.synthetic ? (
-          <a class="card__link" href={hrefFor('map')}>
-            <Bi k="action.directions" />
-          </a>
-        ) : (
-          <a
-            class="card__link"
-            href={osmSearchUrl(`${ghat.name}, ${ghat.town}, Andhra Pradesh`)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Bi k="action.directions" />
-          </a>
-        )}
-      </div>
-      {ghat.facilities.length === 0 ? null : (
-        <ul class="tags" aria-label={t('ghats.facilities')}>
-          {ghat.facilities.map((facility) => (
-            <li key={facility}>{t(FACILITY_LABELS[facility])}</li>
-          ))}
-        </ul>
-      )}
-      {FLAGS.partners ? <VolunteerStrip ghatId={ghat.id} /> : null}
-      <SourceStamp meta={ghat} />
+          {riverReported ? <p class="note note--flush">{t('pv.strip.river')}</p> : null}
+          <SourceStamp meta={ghat} />
+          {ghat.synthetic ? (
+            <a class="card__link" href={hrefFor('map')}>
+              <Bi k="action.directions" />
+            </a>
+          ) : (
+            <a
+              class="card__link"
+              href={osmSearchUrl(`${ghat.name}, ${ghat.town}, Andhra Pradesh`)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Bi k="action.directions" />
+            </a>
+          )}
+        </div>
+      </details>
     </li>
   );
 }

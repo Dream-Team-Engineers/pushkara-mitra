@@ -462,6 +462,8 @@
     "ghats.namesUnverified": "Telugu and Hindi names are from an unofficial guide and are unverified until an official list is published.",
     "pv.post.pickOne": "Choose at least one, then send. Leave the others empty.",
     "pv.post.partial": "Some updates were sent. Any item you updated for this ghat can be updated again after 10 minutes; the ones still selected were not sent.",
-    "pv.post.waitTen": "You already updated this for this ghat. You can update the same item again after 10 minutes."
+    "pv.post.waitTen": "You already updated this for this ghat. You can update the same item again after 10 minutes.",
+    "meter.river": "River level",
+    "conditions.sourceMore": "Source and date"
   }
 }
