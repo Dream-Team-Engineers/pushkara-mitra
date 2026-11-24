@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Production D1 database created and migrated, not bound — 2026-11-24 (time not recorded)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) approved creation, region APAC and "create and migrate, do not bind" (2026-11-24); run by Claude Code (agent). Independent reviewer: NONE.
+- **Done:** `npx wrangler d1 create pushkara-mitra-production --location apac` (id `d3117bbc-34d9-4212-bac1-3bf8f35044d1`, an identifier, not a secret); migrations 0001 to 0006 applied with `wrangler d1 migrations apply --remote` through a temporary config outside the repo, all six reported done. The tables are empty: no data written.
+- **Not done:** no binding in `wrangler.toml`, no production deploy, production flags still off. Production stays unreleased; the paid plan (OQ-028), data residency (OQ-026, APAC is not an India guarantee), privacy notice (OQ-029) and counsel details (OQ-024) remain open. Migration 0007 (Partners) must be applied here too before any production release that includes it.
+- **Rollback:** `npx wrangler d1 delete pushkara-mitra-production` (it holds no data).
+
 ## Partners phase 2: design, data inventory and threat model — 2026-11-24 (docs only, no code yet)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "Yes" to starting job card item 3; written by Claude Code (agent). Independent reviewer: NONE.
