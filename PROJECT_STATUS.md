@@ -6,6 +6,20 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Pause for office hours; resume this evening — 2026-11-24 (time not recorded)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) paused work for office time; Claude Code (agent) recorded this. Independent reviewer: NONE.
+- **State now:** `main` at `1a0d7f6`, pushed, working tree clean apart from this entry. CI, Security, Supply chain, Scorecard and Deploy staging passed on that commit (the admin Worker deployed by the workflow too); staging `/healthz` ok; the admin dashboard still answers 302 to Access sign-in when signed out. Last local `npm run check`: 1106 passed, 24 skipped. Production **not deployed**.
+- **Done today (from `f33dfb7`):** flaky smoke check fixed (`cb7b36f`); admin Worker added to the staging deploy (`fbcc784`); Partners design, data inventory DI-20 to DI-23, CON-07, OQ-045 and OQ-046 (`9584cbb`); production D1 `pushkara-mitra-production` created in APAC and migrated 0001 to 0006, not bound (`5ad7633`); Partners step 1: migration 0007, repository, `/api/v1/partners/...` routes behind `FLAG_PARTNERS` (`27cc90d`); Partners step 2: admin Partners tab with approve, reject, suspend, nudge and hide (`1a0d7f6`). Staging D1 has migrations 0001 to 0007. `FLAG_PARTNERS` is **off** in the app and in the admin Worker, so nobody can apply yet.
+- **Job card for this evening:**
+  1. **Agent:** Partners step 3, the app side: Partners screen (apply with Google re-verification and the consent line, status, availability switch, inbox, post a fixed-choice update), pilgrim "From a volunteer" strip with age and "not an official figure" line, strings in en/te/hi (add them to the O1 review list), then set `FLAG_PARTNERS` to `enabled` in the staging app and `wrangler.admin.toml` and test the full path on staging.
+  2. **Owner (10 min), still open from before:** two-phone Group test and header colours on staging (job card item 1 of 2026-11-23); report anything odd with a screenshot.
+  3. **Owner, when ready:** native review of O1 Parts D and E, and the new Partners strings once added.
+  4. **Owner decision needed before production:** OQ-045 (volunteer crowd and river reports: wording, liability, whether river updates should wait for an official source) and OQ-046 (partner data retention, age rule); plus the earlier paid plan (OQ-028), residency (OQ-026), privacy notice (OQ-029) and counsel details (OQ-024, on launch day).
+  5. **Before any production release that includes Partners:** apply migration 0007 to the production D1 (it stops at 0006), deploy the admin Worker to production with its own Access setup, and get the owner's explicit release approval.
+- **Rollback points:** `git revert <commit>` then push (staging redeploys), or `npx wrangler rollback <version> --env staging`; stop Partners by leaving `FLAG_PARTNERS` unset; the production D1 can be deleted with `npx wrangler d1 delete pushkara-mitra-production` (no data).
+- **Legal:** no sign-off recorded. Engineering readiness and legal sign-off are reported separately.
+
 ## Partners phase 2, step 2: admin Partners tab — 2026-11-24 (staging only, flag off)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "Yes" to continue; implementation by Claude Code (agent). Independent reviewer: NONE.
