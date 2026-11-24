@@ -47,12 +47,22 @@ if (!existsSync(join(DIST, 'index.html'))) {
   process.exit(2);
 }
 
+// URL paths arrive percent-encoded ("Noto%20Sans%20Medium"); the files on disk have real spaces.
+// Without decoding, map glyph requests got a 404 whenever the map asked for them before the run ended.
+const safeDecode = (path) => {
+  try {
+    return decodeURIComponent(path);
+  } catch {
+    return path;
+  }
+};
+
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost');
   const rel =
     url.pathname === '/'
       ? 'index.html'
-      : normalize(url.pathname)
+      : normalize(safeDecode(url.pathname))
           .replace(/^(\.\.[/\\])+/, '')
           // normalize() keeps a leading separator ("\assets\x.js" on Windows), which resolve()
           // would read as the drive root, outside DIST.
