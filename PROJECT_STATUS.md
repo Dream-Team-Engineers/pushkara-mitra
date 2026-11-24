@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Telugu and Hindi review recorded — 2026-11-24
+
+- **Who:** owner Krishna Murthy Raju G (gkmraju) stated "te/hi reviewed by GKM Raju on 24.11.2026"; recorded by Claude Code (agent). Independent reviewer: NONE. The statement did not name parts, so it was recorded as covering O1 Parts D, E and F (all strings added up to that date, none corrected); reviewedBy in te.json and hi.json updated. The owner can narrow this if only some parts were meant. Not covered: the unreleased consent and privacy wording draft. Language review is separate from counsel approval (OQ-019); no legal sign-off.
+
 ## Food wording and grey tag; review links — 2026-11-24 (staging)
 
 - Owner request: the word Finished is no longer shown anywhere; the food report reads Food: Available (green) or Food: Not available (grey). The stored value stays finished (internal code, no migration). O1 Part F regenerated with the four strings added since (58 in total). PowerShell npm run check: 1123 passed, 24 skipped.
