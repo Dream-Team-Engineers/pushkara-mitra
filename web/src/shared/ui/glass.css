@@ -1423,3 +1423,27 @@ main > a.link-card {
   font-size: var(--text-caption);
   cursor: pointer;
 }
+
+/* Ghat list: volunteer reports stay visible on the closed card, one wrapped line of small tags */
+.volunteer-compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-block-start: 2px;
+  font-size: var(--text-caption);
+}
+
+.volunteer-compact__label {
+  font-weight: 700;
+}
+
+.volunteer-compact__tag {
+  padding: 1px var(--space-2);
+  background: var(--primary-soft);
+  border-radius: 999px;
+}
+
+.volunteer-compact__age {
+  color: var(--text-muted);
+}

@@ -64,6 +64,44 @@ export function latestVolunteer(kind: PartnerKind, ghatId: string): VolunteerUpd
  * line (wording NEEDS REVIEW, OQ-045), unless `compact` (the ghat list), which shows that line in
  * the card's details instead.
  */
+/** One line for the closed ghat card: label, a tag per report and the newest age. No disclaimer here; see VolunteerDisclaimer. */
+function CompactStrip({ rows }: { readonly rows: readonly Row[] }) {
+  const newest = Math.max(...rows.map((row) => Date.parse(row.latest.reportedAt)));
+  return (
+    <span class="volunteer-compact" aria-label={t('pv.strip.title')}>
+      <span class="volunteer-compact__label">{t('pv.strip.title')}</span>
+      {rows.map(({ kind, label }) => (
+        <span key={kind} class="volunteer-compact__tag">
+          {t(kind === 'food' ? 'pv.kind.foodShort' : KIND_LABELS[kind])}: {t(label)}
+        </span>
+      ))}
+      <span class="volunteer-compact__age">
+        {t('pv.strip.age', { minutes: ageMinutes(new Date(newest).toISOString()) })}
+      </span>
+    </span>
+  );
+}
+
+interface Row {
+  readonly kind: PartnerKind;
+  readonly latest: VolunteerUpdate;
+  readonly label: MessageKey;
+}
+
+function rowsFor(ghatId: string): readonly Row[] {
+  return PARTNER_KINDS.flatMap((kind) => {
+    const latest = latestVolunteer(kind, ghatId);
+    const label = latest === null ? null : valueLabel(kind, latest.value);
+    return latest === null || label === null ? [] : [{ kind, latest, label }];
+  });
+}
+
+/**
+ * The pilgrim-facing "From a volunteer" strip for one ghat (ADR 0019 section 5): the latest report
+ * per kind with its age. It never says who reported and never replaces the official crowd reading.
+ * The "not an official figure" and official-bulletin lines (wording NEEDS REVIEW, OQ-045) are shown
+ * once at the top of a screen by VolunteerDisclaimer; the full variant repeats them for one ghat.
+ */
 export function VolunteerStrip({
   ghatId,
   compact = false,
@@ -71,12 +109,9 @@ export function VolunteerStrip({
   readonly ghatId: string;
   readonly compact?: boolean;
 }) {
-  const rows = PARTNER_KINDS.flatMap((kind) => {
-    const latest = latestVolunteer(kind, ghatId);
-    const label = latest === null ? null : valueLabel(kind, latest.value);
-    return latest === null || label === null ? [] : [{ kind, latest, label }];
-  });
+  const rows = rowsFor(ghatId);
   if (rows.length === 0) return null;
+  if (compact) return <CompactStrip rows={rows} />;
   return (
     <section class="volunteer-strip" aria-label={t('pv.strip.title')}>
       <p class="card__meta">
@@ -90,9 +125,18 @@ export function VolunteerStrip({
           </li>
         ))}
       </ul>
-      {!compact && rows.some((row) => row.kind === 'river') ? (
+      {rows.some((row) => row.kind === 'river') ? (
         <p class="note note--flush">{t('pv.strip.river')}</p>
       ) : null}
     </section>
   );
+}
+
+/** One shared line for a whole screen, shown only while at least one volunteer report is visible. */
+export function VolunteerDisclaimer() {
+  const state = volunteerUpdatesResource.state.value;
+  if (state.status !== 'ready' || state.data === null || state.data.updates.length === 0) {
+    return null;
+  }
+  return <p class="note">{t('pv.strip.disclaimer')}</p>;
 }

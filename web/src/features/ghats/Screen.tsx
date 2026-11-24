@@ -7,7 +7,7 @@ import { FLAGS } from '../../shared/flags/flags';
 import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { ghatsResource } from '../../shared/data/resources';
 import {
-  latestVolunteer,
+  VolunteerDisclaimer,
   VolunteerStrip,
   VolunteerUpdatesLoader,
 } from '../partners/VolunteerStrip';
@@ -57,7 +57,6 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
   const local = localName(ghat);
   // A fresh staff report wins; otherwise the record's own level, which is "No data" for approved ghats.
   const crowd = live?.[ghat.id] ?? ghat.crowd;
-  const riverReported = FLAGS.partners && latestVolunteer('river', ghat.id) !== null;
   // Compact by default so four or five ghats fit on a screen; tap a card for facilities, source and directions.
   return (
     <li>
@@ -81,8 +80,8 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
           <span class="card__meta ghat-card__meta">
             {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
           </span>
+          {FLAGS.partners ? <VolunteerStrip ghatId={ghat.id} compact /> : null}
         </summary>
-        {FLAGS.partners ? <VolunteerStrip ghatId={ghat.id} compact /> : null}
         <div class="ghat-card__more">
           {ghat.facilities.length === 0 ? null : (
             <ul class="tags" aria-label={t('ghats.facilities')}>
@@ -91,7 +90,6 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
               ))}
             </ul>
           )}
-          {riverReported ? <p class="note note--flush">{t('pv.strip.river')}</p> : null}
           <SourceStamp meta={ghat} />
           {ghat.synthetic ? (
             <a class="card__link" href={hrefFor('map')}>
@@ -137,6 +135,7 @@ export default function GhatsScreen() {
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
           return (
             <>
+              {FLAGS.partners ? <VolunteerDisclaimer /> : null}
               <p class="note">{t(note)}</p>
               <p class="note">
                 {t('crowd.estimate')} {t('ghats.snanamPending')}

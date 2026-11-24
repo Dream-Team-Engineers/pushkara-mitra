@@ -2,7 +2,12 @@ import { useLiveCrowd } from '../../shared/data/crowd';
 import { crowdResource } from '../../shared/data/resources';
 import { FLAGS } from '../../shared/flags/flags';
 import { ageMinutes } from '../../shared/partners/partnersClient';
-import { latestVolunteer, valueLabel, VolunteerUpdatesLoader } from '../partners/VolunteerStrip';
+import {
+  latestVolunteer,
+  valueLabel,
+  VolunteerDisclaimer,
+  VolunteerUpdatesLoader,
+} from '../partners/VolunteerStrip';
 import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -96,8 +101,7 @@ function GhatConditions({
       {newest === undefined ? null : (
         <p class="cond-card__note">
           {t('pv.strip.title')} ·{' '}
-          {t('pv.strip.age', { minutes: ageMinutes(new Date(newest).toISOString()) })} ·{' '}
-          {t('pv.strip.notOfficial')}
+          {t('pv.strip.age', { minutes: ageMinutes(new Date(newest).toISOString()) })}
         </p>
       )}
       <details class="cond-card__source">
@@ -123,6 +127,7 @@ export default function ConditionsScreen() {
         <h2 id="crowd-title" class="section__title">
           <Bi k="conditions.crowd" />
         </h2>
+        {FLAGS.partners ? <VolunteerDisclaimer /> : null}
         <p class="note note--flush">{t('conditions.crowdNote')}</p>
         <ResourceView
           resource={crowdResource}
@@ -133,7 +138,6 @@ export default function ConditionsScreen() {
                   <GhatConditions key={ghat.id} ghat={ghat} live={live} />
                 ))}
               </ul>
-              {FLAGS.partners ? <p class="note">{t('pv.strip.river')}</p> : null}
             </>
           )}
         />

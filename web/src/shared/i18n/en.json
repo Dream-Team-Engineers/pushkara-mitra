@@ -464,6 +464,8 @@
     "pv.post.partial": "Some updates were sent. Any item you updated for this ghat can be updated again after 10 minutes; the ones still selected were not sent.",
     "pv.post.waitTen": "You already updated this for this ghat. You can update the same item again after 10 minutes.",
     "meter.river": "River level",
-    "conditions.sourceMore": "Source and date"
+    "conditions.sourceMore": "Source and date",
+    "pv.kind.foodShort": "Food",
+    "pv.strip.disclaimer": "Items marked \"From a volunteer\" are reports by volunteers, not official figures. For river and flood warnings, follow the official bulletin and local officials."
   }
 }
