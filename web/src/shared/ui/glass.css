@@ -1447,3 +1447,19 @@ main > a.link-card {
 .volunteer-compact__age {
   color: var(--text-muted);
 }
+
+/* Volunteer tags: green good, amber careful, red bad (words stay on the tag) */
+.volunteer-compact__tag--good {
+  background: color-mix(in srgb, #2e8b57 18%, transparent);
+  box-shadow: inset 0 0 0 1px #2e8b57;
+}
+
+.volunteer-compact__tag--warn {
+  background: color-mix(in srgb, #b8740a 20%, transparent);
+  box-shadow: inset 0 0 0 1px #b8740a;
+}
+
+.volunteer-compact__tag--bad {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}

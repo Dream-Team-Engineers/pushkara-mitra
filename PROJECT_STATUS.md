@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Disclaimer at the bottom; colour-coded volunteer tags — 2026-11-24 (staging)
+
+- Owner request: the shared volunteer disclaimer now sits at the bottom of the Ghats list and of the Conditions list; volunteer tags are colour-coded (green: low crowd, normal river, food available; amber: moderate crowd, rising river; red: high crowd, high river, food finished), with the words kept on every tag. PowerShell npm run check: 1123 passed, 24 skipped. Not looked at in a browser by the agent.
+
 ## Volunteer line visible on closed ghat cards; one shared disclaimer — 2026-11-24 (staging)
 
 - Owner feedback from a screenshot: the volunteer line was inside the collapsed part of the ghat card, so it was hidden when the card was closed, and the not-official line repeated on every card. Now the closed card shows one wrapped line of small tags (From a volunteer, Crowd, River level, Food, newest age), and the not-official and official-bulletin line is shown once at the top of Ghats and of Conditions, only while at least one volunteer report is visible. The open card keeps facilities, source and date, and Directions. New strings (te and hi to review): pv.kind.foodShort, pv.strip.disclaimer. Not looked at in a browser by the agent.

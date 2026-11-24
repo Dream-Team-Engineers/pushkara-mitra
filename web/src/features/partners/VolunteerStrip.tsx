@@ -32,6 +32,18 @@ export const KIND_LABELS = {
   food: 'pv.kind.food',
 } as const satisfies Record<PartnerKind, MessageKey>;
 
+/** Colour of a reported value: good, careful or bad. The words stay on the tag, so colour is never the only signal. */
+const TONES = {
+  crowd: { low: 'good', moderate: 'warn', high: 'bad' },
+  river: { normal: 'good', rising: 'warn', high: 'bad' },
+  food: { available: 'good', finished: 'bad' },
+} as const satisfies Record<PartnerKind, Record<string, 'good' | 'warn' | 'bad'>>;
+
+export function toneOf(kind: PartnerKind, value: string): 'good' | 'warn' | 'bad' | 'none' {
+  const tones: Readonly<Record<string, 'good' | 'warn' | 'bad'>> = TONES[kind];
+  return tones[value] ?? 'none';
+}
+
 export function valueLabel(kind: PartnerKind, value: string): MessageKey | null {
   const labels: Readonly<Record<string, MessageKey>> = VALUE_LABELS[kind];
   return labels[value] ?? null;
@@ -70,8 +82,11 @@ function CompactStrip({ rows }: { readonly rows: readonly Row[] }) {
   return (
     <span class="volunteer-compact" aria-label={t('pv.strip.title')}>
       <span class="volunteer-compact__label">{t('pv.strip.title')}</span>
-      {rows.map(({ kind, label }) => (
-        <span key={kind} class="volunteer-compact__tag">
+      {rows.map(({ kind, latest, label }) => (
+        <span
+          key={kind}
+          class={`volunteer-compact__tag volunteer-compact__tag--${toneOf(kind, latest.value)}`}
+        >
           {t(kind === 'food' ? 'pv.kind.foodShort' : KIND_LABELS[kind])}: {t(label)}
         </span>
       ))}

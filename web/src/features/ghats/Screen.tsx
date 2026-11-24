@@ -135,7 +135,6 @@ export default function GhatsScreen() {
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
           return (
             <>
-              {FLAGS.partners ? <VolunteerDisclaimer /> : null}
               <p class="note">{t(note)}</p>
               <p class="note">
                 {t('crowd.estimate')} {t('ghats.snanamPending')}
@@ -152,6 +151,7 @@ export default function GhatsScreen() {
                   ))}
                 </ul>
               )}
+              {FLAGS.partners ? <VolunteerDisclaimer /> : null}
             </>
           );
         }}

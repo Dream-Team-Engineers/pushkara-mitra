@@ -127,7 +127,6 @@ export default function ConditionsScreen() {
         <h2 id="crowd-title" class="section__title">
           <Bi k="conditions.crowd" />
         </h2>
-        {FLAGS.partners ? <VolunteerDisclaimer /> : null}
         <p class="note note--flush">{t('conditions.crowdNote')}</p>
         <ResourceView
           resource={crowdResource}
@@ -138,6 +137,7 @@ export default function ConditionsScreen() {
                   <GhatConditions key={ghat.id} ghat={ghat} live={live} />
                 ))}
               </ul>
+              {FLAGS.partners ? <VolunteerDisclaimer /> : null}
             </>
           )}
         />
