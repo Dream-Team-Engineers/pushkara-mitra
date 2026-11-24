@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partners phase 2: design, data inventory and threat model — 2026-11-24 (docs only, no code yet)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "Yes" to starting job card item 3; written by Claude Code (agent). Independent reviewer: NONE.
+- **What:** [ADR 0019](docs/decisions/0019-partners-v1.md) with threat model; data-inventory rows DI-20 to DI-23; consent-register row CON-07 (purpose `partner`); open questions OQ-045 (volunteer crowd and river reports: wording, liability, whether river updates should wait for an official source) and OQ-046 (partner data retention, age rule). All NEEDS REVIEW; staging only.
+- **Choices made by the agent where the owner's 2026-11-23 decisions were silent (change any of them):** fixed-choice updates only (no free text, photo, link or contact); pilgrims see "From a volunteer", the age and a "not an official figure" line, for 3 hours; volunteer updates sit beside, never replace, the official crowd reading; availability expires after 12 hours and is visible to admins as counts only; nudges use fixed wording, expire after 6 hours; admin Worker gets three narrow writes (approve/reject/suspend, nudge, hide) with CSRF and an audit trail; three hidden updates auto-suspend a partner; rejected applicants' name and email deleted after 30 days; no under-18 partners; applicants' Google first name and email are stored for admins (needed to vet them), the first place the app stores either.
+- **Tests:** none run (documentation only); `npm run check` run before commit.
+- **Next:** build order in ADR 0019 (migration 0007 and repository, routes with tests, admin tab, app screen, strings).
+
 ## Smoke check fixed; admin Worker added to staging deploy — 2026-11-24 (staging only)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "resume" (job card items 4 and 5); implementation by Claude Code (agent). Independent reviewer: NONE.
