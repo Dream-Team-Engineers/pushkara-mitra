@@ -103,9 +103,15 @@ async function partnerWrite(
   nowMs: number,
 ): Promise<Response> {
   if (env.FLAG_PARTNERS !== 'enabled') return respond('Not found.', 404, 'text/plain');
-  if (request.headers.get('Origin') !== new URL(request.url).origin) {
-    return respond('Not allowed.', 403, 'text/plain');
-  }
+  // The page sends Referrer-Policy: no-referrer, and some browsers then send "Origin: null" on a
+  // same-origin form post. Sec-Fetch-Site is set by the browser and cannot be forged by a page, so
+  // it is accepted in that case. Anything else must carry this Worker's own origin.
+  const origin = request.headers.get('Origin');
+  const sameSite =
+    origin === new URL(request.url).origin ||
+    ((origin === null || origin === 'null') &&
+      request.headers.get('Sec-Fetch-Site') === 'same-origin');
+  if (!sameSite) return respond('Not allowed (origin).', 403, 'text/plain');
   if (
     !(request.headers.get('Content-Type') ?? '')
       .toLowerCase()
@@ -118,7 +124,8 @@ async function partnerWrite(
   const form = new URLSearchParams(text);
   const given = form.get('csrf') ?? '';
   const expected = await csrfToken(request.headers.get('Cf-Access-Jwt-Assertion'));
-  if (!sameText(given, expected)) return respond('Not allowed.', 403, 'text/plain');
+  if (!sameText(given, expected))
+    return respond('Not allowed (token). Reload the page and try again.', 403, 'text/plain');
   const db = env.DB;
   if (db === undefined) return respond('The database is not connected.', 503, 'text/plain');
 

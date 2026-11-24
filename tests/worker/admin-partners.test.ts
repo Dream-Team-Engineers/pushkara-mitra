@@ -240,6 +240,31 @@ describe('write actions', () => {
     expect(await status(ref)).toBe('pending');
   });
 
+  it('accepts a same-origin post that arrives with Origin null, and refuses a cross-site one', async () => {
+    const jwt = await token('synthetic-admin-1');
+    const csrf = await csrfFrom(jwt);
+    const ref = await addPartner('pending');
+    const post = (origin: string | null, site: string) =>
+      handleAdmin(
+        new Request(`${ORIGIN}/partners/decide`, {
+          method: 'POST',
+          headers: {
+            'Cf-Access-Jwt-Assertion': jwt,
+            'Sec-Fetch-Site': site,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            ...(origin === null ? {} : { Origin: origin }),
+          },
+          body: new URLSearchParams({ csrf, ref, do: 'approve' }).toString(),
+        }),
+        ON,
+        deps(),
+      );
+    expect((await post('null', 'cross-site')).status).toBe(403);
+    expect((await post(null, 'cross-site')).status).toBe(403);
+    expect((await post('https://evil.example', 'same-origin')).status).toBe(403);
+    expect((await post('null', 'same-origin')).status).toBe(303);
+  });
+
   it('needs a verified Access token for writes too', async () => {
     const response = await handleAdmin(
       new Request(`${ORIGIN}/partners/decide`, {
