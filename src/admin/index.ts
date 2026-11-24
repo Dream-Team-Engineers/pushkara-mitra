@@ -1,3 +1,10 @@
+import {
+  decidePartner,
+  partnerOverview,
+  purgeDuePartnerData,
+  sendNudge,
+  setUpdateHidden,
+} from '../db/adminPartners';
 import { growth, groupStats, live, tableCounts } from '../db/adminStats';
 import { istPeriods } from '../http/istTime';
 import type { KeyLookup } from '../security/accessJwt';
@@ -9,6 +16,7 @@ import {
   liveBody,
   moreBody,
   page,
+  PARTNER_NOTICES,
   partnersBody,
   type Range,
   type Tab,
@@ -16,13 +24,17 @@ import {
 
 /**
  * Staff admin dashboard Worker (ADR 0018). A separate Worker on its own address, behind Cloudflare
- * Access; it binds the same D1 database as the app and only reads from it. Every request is admitted
- * by `admit` first; nothing is shown without a verified Access token.
+ * Access; it binds the same D1 database as the app. It reads aggregates, and since ADR 0019 it has
+ * exactly three write actions on partner data (decide, nudge, hide), each a same-origin form POST
+ * carrying a token derived from the Access token. Every request is admitted by `admit` first;
+ * nothing is shown or changed without a verified Access token.
  */
 export interface AdminEnv extends AdminAccessEnv {
   readonly DB?: D1Database;
   /** Shown on the More tab, e.g. "staging". */
   readonly ENVIRONMENT_NAME?: string;
+  /** Partners (ADR 0019): the Partners tab can change data only when this is exactly `enabled`. */
+  readonly FLAG_PARTNERS?: string;
 }
 
 export interface AdminDeps {
@@ -53,6 +65,99 @@ function respond(body: string, status: number, type: string): Response {
   });
 }
 
+const FORM_BODY_MAX = 2048;
+const REF = /^[A-Za-z0-9_-]{8,128}$/;
+const ID = /^[a-f0-9]{32}$/;
+const GHAT = /^[a-z0-9][a-z0-9/-]{0,63}$/;
+const WRITE_PATHS = ['/partners/decide', '/partners/nudge', '/partners/hide'];
+
+/** Token for the forms: unknown to another site because it is derived from this session's Access token. */
+async function csrfToken(jwt: string | null): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(`admin-csrf.v1|${jwt ?? ''}`),
+  );
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function sameText(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function backToPartners(notice: string): Response {
+  return new Response(null, {
+    status: 303,
+    headers: { ...SECURITY_HEADERS, Location: `/?tab=partners&notice=${notice}` },
+  });
+}
+
+/** The three partner write actions. Anything unexpected is refused before the database is touched. */
+async function partnerWrite(
+  request: Request,
+  env: AdminEnv,
+  path: string,
+  admin: string,
+  nowMs: number,
+): Promise<Response> {
+  if (env.FLAG_PARTNERS !== 'enabled') return respond('Not found.', 404, 'text/plain');
+  if (request.headers.get('Origin') !== new URL(request.url).origin) {
+    return respond('Not allowed.', 403, 'text/plain');
+  }
+  if (
+    !(request.headers.get('Content-Type') ?? '')
+      .toLowerCase()
+      .startsWith('application/x-www-form-urlencoded')
+  ) {
+    return respond('Not allowed.', 415, 'text/plain');
+  }
+  const text = await request.text();
+  if (text.length > FORM_BODY_MAX) return respond('Too large.', 413, 'text/plain');
+  const form = new URLSearchParams(text);
+  const given = form.get('csrf') ?? '';
+  const expected = await csrfToken(request.headers.get('Cf-Access-Jwt-Assertion'));
+  if (!sameText(given, expected)) return respond('Not allowed.', 403, 'text/plain');
+  const db = env.DB;
+  if (db === undefined) return respond('The database is not connected.', 503, 'text/plain');
+
+  try {
+    if (path === '/partners/decide') {
+      const ref = form.get('ref') ?? '';
+      const choice = form.get('do');
+      if (!REF.test(ref) || (choice !== 'approve' && choice !== 'reject' && choice !== 'suspend')) {
+        return backToPartners('invalid');
+      }
+      const done = await decidePartner(db, admin, ref, choice, nowMs);
+      return backToPartners(
+        done
+          ? { approve: 'approved', reject: 'rejected', suspend: 'suspended' }[choice]
+          : 'invalid',
+      );
+    }
+    if (path === '/partners/nudge') {
+      const kind = form.get('kind');
+      const ghat = (form.get('ghat') ?? '').trim();
+      if (
+        (kind !== 'crowd' && kind !== 'river' && kind !== 'food') ||
+        (ghat !== '' && !GHAT.test(ghat))
+      ) {
+        return backToPartners('invalid');
+      }
+      const sent = await sendNudge(db, admin, kind, ghat === '' ? null : ghat, nowMs);
+      return backToPartners(sent ? 'nudged' : 'limit');
+    }
+    const id = form.get('id') ?? '';
+    const choice = form.get('do');
+    if (!ID.test(id) || (choice !== 'hide' && choice !== 'show')) return backToPartners('invalid');
+    const done = await setUpdateHidden(db, admin, id, choice === 'hide', nowMs);
+    return backToPartners(done ? (choice === 'hide' ? 'hidden' : 'shown') : 'invalid');
+  } catch {
+    return respond('The change could not be saved.', 503, 'text/plain');
+  }
+}
+
 function shiftDay(day: string, days: number): string {
   return new Date(Date.parse(`${day}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 }
@@ -75,9 +180,12 @@ export async function handleAdmin(
       'text/plain',
     );
   }
+  const url = new URL(request.url);
+  if (request.method === 'POST' && WRITE_PATHS.includes(url.pathname)) {
+    return partnerWrite(request, env, url.pathname, admission.subject, nowMs);
+  }
   if (request.method !== 'GET') return respond('Method not allowed.', 405, 'text/plain');
 
-  const url = new URL(request.url);
   if (url.pathname === '/admin.css') {
     return new Response(ADMIN_CSS, {
       headers: { ...SECURITY_HEADERS, 'Content-Type': 'text/css; charset=utf-8' },
@@ -144,10 +252,20 @@ export async function handleAdmin(
       );
     }
     if (tab === 'partners') {
+      const writable = env.FLAG_PARTNERS === 'enabled';
+      // Retention rules run when staff look (ADR 0019), only where partners are switched on.
+      if (writable) await purgeDuePartnerData(db, nowMs);
+      const noticeParam = url.searchParams.get('notice');
       return respond(
         page(
           { tab, title: 'Partners', subtitle: 'Priests and volunteers', updated },
-          partnersBody(),
+          partnersBody({
+            data: await partnerOverview(db, nowMs),
+            csrf: await csrfToken(request.headers.get('Cf-Access-Jwt-Assertion')),
+            writable,
+            notice: noticeParam !== null && noticeParam in PARTNER_NOTICES ? noticeParam : null,
+            nowMs,
+          }),
         ),
         200,
         'text/html',

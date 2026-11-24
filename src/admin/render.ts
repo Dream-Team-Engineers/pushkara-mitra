@@ -1,3 +1,4 @@
+import type { PartnerOverview, PartnerRow } from '../db/adminPartners';
 import type { DayRow, Growth, GroupStats, Live, TableCounts } from '../db/adminStats';
 
 /**
@@ -237,21 +238,131 @@ export function groupsBody(data: GroupStats, maxMembers: number): string {
 <p class="note">No group names, codes or member names are shown here.</p>`;
 }
 
-export function partnersBody(): string {
-  return `<section class="hero" aria-label="Partners">
-  <p class="big"><strong>0</strong> Partners live</p>
+export const PARTNER_NOTICES: Readonly<Record<string, string>> = {
+  approved: 'Partner approved.',
+  rejected: 'Application rejected.',
+  suspended: 'Partner suspended.',
+  nudged: 'Nudge sent to partners.',
+  hidden: 'Update hidden from pilgrims.',
+  shown: 'Update shown again.',
+  limit: 'Too many nudges this hour. Try again later.',
+  invalid: 'That could not be done (already changed, or not allowed).',
+};
+
+export interface PartnersView {
+  readonly data: PartnerOverview;
+  /** Hidden form field proving the request came from this page (derived from the Access token). */
+  readonly csrf: string;
+  /** False when FLAG_PARTNERS is not enabled: the page then only reads. */
+  readonly writable: boolean;
+  readonly notice: string | null;
+  readonly nowMs: number;
+}
+
+const csrfField = (csrf: string): string =>
+  `<input type="hidden" name="csrf" value="${escapeHtml(csrf)}">`;
+
+function action(
+  path: string,
+  csrf: string,
+  fields: Readonly<Record<string, string>>,
+  label: string,
+  tone: 'go' | 'stop',
+): string {
+  const hidden = Object.entries(fields)
+    .map(([k, v]) => `<input type="hidden" name="${escapeHtml(k)}" value="${escapeHtml(v)}">`)
+    .join('');
+  return `<form class="act" method="post" action="${escapeHtml(path)}">${csrfField(csrf)}${hidden}<button class="btn btn--${tone}" type="submit">${escapeHtml(label)}</button></form>`;
+}
+
+function partnerCard(p: PartnerRow, csrf: string, writable: boolean, nowMs: number): string {
+  const who = `${p.role === 'priest' ? 'Priest' : 'Volunteer'}${p.ghatId === null ? '' : ` · ${p.ghatId}`}`;
+  const buttons = !writable
+    ? ''
+    : p.status === 'pending'
+      ? action('/partners/decide', csrf, { ref: p.ref, do: 'approve' }, 'Approve', 'go') +
+        action('/partners/decide', csrf, { ref: p.ref, do: 'reject' }, 'Reject', 'stop')
+      : p.status === 'approved'
+        ? action('/partners/decide', csrf, { ref: p.ref, do: 'suspend' }, 'Suspend', 'stop')
+        : action('/partners/decide', csrf, { ref: p.ref, do: 'approve' }, 'Approve again', 'go');
+  const state =
+    p.status === 'approved'
+      ? p.available
+        ? 'Available now'
+        : 'Not available'
+      : p.status === 'suspended'
+        ? 'Suspended'
+        : `Applied ${ago(p.appliedAt, nowMs)}`;
+  return `<li class="person">
+  <div><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.email)}</span><span>${escapeHtml(who)}</span><span class="state state--${escapeHtml(p.status)}">${escapeHtml(state)}</span></div>
+  <div class="acts">${buttons}</div>
+</li>`;
+}
+
+export function partnersBody(view: PartnersView): string {
+  const { data, csrf, writable, notice, nowMs } = view;
+  const live = data.priestsAvailable + data.volunteersAvailable;
+  const flash =
+    notice === null
+      ? ''
+      : `<p class="flash" role="status">${escapeHtml(PARTNER_NOTICES[notice] ?? PARTNER_NOTICES['invalid'] ?? '')}</p>`;
+  const off = writable
+    ? ''
+    : '<p class="note">Partners are switched off in this environment (FLAG_PARTNERS), so nothing can be changed here yet.</p>';
+  const waiting =
+    data.waiting.length === 0
+      ? '<p class="note">Nobody is waiting for approval.</p>'
+      : `<ul class="people">${data.waiting.map((p) => partnerCard(p, csrf, writable, nowMs)).join('')}</ul>`;
+  const partners =
+    data.partners.length === 0
+      ? '<p class="note">No approved partners yet.</p>'
+      : `<ul class="people">${data.partners.map((p) => partnerCard(p, csrf, writable, nowMs)).join('')}</ul>`;
+  const nudge = writable
+    ? `<form class="card nudge" method="post" action="/partners/nudge">${csrfField(csrf)}
+  <h2>Ask partners for an update</h2>
+  <label>What<select name="kind"><option value="crowd">Crowd level</option><option value="river">River level</option><option value="food">Free food</option></select></label>
+  <label>Ghat (optional)<input name="ghat" maxlength="64" pattern="[a-z0-9][a-z0-9/\\-]{0,63}" placeholder="all ghats" autocomplete="off"></label>
+  <button class="btn btn--go" type="submit">Send nudge</button>
+  <p class="note">Fixed wording only. Goes to approved partners (all, or those with that home ghat) and closes after 6 hours. 10 per hour.</p>
+</form>`
+    : '';
+  const updates =
+    data.updates.length === 0
+      ? '<p class="note">No volunteer updates in the last 24 hours.</p>'
+      : `<div class="table-wrap"><table><thead><tr><th scope="col">Ghat</th><th scope="col">What</th><th scope="col">From</th><th scope="col">When</th><th scope="col"></th></tr></thead><tbody>${data.updates
+          .map(
+            (u) =>
+              `<tr${u.hidden ? ' class="stale"' : ''}><th scope="row">${escapeHtml(u.ghatId)}</th><td>${escapeHtml(u.kind)}: ${escapeHtml(u.value)}${u.hidden ? ' · hidden' : ''}</td><td>${escapeHtml(u.partnerName)}</td><td>${escapeHtml(ago(u.createdAt, nowMs))}</td><td>${
+                writable
+                  ? action(
+                      '/partners/hide',
+                      csrf,
+                      { id: u.id, do: u.hidden ? 'show' : 'hide' },
+                      u.hidden ? 'Show' : 'Hide',
+                      u.hidden ? 'go' : 'stop',
+                    )
+                  : ''
+              }</td></tr>`,
+          )
+          .join('')}</tbody></table></div>`;
+  return `${flash}<section class="hero" aria-label="Partners">
+  <p class="big"><strong>${num(live)}</strong> Partners available</p>
   <div class="grid">
-    ${stat(0, 'Priests available')}
-    ${stat(0, 'Volunteers available')}
-    ${stat(0, 'Waiting for approval')}
-    ${stat(0, 'Nudges sent today')}
+    ${stat(data.priestsAvailable, 'Priests available')}
+    ${stat(data.volunteersAvailable, 'Volunteers available')}
+    ${stat(data.pending, 'Waiting for approval')}
+    ${stat(data.approved, 'Approved')}
+    ${stat(data.nudgesToday, 'Nudges in 24 h')}
   </div>
-</section>
-<h2 class="section">Coming next</h2>
-<ul class="steps">
-  <li><strong>Phase 2:</strong> priests and volunteers sign in with Google and ask to join; one of the three admins approves them here. Approved partners mark themselves available. Nudge them for crowd level, river level and free-food updates through an in-app inbox; their updates show to pilgrims at once, marked as from a volunteer, and can be hidden here.</li>
-  <li><strong>Phase 3:</strong> nudges also arrive as phone notifications (with the partner's permission).</li>
-</ul>`;
+</section>${off}
+<h2 class="section">Waiting for approval</h2>
+${waiting}
+${nudge}
+<h2 class="section">Partners</h2>
+${partners}
+<h2 class="section">Volunteer updates (24 hours)</h2>
+${updates}
+<p class="note">Names and emails here are for approving people only. Pilgrims never see them: they see "From a volunteer", the age, and that it is not an official figure.</p>`;
 }
 
 export function moreBody(counts: TableCounts, environment: string, subject: string): string {
@@ -337,5 +448,20 @@ dd{margin:0}
 .tabs a.on .ico{stroke:var(--accent)}
 .ico{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #fde047;outline-offset:2px}
+.flash{margin:10px 0;padding:10px 14px;border:1px solid rgba(74,222,128,.45);border-radius:12px;background:rgba(21,128,61,.3);font-weight:700}
+.people{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.person{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.person>div:first-child{display:grid;gap:2px;min-width:0}
+.person span{color:var(--muted);font-size:.85rem;overflow-wrap:anywhere}
+.person strong{overflow-wrap:anywhere}
+.person .state--approved{color:var(--ok)}.person .state--suspended,.person .state--rejected{color:var(--bad)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.act{margin:0}
+.btn{min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.btn--go{background:var(--accent2)}
+.btn--stop{background:rgba(248,113,113,.22);color:var(--text)}
+.nudge{display:grid;gap:10px;margin-top:14px}
+.nudge label{display:grid;gap:4px;color:var(--muted);font-size:.85rem}
+.nudge select,.nudge input{min-height:40px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.08);color:var(--text);font:inherit;color-scheme:dark}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #fde047;outline-offset:2px}
 `;

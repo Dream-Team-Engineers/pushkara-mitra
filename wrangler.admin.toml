@@ -1,7 +1,7 @@
 # Staff admin dashboard Worker (ADR 0018). Separate from the public app Worker in wrangler.toml.
 # The whole Worker sits behind Cloudflare Access; the Access policy names the three admins (their
 # emails live only in that policy, never here). The Worker verifies the Access token itself and
-# answers 503 until ACCESS_TEAM_DOMAIN and ACCESS_AUD are set. Read-only use of the app's D1.
+# answers 503 until ACCESS_TEAM_DOMAIN and ACCESS_AUD are set. Reads aggregates from the app's D1; its only writes are the three partner actions of ADR 0019, off unless FLAG_PARTNERS is "enabled" here.
 name = "pushkara-mitra-admin"
 main = "src/admin/index.ts"
 compatibility_date = "2026-08-22"

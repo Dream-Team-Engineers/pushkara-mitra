@@ -5,6 +5,7 @@ import crowd from '../../migrations/0003_crowd_reading.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
 import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import metric from '../../migrations/0006_daily_metric.sql?raw';
+import partnersMigration from '../../migrations/0007_partners.sql?raw';
 import { handleAdmin, type AdminEnv } from '../../src/admin/index';
 import { escapeHtml } from '../../src/admin/render';
 import worker, { type Env } from '../../src/index';
@@ -73,7 +74,7 @@ beforeAll(async () => {
   const jwk = (await crypto.subtle.exportKey('jwk', pair.publicKey)) as JsonWebKey;
   lookupKey = (kid) => Promise.resolve(kid === 'k1' ? jwk : null);
 
-  const migration = [core, crowd, groupName, groupBlock, metric].join('\n\n');
+  const migration = [core, crowd, groupName, groupBlock, metric, partnersMigration].join('\n\n');
   for (const statement of migration.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql === '') continue;
