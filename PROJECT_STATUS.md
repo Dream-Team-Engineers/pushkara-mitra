@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Smoke check fixed; admin Worker added to staging deploy — 2026-11-24 (staging only)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "resume" (job card items 4 and 5); implementation by Claude Code (agent). Independent reviewer: NONE.
+- **Flaky smoke check (item 4):** the cause was in the test server, not the app. `scripts/smoke-web.mjs` looked up the percent-encoded path (`Noto%20Sans%20Medium`) on disk, so the map glyph file always 404'd; it only failed when the map asked for glyphs before the run ended. The path is now decoded (the traversal guard still applies). Commit `cb7b36f`. Local: `npm run build:web` then `npm run smoke:web` all rows pass including "No console errors"; `npm run check`: 1079 passed, 24 skipped, format clean. One local pass does not prove the flake is gone; confirm over the next few CI runs.
+- **Admin Worker in the deploy (item 5):** `.github/workflows/deploy-staging.yml` now runs `wrangler deploy -c wrangler.admin.toml --env staging` after the app deploy, with the same secrets, and fails if no admin workers.dev URL is printed. Not yet proven in CI: if the API token lacks Workers edit rights for this script the deploy job will fail at that step (the app itself will already be deployed). Rollback: revert the workflow commit.
+- **Next:** item 3 (Partners, phase 2: data-inventory rows and threat model first). Items 1 and 6 remain with the owner.
+
 ## Day close and job card for next session — 2026-11-23 23:10 IST
 
 - **Who:** owner and sole maintainer Krishna Murthy Raju G (`gkmraju`); implementation by Claude Code (agent) at the owner's direction. Independent reviewer: NONE.

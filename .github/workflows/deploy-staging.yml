@@ -70,6 +70,17 @@ jobs:
             exit 1
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Deploy the staff admin Worker to staging (ADR 0018; behind Cloudflare Access)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx wrangler deploy -c wrangler.admin.toml --env staging 2>&1 | tee admin-deploy.log
+          grep -qE 'https://pushkara-mitra-admin-staging\.[a-z0-9-]+\.workers\.dev' admin-deploy.log || {
+            echo "::error::Wrangler reported success but no pushkara-mitra-admin-staging workers.dev URL was found in its output."
+            exit 1
+          }
       - name: Smoke test /healthz on the deployed URL
         env:
           STAGING_URL: ${{ steps.deploy.outputs.url }}
