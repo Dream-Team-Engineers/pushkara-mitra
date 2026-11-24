@@ -55,6 +55,8 @@ FLAG_GROUPS = "enabled"
 FLAG_GROUP_LOCATION = "enabled"
 # App-open counters for the staff dashboard (ADR 0018): counts only, no identifiers.
 FLAG_METRICS = "enabled"
+# Partners (ADR 0019): apply, availability, inbox, volunteer updates. Staging only; stays off in production.
+FLAG_PARTNERS = "enabled"
 [env.staging.assets]
 directory = "./dist/web"
 binding = "ASSETS"

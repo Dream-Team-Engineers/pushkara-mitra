@@ -154,6 +154,38 @@ export async function renderGoogleButton(parent: HTMLElement): Promise<void> {
   });
 }
 
+/**
+ * Draws Google's button to get a fresh ID token for one purpose (a partner application), which the
+ * caller sends to our Worker. The token is not kept here. The nonce is the same one-time, cookie-bound
+ * nonce as sign-in, so the server can check it. Replaces the callback set by `renderGoogleButton`;
+ * that is set again the next time sign-in is shown.
+ */
+export async function renderCredentialButton(
+  parent: HTMLElement,
+  onCredential: (credential: string | null) => void,
+): Promise<void> {
+  if (GOOGLE_CLIENT_ID === undefined) return;
+  await loadScript();
+  const id = window.google?.accounts.id;
+  if (id === undefined) throw new Error('Google sign-in is unavailable');
+  const nonce = await fetchNonce();
+  id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    ...(nonce === undefined ? {} : { nonce }),
+    callback: (response) => {
+      onCredential(typeof response.credential === 'string' ? response.credential : null);
+    },
+  });
+  id.renderButton(parent, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'continue_with',
+    shape: 'pill',
+    width: 280,
+  });
+}
+
 /** Signs out here and asks the Worker to clear the cookie on this device. */
 export async function signOut(): Promise<void> {
   user.value = null;

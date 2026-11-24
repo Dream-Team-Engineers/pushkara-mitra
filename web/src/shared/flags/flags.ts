@@ -18,6 +18,7 @@ interface BuildEnv {
   readonly VITE_SHOW_SAMPLES?: string;
   readonly VITE_GROUPS?: string;
   readonly VITE_METRICS?: string;
+  readonly VITE_PARTNERS?: string;
 }
 const BUILD_ENV: BuildEnv = (import.meta as unknown as { env?: BuildEnv }).env ?? {};
 const CLIENT_ID = BUILD_ENV.VITE_GOOGLE_CLIENT_ID;
@@ -55,6 +56,12 @@ export const FLAGS = {
    * production until the owner approves the release. Not read from the URL or storage.
    */
   myGroup: BUILD_ENV.VITE_GROUPS === 'enabled',
+  /**
+   * Partners (priests and volunteers, ADR 0019): apply, availability, inbox, fixed-choice updates and
+   * the pilgrim "From a volunteer" strip. Staging build only; off in production until the owner
+   * approves the release and OQ-045 and OQ-046 are decided. Not read from the URL or storage.
+   */
+  partners: BUILD_ENV.VITE_PARTNERS === 'enabled',
   /** Live map overlays of people or groups. Public base map is not behind this flag. */
   liveMap: false,
   /** SOS dispatch to responders. The app never replaces police or emergency services. */

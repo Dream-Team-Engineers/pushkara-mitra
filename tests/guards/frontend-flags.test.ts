@@ -13,6 +13,7 @@ const REQUIRED_FLAGS: readonly FlagName[] = [
   'pilgrimPass',
   'googleSignIn',
   'myGroup',
+  'partners',
   'liveMap',
   'sosDispatch',
   'photoUpload',

@@ -2,10 +2,11 @@ import { useSignal } from '@preact/signals';
 import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { GHATS } from '../../shared/data/fixtures';
-import { SHOW_SAMPLES } from '../../shared/flags/flags';
+import { FLAGS, SHOW_SAMPLES } from '../../shared/flags/flags';
 import { t } from '../../shared/i18n/i18n';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
+import LivePartners from './LivePartners';
 
 /**
  * Community partners and volunteers prototype (flag `partnerContact` is off). Entries stay in
@@ -156,7 +157,7 @@ export function VolunteerPanel() {
   );
 }
 
-export default function PartnersScreen() {
+function PrototypePartners() {
   const role = useSignal<Role>('partner');
   return (
     <>
@@ -174,4 +175,9 @@ export default function PartnersScreen() {
       <p class="note">{t('proto.notSent')}</p>
     </>
   );
+}
+
+/** Real Partners screen in the staging build (flag `partners`, ADR 0019); the prototype everywhere else. */
+export default function PartnersScreen() {
+  return FLAGS.partners ? <LivePartners /> : <PrototypePartners />;
 }

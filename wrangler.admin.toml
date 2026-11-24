@@ -17,6 +17,8 @@ ENVIRONMENT_NAME = "staging"
 # domain is public and the AUD tag only identifies the application; tokens are signed by Cloudflare.
 ACCESS_TEAM_DOMAIN = "https://sparkling-star-84a3.cloudflareaccess.com"
 ACCESS_AUD = "7b856e89b26479ed1c0d6c84f064f411bada86a36aab01f66ea0405373634b0a"
+# Partner write actions (ADR 0019). Must match the app Worker; off means the tab only reads.
+FLAG_PARTNERS = "enabled"
 
 [[env.staging.d1_databases]]
 binding = "DB"

@@ -3,8 +3,10 @@ import { Bi } from '../../shared/ui/Bi';
 import { hrefFor } from '../../app/router';
 import { useLiveCrowd, type LiveCrowd } from '../../shared/data/crowd';
 import type { District, Facility, GhatFixture } from '../../shared/data/fixtures';
+import { FLAGS } from '../../shared/flags/flags';
 import { osmSearchUrl } from '../../shared/data/sourceLinks';
 import { ghatsResource } from '../../shared/data/resources';
+import { VolunteerStrip, VolunteerUpdatesLoader } from '../partners/VolunteerStrip';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, CrowdChip, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -94,6 +96,7 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
           ))}
         </ul>
       )}
+      {FLAGS.partners ? <VolunteerStrip ghatId={ghat.id} /> : null}
       <SourceStamp meta={ghat} />
     </li>
   );
@@ -105,6 +108,7 @@ export default function GhatsScreen() {
   return (
     <>
       <ScreenHeader titleKey="module.ghats.title" subtitleKey="module.ghats.subtitle" />
+      {FLAGS.partners ? <VolunteerUpdatesLoader /> : null}
       <ChipGroup
         legend="ghats.filter"
         options={FILTERS}

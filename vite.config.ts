@@ -39,6 +39,8 @@ export default defineConfig(({ mode }) => ({
     'import.meta.env.VITE_DEVICE_LOCATION': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
     // Real groups and live sharing with the group: staging build only (flags.ts, ADR 0017).
     'import.meta.env.VITE_GROUPS': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
+    // Partners (priests and volunteers): staging build only (flags.ts, ADR 0019).
+    'import.meta.env.VITE_PARTNERS': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
     // App-open and install counters for the staff dashboard: staging build only (ADR 0018).
     'import.meta.env.VITE_METRICS': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
     // Labelled sample rows and the sample sponsored strip: every build except production (OQ-044).
