@@ -35,6 +35,8 @@ export interface Env {
   FLAG_CROWD?: string;
   /** App-open counters for the staff dashboard (ADR 0018). */
   FLAG_METRICS?: string;
+  /** Partners: priests and volunteers (ADR 0019). */
+  FLAG_PARTNERS?: string;
   /** Worker secret: the bearer token that may report crowd levels. Without it the ingest route answers 503. */
   CROWD_INGEST_TOKEN?: string;
 }
@@ -51,6 +53,7 @@ async function route(request: Request, env: Env): Promise<Response> {
       sessionSecret: env.SESSION_SECRET,
       crowdIngestToken: env.CROWD_INGEST_TOKEN,
       groupLocation: env.GROUP_LOCATION,
+      googleClientId: env.GOOGLE_CLIENT_ID,
     });
   }
 

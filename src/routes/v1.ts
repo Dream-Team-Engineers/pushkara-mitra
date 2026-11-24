@@ -2,6 +2,8 @@ import { groupJoinCode, randomId, sha256Hex } from '../db/ids';
 import type { ConsentPurpose, CrowdLevel, Repository, SosCategory } from '../db/repository';
 import { envFlags } from '../flags';
 import { istPeriods } from '../http/istTime';
+import { handlePartners, PARTNER_PATHS } from './partners';
+import type { KeyFetcher } from '../security/googleIdToken';
 import { memoryRateLimiter, type RateLimiter } from '../security/rateLimit';
 import {
   clearedSessionCookie,
@@ -25,6 +27,7 @@ import {
  *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
  *   POST   /api/v1/ping                count one app open or install         [flag FLAG_METRICS]
+ *   /api/v1/partners/...               priests and volunteers (ADR 0019)      [flag FLAG_PARTNERS]
  *   POST   /api/v1/sos                 SOS intake, no sign-in, no location    [flag FLAG_SOS]
  *   GET    /api/v1/crowd               latest crowd level per ghat, public    [flag FLAG_CROWD]
  *   POST   /api/v1/crowd               report a level, bearer token only      [flag FLAG_CROWD]
@@ -66,7 +69,13 @@ export function cleanGroupName(raw: unknown): string | null | undefined {
 }
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
-const PURPOSES: readonly ConsentPurpose[] = ['sign-in', 'group', 'pass', 'notifications'];
+const PURPOSES: readonly ConsentPurpose[] = [
+  'sign-in',
+  'group',
+  'pass',
+  'notifications',
+  'partner',
+];
 const SOS_CATEGORIES: readonly SosCategory[] = ['medical', 'lost', 'crowd', 'other'];
 const LOCALES = ['te', 'en', 'hi'] as const;
 const CROWD_LEVELS: readonly CrowdLevel[] = ['low', 'moderate', 'high'];
@@ -111,6 +120,9 @@ export interface V1Deps {
   readonly crowdIngestToken?: string | undefined;
   /** The live-room Durable Object namespace (ADR 0017). Absent means live sharing is unavailable. */
   readonly groupLocation?: DurableObjectNamespace | undefined;
+  /** Google sign-in settings, used only to re-verify a partner applicant (ADR 0019). */
+  readonly googleClientId?: string | undefined;
+  readonly googleKeys?: KeyFetcher | undefined;
   readonly sosLimiter?: RateLimiter;
   readonly limiter?: RateLimiter;
   readonly nowSeconds?: () => number;
@@ -521,16 +533,18 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
   const isPing = path === '/ping';
   const isCrowd = path === '/crowd';
   const isGroups = path === '/groups' || path.startsWith('/groups/');
+  const isPartners = PARTNER_PATHS.includes(path);
   const isMe = path === '/me' || path === '/me/consents';
   // Unknown paths are 404 before any flag, limiter, database or session is consulted.
   const knownGroups = path === '/groups' || path === '/groups/join' || GROUP_ACTION.test(path);
-  if (!isSos && !isPing && !isCrowd && !isMe && !(isGroups && knownGroups)) {
+  if (!isSos && !isPing && !isCrowd && !isMe && !isPartners && !(isGroups && knownGroups)) {
     return fail('NOT_FOUND', 404);
   }
   if (isPing && !flags.isEnabled('metrics')) return fail('NOT_FOUND', 404);
   if (isSos && !flags.isEnabled('sos')) return fail('NOT_FOUND', 404);
   if (isGroups && !flags.isEnabled('groups')) return fail('NOT_FOUND', 404);
   if (isCrowd && !flags.isEnabled('crowd')) return fail('NOT_FOUND', 404);
+  if (isPartners && !flags.isEnabled('partners')) return fail('NOT_FOUND', 404);
 
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   const limiter = isSos ? (deps.sosLimiter ?? defaultSosLimiter) : (deps.limiter ?? defaultLimiter);
@@ -545,6 +559,31 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
     if (isSos) return await sos(request, repo, now);
     if (isPing) return await ping(request, repo, now);
     if (isCrowd) return await crowd(request, deps, repo, now);
+    if (isPartners) {
+      return await handlePartners(
+        {
+          request,
+          repo,
+          now,
+          sessionSecret: deps.sessionSecret,
+          googleClientId: deps.googleClientId,
+          googleKeys: deps.googleKeys,
+          requireSession: () => requireSession(request, deps, repo, now),
+          readJson: () => readJsonObject(request),
+          hasOnlyKeys,
+          sameOrigin: () => sameOrigin(request),
+          recordConsent: (subjectRef, locale) =>
+            repo.recordConsent(subjectRef, {
+              purposeId: 'partner',
+              noticeVersion: 'partner-1',
+              locale,
+              decision: 'granted',
+              at: iso(now),
+            }),
+        },
+        path,
+      );
+    }
     if (isGroups) return await groups(request, deps, repo, now, path.slice('/groups'.length));
     return await me(request, deps, repo, now, path.slice('/me'.length));
   } catch {

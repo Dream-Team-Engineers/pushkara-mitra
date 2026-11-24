@@ -6,6 +6,15 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partners phase 2, step 1: migration 0007, repository, partner routes — 2026-11-24 (staging only, flag off)
+
+- **Who:** owner Krishna Murthy Raju G (`gkmraju`) approved the ADR 0019 defaults ("Yes") and chose to re-verify Google at apply; implementation by Claude Code (agent). Independent reviewer: NONE.
+- **What:** migration `0007_partners.sql` (tables `partner`, `partner_nudge`, `partner_nudge_read`, `partner_update`, `partner_audit`; `consent_ledger` rebuilt so purpose `partner` is allowed, rows, order, trigger and index kept); repository methods; `src/routes/partners.ts` mounted at `/api/v1/partners/...` behind `FLAG_PARTNERS` (apply with Google re-verification and nonce, own status, availability with 12-hour expiry, inbox, fixed-choice updates with 10-minute and 30-a-day limits, public "from a volunteer" read for 3 hours); erasure removes the partner's rows and detaches the audit rows. Flag `FLAG_PARTNERS` is **not set** on staging, so every partner route answers 404 there.
+- **Evidence:** `npm run check`: 1095 passed, 24 skipped, lint, typecheck and format clean; new tests `tests/worker/partners.test.ts` (15) and `tests/worker/migration-0007.test.ts` (1, proves the ledger rebuild keeps rows). Migration 0007 applied to the **staging** D1 on 2026-11-24 before the push (`wrangler d1 migrations apply ... --env staging --remote`, reported done; staging consent table had 0 rows afterwards, the earlier count was not recorded). **Not applied to the production D1** (not part of the owner's approval; needed before any production release that includes this Worker, because erasure now touches the partner tables).
+- **Not built yet:** admin Partners tab (approve, reject, suspend, nudge, hide with CSRF and audit; ADR 0018 section 3 amendment and the guard test for the admin write set), the Partners screen in the app, the pilgrim "from a volunteer" strip, strings in en/te/hi, Worker config for `FLAG_PARTNERS` on staging. Until the admin tab exists nobody can be approved except by direct database edit, so the feature stays off.
+- **Next:** admin tab, then app screens and strings, then turn the flag on in staging.
+- **Rollback:** `git revert` the commit and push (migration 0007 is additive apart from the ledger rebuild and can stay).
+
 ## Production D1 database created and migrated, not bound — 2026-11-24 (time not recorded)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) approved creation, region APAC and "create and migrate, do not bind" (2026-11-24); run by Claude Code (agent). Independent reviewer: NONE.

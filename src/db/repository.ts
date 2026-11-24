@@ -6,7 +6,7 @@
  */
 import { randomId } from './ids';
 
-export type ConsentPurpose = 'sign-in' | 'group' | 'pass' | 'notifications';
+export type ConsentPurpose = 'sign-in' | 'group' | 'pass' | 'notifications' | 'partner';
 export type SosCategory = 'medical' | 'lost' | 'crowd' | 'other';
 
 export type CrowdLevel = 'low' | 'moderate' | 'high';
@@ -37,6 +37,36 @@ export interface GroupSummary {
 export type JoinResult =
   | { readonly ok: true; readonly groupId: string }
   | { readonly ok: false; readonly reason: 'invalid_code' | 'already_member' | 'full' };
+
+export type PartnerRole = 'priest' | 'volunteer';
+export type PartnerStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
+export type PartnerKind = 'crowd' | 'river' | 'food';
+
+/** What the person themselves may know about their own application (never the name or email). */
+export interface PartnerRecord {
+  readonly role: PartnerRole;
+  readonly ghatId: string | null;
+  readonly status: PartnerStatus;
+  readonly availableUntil: string | null;
+}
+
+export type ApplyResult = 'created' | 'exists' | 'cooldown';
+
+export interface PartnerNudge {
+  readonly id: string;
+  readonly kind: PartnerKind;
+  readonly ghatId: string | null;
+  readonly createdAt: string;
+  readonly read: boolean;
+}
+
+/** A volunteer's update as pilgrims see it: no partner identity of any kind. */
+export interface PublicPartnerUpdate {
+  readonly kind: PartnerKind;
+  readonly ghatId: string;
+  readonly value: string;
+  readonly reportedAt: string;
+}
 
 /** Most people one group may hold, owner included (ADR 0017). */
 export const MAX_GROUP_MEMBERS = 10;
@@ -114,6 +144,43 @@ export interface Repository {
     metric: 'open' | 'install',
     locale: 'te' | 'en' | 'hi',
   ): Promise<void>;
+
+  /** Partners (ADR 0019). The applicant's name and email are stored for admins only. */
+  getPartner(subjectRef: string): Promise<PartnerRecord | null>;
+  /** A new or renewed application. A rejected person may apply again only after `cooldownBeforeIso`. */
+  applyPartner(input: {
+    subjectRef: string;
+    role: PartnerRole;
+    ghatId: string | null;
+    name: string;
+    email: string;
+    nowIso: string;
+    cooldownBeforeIso: string;
+  }): Promise<ApplyResult>;
+  /** Approved partners only: switches availability on until `untilIso`, or off with null. */
+  setAvailability(subjectRef: string, untilIso: string | null): Promise<boolean>;
+  /** Nudges still open that apply to this partner (no ghat, or their home ghat). */
+  listNudges(
+    subjectRef: string,
+    ghatId: string | null,
+    nowIso: string,
+  ): Promise<readonly PartnerNudge[]>;
+  markNudgesRead(subjectRef: string, nowIso: string): Promise<void>;
+  /** How many updates this partner posted since `sinceIso` (optionally for one kind and ghat). */
+  countPartnerUpdates(
+    subjectRef: string,
+    sinceIso: string,
+    only?: { kind: PartnerKind; ghatId: string },
+  ): Promise<number>;
+  insertPartnerUpdate(input: {
+    subjectRef: string;
+    kind: PartnerKind;
+    ghatId: string;
+    value: string;
+    createdAt: string;
+  }): Promise<string>;
+  /** Latest unhidden update per kind and ghat from approved partners, newer than `sinceIso`. */
+  listPublicPartnerUpdates(sinceIso: string): Promise<readonly PublicPartnerUpdate[]>;
 
   /** Erasure: removes everything held for this subject. Returns row counts. */
   eraseSubject(subjectRef: string): Promise<{ sessions: number; consents: number; groups: number }>;
@@ -421,6 +488,166 @@ export function d1Repository(db: D1Database): Repository {
       );
     },
 
+    async getPartner(subjectRef) {
+      const rows = await all<{
+        role: PartnerRole;
+        ghat_id: string | null;
+        status: PartnerStatus;
+        available_until: string | null;
+      }>(
+        'SELECT role, ghat_id, status, available_until FROM partner WHERE subject_ref = ?',
+        subjectRef,
+      );
+      const r = rows[0];
+      if (r === undefined) return null;
+      return {
+        role: r.role,
+        ghatId: r.ghat_id,
+        status: r.status,
+        availableUntil: r.available_until,
+      };
+    },
+
+    async applyPartner({ subjectRef, role, ghatId, name, email, nowIso, cooldownBeforeIso }) {
+      const inserted = await run(
+        `INSERT OR IGNORE INTO partner (subject_ref, role, ghat_id, status, name, email, applied_at)
+         VALUES (?, ?, ?, 'pending', ?, ?, ?)`,
+        subjectRef,
+        role,
+        ghatId,
+        name,
+        email,
+        nowIso,
+      );
+      if (inserted.meta.changes === 1) return 'created';
+      // Only a rejected person may apply again, and only after the waiting time.
+      const renewed = await run(
+        `UPDATE partner SET role = ?, ghat_id = ?, status = 'pending', name = ?, email = ?,
+                applied_at = ?, decided_at = NULL, decided_by = NULL, available_until = NULL
+         WHERE subject_ref = ? AND status = 'rejected' AND decided_at IS NOT NULL AND decided_at <= ?`,
+        role,
+        ghatId,
+        name,
+        email,
+        nowIso,
+        subjectRef,
+        cooldownBeforeIso,
+      );
+      if (renewed.meta.changes === 1) return 'created';
+      const rows = await all<{ status: PartnerStatus }>(
+        'SELECT status FROM partner WHERE subject_ref = ?',
+        subjectRef,
+      );
+      return rows[0]?.status === 'rejected' ? 'cooldown' : 'exists';
+    },
+
+    async setAvailability(subjectRef, untilIso) {
+      const result = await run(
+        "UPDATE partner SET available_until = ? WHERE subject_ref = ? AND status = 'approved'",
+        untilIso,
+        subjectRef,
+      );
+      return result.meta.changes === 1;
+    },
+
+    async listNudges(subjectRef, ghatId, nowIso) {
+      const rows = await all<{
+        id: string;
+        kind: PartnerKind;
+        ghat_id: string | null;
+        created_at: string;
+        is_read: number;
+      }>(
+        `SELECT n.id, n.kind, n.ghat_id, n.created_at,
+                EXISTS (SELECT 1 FROM partner_nudge_read r WHERE r.nudge_id = n.id AND r.subject_ref = ?) AS is_read
+         FROM partner_nudge n
+         WHERE n.expires_at > ? AND (n.ghat_id IS NULL OR n.ghat_id = ?)
+         ORDER BY n.created_at DESC, n.id`,
+        subjectRef,
+        nowIso,
+        ghatId,
+      );
+      return rows.map((r) => ({
+        id: r.id,
+        kind: r.kind,
+        ghatId: r.ghat_id,
+        createdAt: r.created_at,
+        read: r.is_read === 1,
+      }));
+    },
+
+    async markNudgesRead(subjectRef, nowIso) {
+      await run(
+        `INSERT OR IGNORE INTO partner_nudge_read (nudge_id, subject_ref)
+         SELECT id, ? FROM partner_nudge WHERE expires_at > ?`,
+        subjectRef,
+        nowIso,
+      );
+    },
+
+    async countPartnerUpdates(subjectRef, sinceIso, only) {
+      const rows =
+        only === undefined
+          ? await all<{ n: number }>(
+              'SELECT COUNT(*) AS n FROM partner_update WHERE subject_ref = ? AND created_at >= ?',
+              subjectRef,
+              sinceIso,
+            )
+          : await all<{ n: number }>(
+              `SELECT COUNT(*) AS n FROM partner_update
+               WHERE subject_ref = ? AND created_at >= ? AND kind = ? AND ghat_id = ?`,
+              subjectRef,
+              sinceIso,
+              only.kind,
+              only.ghatId,
+            );
+      return rows[0]?.n ?? 0;
+    },
+
+    async insertPartnerUpdate({ subjectRef, kind, ghatId, value, createdAt }) {
+      const id = randomId();
+      await run(
+        `INSERT INTO partner_update (id, subject_ref, kind, ghat_id, value, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        id,
+        subjectRef,
+        kind,
+        ghatId,
+        value,
+        createdAt,
+      );
+      return id;
+    },
+
+    async listPublicPartnerUpdates(sinceIso) {
+      // Latest per kind and ghat. A hidden update is skipped, so an older visible one may show;
+      // a suspended or removed partner's updates never show.
+      const rows = await all<{
+        kind: PartnerKind;
+        ghat_id: string;
+        value: string;
+        created_at: string;
+      }>(
+        `SELECT u.kind, u.ghat_id, u.value, u.created_at
+         FROM partner_update u JOIN partner p ON p.subject_ref = u.subject_ref
+         WHERE u.hidden_at IS NULL AND p.status = 'approved' AND u.created_at >= ?
+           AND NOT EXISTS (
+             SELECT 1 FROM partner_update v JOIN partner q ON q.subject_ref = v.subject_ref
+             WHERE v.kind = u.kind AND v.ghat_id = u.ghat_id AND v.hidden_at IS NULL
+               AND q.status = 'approved' AND v.created_at >= ?
+               AND (v.created_at > u.created_at OR (v.created_at = u.created_at AND v.id > u.id)))
+         ORDER BY u.ghat_id, u.kind`,
+        sinceIso,
+        sinceIso,
+      );
+      return rows.map((r) => ({
+        kind: r.kind,
+        ghatId: r.ghat_id,
+        value: r.value,
+        reportedAt: r.created_at,
+      }));
+    },
+
     async eraseSubject(subjectRef) {
       // The leader typed the group name: it goes with their account, even if the group continues.
       await run(
@@ -433,6 +660,12 @@ export function d1Repository(db: D1Database): Repository {
         db.prepare('DELETE FROM consent_ledger WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM membership WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM group_block WHERE subject_ref = ?').bind(subjectRef),
+        // Partner data (ADR 0019): application, name and email, reads, updates. The audit trail keeps
+        // the admin's decision but loses the person.
+        db.prepare('DELETE FROM partner WHERE subject_ref = ?').bind(subjectRef),
+        db.prepare('DELETE FROM partner_nudge_read WHERE subject_ref = ?').bind(subjectRef),
+        db.prepare('DELETE FROM partner_update WHERE subject_ref = ?').bind(subjectRef),
+        db.prepare("UPDATE partner_audit SET target = 'removed' WHERE target = ?").bind(subjectRef),
       ]);
       // Groups left with no members are removed; their invitations go with them.
       await run(
