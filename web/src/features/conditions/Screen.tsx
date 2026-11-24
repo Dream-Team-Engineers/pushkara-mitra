@@ -8,6 +8,8 @@ import {
   VolunteerDisclaimer,
   VolunteerUpdatesLoader,
 } from '../partners/VolunteerStrip';
+import { favourites, favouritesFirst } from '../../shared/prefs/favourites';
+import { StarButton } from '../../shared/ui/StarButton';
 import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -89,7 +91,10 @@ function GhatConditions({
     .sort((x, y) => y - x)[0];
   return (
     <li class="card cond-card">
-      <h3 class="card__title">{ghat.name}</h3>
+      <div class="ghat-card__top">
+        <h3 class="card__title">{ghat.name}</h3>
+        <StarButton ghatId={ghat.id} />
+      </div>
       <div class="meter-row">
         <Meter label="meter.crowd" level={crowd} />
         <Meter
@@ -133,7 +138,7 @@ export default function ConditionsScreen() {
           render={(items) => (
             <>
               <ul class="card-list">
-                {items.map((ghat) => (
+                {favouritesFirst(items, favourites.value).map((ghat) => (
                   <GhatConditions key={ghat.id} ghat={ghat} live={live} />
                 ))}
               </ul>

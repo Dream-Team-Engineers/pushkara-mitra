@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Favourite ghats (star) on Ghats and Conditions — 2026-11-24 (staging build and production code path, no flag)
+
+- **Who:** owner request; implementation by Claude Code (agent). Independent reviewer: NONE.
+- **Done:** a star on every ghat card in Ghats and Conditions; starred ghats are listed first (in both screens, within the chosen district filter on Ghats). The list is ghat ids only (at most 30), kept in this browser under pm.favs through preferences.ts, the one file allowed to touch storage; never sent to a server, no position, no account. Data inventory DI-11 updated. 2 new strings (fav.add, fav.remove) in en, te and hi, agent-written, need review. PowerShell npm run check: 1130 passed, 24 skipped.
+- **Needs the owner (privacy):** the draft privacy notice (docs/legal/privacy-notice-v1-draft.md, evidence row about what is stored) still says only language and theme are stored; it must also mention colour and favourite ghats before production (OQ-029). Not edited here because it is legal text.
+- **Not built, awaiting the owner:** ordering by nearest ghat. The ghat list has no coordinates of its own (many positions are approximate, six share a point, three are outside the map: O7 worksheet), so a nearest order would be unreliable and could point someone to the wrong ghat.
+
 ## Telugu and Hindi review recorded — 2026-11-24
 
 - **Who:** owner Krishna Murthy Raju G (gkmraju) stated "te/hi reviewed by GKM Raju on 24.11.2026"; recorded by Claude Code (agent). Independent reviewer: NONE. The statement did not name parts, so it was recorded as covering O1 Parts D, E and F (all strings added up to that date, none corrected); reviewedBy in te.json and hi.json updated. The owner can narrow this if only some parts were meant. Not covered: the unreleased consent and privacy wording draft. Language review is separate from counsel approval (OQ-019); no legal sign-off.

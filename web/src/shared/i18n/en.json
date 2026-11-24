@@ -466,6 +466,8 @@
     "meter.river": "River level",
     "conditions.sourceMore": "Source and date",
     "pv.kind.foodShort": "Food",
-    "pv.strip.disclaimer": "Items marked \"From a volunteer\" are reports by volunteers, not official figures. For river and flood warnings, follow the official bulletin and local officials."
+    "pv.strip.disclaimer": "Items marked \"From a volunteer\" are reports by volunteers, not official figures. For river and flood warnings, follow the official bulletin and local officials.",
+    "fav.add": "Add to favourites",
+    "fav.remove": "Remove from favourites"
   }
 }

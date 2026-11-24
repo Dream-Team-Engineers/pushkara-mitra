@@ -1469,3 +1469,29 @@ main > a.link-card {
   box-shadow: inset 0 0 0 1px var(--text-muted);
   color: var(--text-muted);
 }
+
+/* Favourite star on ghat cards */
+.star {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  margin: calc(var(--space-2) * -1) 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.star.is-on {
+  color: #d99a00;
+}
+
+.ghat-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}

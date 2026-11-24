@@ -69,3 +69,33 @@ export function writePreference(
     // Storage may be full, blocked or private; the choice still applies for this visit.
   }
 }
+
+/**
+ * Favourite ghats (owner request 2026-11-24): a short list of ghat ids, on this device only, so the
+ * ghats the person cares about are shown first. Ids only: no position, no name, no account. Never
+ * sent to a server. Values are validated on read.
+ */
+export const FAVOURITES_KEY = 'pm.favs';
+export const MAX_FAVOURITES = 30;
+const GHAT_ID = /^[a-z0-9][a-z0-9/-]{0,63}$/;
+
+export function readFavourites(store: PreferenceStore | undefined): readonly string[] {
+  try {
+    const raw = store?.getItem(FAVOURITES_KEY) ?? null;
+    if (raw === null) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    const ids = parsed.filter((id): id is string => typeof id === 'string' && GHAT_ID.test(id));
+    return [...new Set(ids)].slice(0, MAX_FAVOURITES);
+  } catch {
+    return [];
+  }
+}
+
+export function writeFavourites(store: PreferenceStore | undefined, ids: readonly string[]): void {
+  try {
+    store?.setItem(FAVOURITES_KEY, JSON.stringify(ids.slice(0, MAX_FAVOURITES)));
+  } catch {
+    // Storage may be full, blocked or private; the favourites still apply for this visit.
+  }
+}

@@ -11,6 +11,8 @@ import {
   VolunteerStrip,
   VolunteerUpdatesLoader,
 } from '../partners/VolunteerStrip';
+import { favourites, favouritesFirst } from '../../shared/prefs/favourites';
+import { StarButton } from '../../shared/ui/StarButton';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { ChipGroup, CrowdChip, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
@@ -75,7 +77,10 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
                 </span>
               )}
             </h2>
-            <CrowdChip level={crowd} />
+            <span class="ghat-card__actions">
+              <StarButton ghatId={ghat.id} />
+              <CrowdChip level={crowd} />
+            </span>
           </span>
           <span class="card__meta ghat-card__meta">
             {t(DISTRICT_LABELS[ghat.district])} · {ghat.town}
@@ -130,7 +135,7 @@ export default function GhatsScreen() {
         resource={ghatsResource}
         render={(items) => {
           if (items.length === 0) return <p class="note">{t('state.empty')}</p>;
-          const visible = filterGhats(items, filter.value);
+          const visible = favouritesFirst(filterGhats(items, filter.value), favourites.value);
           // Samples say they are samples; approved data says what the source does not cover.
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
           return (
