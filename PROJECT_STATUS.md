@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Decision: no nearest-first ghat order in v1 — 2026-11-24
+
+- **Who:** owner Krishna Murthy Raju G (gkmraju) chose option 2 ("2"): skip nearest-first and rely on favourites and the district filter; recorded by Claude Code (agent). Reason on record: the ghat list has no reliable coordinates (O7 worksheet). Revisit only if the owner confirms coordinates for the ghats pilgrims use; any later version must follow the map location rules (foreground, after a tap, never stored or sent). No code change.
+
 ## Favourite ghats (star) on Ghats and Conditions — 2026-11-24 (staging build and production code path, no flag)
 
 - **Who:** owner request; implementation by Claude Code (agent). Independent reviewer: NONE.
