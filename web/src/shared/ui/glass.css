@@ -1463,3 +1463,9 @@ main > a.link-card {
   background: color-mix(in srgb, var(--danger) 18%, transparent);
   box-shadow: inset 0 0 0 1px var(--danger);
 }
+
+.volunteer-compact__tag--grey {
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+  box-shadow: inset 0 0 0 1px var(--text-muted);
+  color: var(--text-muted);
+}

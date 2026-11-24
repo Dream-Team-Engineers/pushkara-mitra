@@ -32,15 +32,18 @@ export const KIND_LABELS = {
   food: 'pv.kind.food',
 } as const satisfies Record<PartnerKind, MessageKey>;
 
-/** Colour of a reported value: good, careful or bad. The words stay on the tag, so colour is never the only signal. */
+/** Colour of a reported value: good, careful, bad, or grey for not available. The words stay on the tag, so colour is never the only signal. */
 const TONES = {
   crowd: { low: 'good', moderate: 'warn', high: 'bad' },
   river: { normal: 'good', rising: 'warn', high: 'bad' },
-  food: { available: 'good', finished: 'bad' },
-} as const satisfies Record<PartnerKind, Record<string, 'good' | 'warn' | 'bad'>>;
+  food: { available: 'good', finished: 'grey' },
+} as const satisfies Record<PartnerKind, Record<string, 'good' | 'warn' | 'bad' | 'grey'>>;
 
-export function toneOf(kind: PartnerKind, value: string): 'good' | 'warn' | 'bad' | 'none' {
-  const tones: Readonly<Record<string, 'good' | 'warn' | 'bad'>> = TONES[kind];
+export function toneOf(
+  kind: PartnerKind,
+  value: string,
+): 'good' | 'warn' | 'bad' | 'grey' | 'none' {
+  const tones: Readonly<Record<string, 'good' | 'warn' | 'bad' | 'grey'>> = TONES[kind];
   return tones[value] ?? 'none';
 }
 

@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Food wording and grey tag; review links — 2026-11-24 (staging)
+
+- Owner request: the word Finished is no longer shown anywhere; the food report reads Food: Available (green) or Food: Not available (grey). The stored value stays finished (internal code, no migration). O1 Part F regenerated with the four strings added since (58 in total). PowerShell npm run check: 1123 passed, 24 skipped.
+
 ## Disclaimer at the bottom; colour-coded volunteer tags — 2026-11-24 (staging)
 
 - Owner request: the shared volunteer disclaimer now sits at the bottom of the Ghats list and of the Conditions list; volunteer tags are colour-coded (green: low crowd, normal river, food available; amber: moderate crowd, rising river; red: high crowd, high river, food finished), with the words kept on every tag. PowerShell npm run check: 1123 passed, 24 skipped. Not looked at in a browser by the agent.
