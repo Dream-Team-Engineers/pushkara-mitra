@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Readiness documents refreshed — 2026-11-24
+
+- **Who:** owner request; Claude Code (agent). Independent reviewer: NONE. docs/DELIVERY_READINESS.md now opens with a current status section (the 2026-11-04 scaffold audit is kept below it as history); docs/VERSION_ROADMAP.md carries a current-status note; README.md was left as the owner trimmed it on GitHub (df916a6). Documentation only; it records the state in this file and certifies no legal compliance. Check: prettier --check clean; no test reads these files.
+
 ## End of day 2026-11-24: state and tasks for tomorrow
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked to call it a day; recorded by Claude Code (agent). Independent reviewer: NONE.
