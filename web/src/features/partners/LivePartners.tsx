@@ -34,10 +34,6 @@ const ROLES: readonly ChipOption<PartnerRole>[] = [
   { value: 'priest', label: 'pv.role.priest' },
   { value: 'volunteer', label: 'pv.role.volunteer' },
 ];
-const KINDS: readonly ChipOption<PartnerKind>[] = PARTNER_KINDS.map((kind) => ({
-  value: kind,
-  label: KIND_LABELS[kind],
-}));
 type Availability = 'on' | 'off';
 const AVAILABILITY: readonly ChipOption<Availability>[] = [
   { value: 'on', label: 'pv.available.on' },
@@ -236,33 +232,52 @@ function Inbox({ unread, onRead }: { readonly unread: number; readonly onRead: (
 }
 
 function PostUpdate() {
-  const kind = useSignal<PartnerKind>('crowd');
   const ghat = useSignal('');
-  const value = useSignal('');
+  const picks = useSignal<Readonly<Partial<Record<PartnerKind, string>>>>({});
   const message = useSignal<MessageKey | null>(null);
   const sending = useSignal(false);
-  const choices = UPDATE_VALUES[kind.value];
-  const options: readonly ChipOption<string>[] = choices.flatMap((choice) => {
-    const label = valueLabel(kind.value, choice);
-    return label === null ? [] : [{ value: choice, label }];
-  });
-  const ready = ghat.value !== '' && value.value !== '' && !sending.value;
+  const chosen = PARTNER_KINDS.filter((kind) => (picks.value[kind] ?? '') !== '');
+  const ready = ghat.value !== '' && chosen.length > 0 && !sending.value;
+
+  const send = (): void => {
+    sending.value = true;
+    message.value = null;
+    const ghatId = ghat.value;
+    Promise.all(
+      chosen.map(async (kind) => ({
+        kind,
+        result: await postVolunteerUpdate({ kind, ghatId, value: picks.value[kind] ?? '' }),
+      })),
+    )
+      .then((outcomes) => {
+        sending.value = false;
+        // Items that went through are cleared; the others stay selected so they can be sent again.
+        const kept: Partial<Record<PartnerKind, string>> = {};
+        for (const { kind, result } of outcomes) {
+          if (result !== 'ok') {
+            const value = picks.value[kind];
+            if (value !== undefined) kept[kind] = value;
+          }
+        }
+        picks.value = kept;
+        const failed = outcomes.filter((outcome) => outcome.result !== 'ok');
+        const first = failed[0];
+        if (first === undefined) message.value = 'pv.post.done';
+        else if (failed.length < outcomes.length) message.value = 'pv.post.partial';
+        else if (first.result === 'limited') message.value = 'pv.post.waitTen';
+        else message.value = first.result === 'ok' ? 'pv.error' : RESULT_TEXT[first.result];
+      })
+      .catch(() => {
+        sending.value = false;
+        message.value = 'pv.error';
+      });
+  };
 
   return (
     <section class="section" aria-labelledby="pv-post-title">
       <h2 id="pv-post-title" class="section__title">
         <Bi k="pv.post.title" />
       </h2>
-      <ChipGroup
-        legend="pv.kind.legend"
-        options={KINDS}
-        selected={kind.value}
-        onSelect={(next) => {
-          kind.value = next;
-          value.value = '';
-          message.value = null;
-        }}
-      />
       <GhatSelect
         id="pv-post-ghat"
         label="pv.post.ghat"
@@ -273,34 +288,32 @@ function PostUpdate() {
           message.value = null;
         }}
       />
-      <ChipGroup
-        legend="pv.post.value"
-        options={options}
-        selected={value.value}
-        onSelect={(next) => {
-          value.value = next;
-          message.value = null;
-        }}
-      />
+      {PARTNER_KINDS.map((kind) => {
+        const options: readonly ChipOption<string>[] = UPDATE_VALUES[kind].flatMap((choice) => {
+          const label = valueLabel(kind, choice);
+          return label === null ? [] : [{ value: choice, label }];
+        });
+        return (
+          <div key={kind} class="pv-kind">
+            <h3 class="card__title">
+              <Bi k={KIND_LABELS[kind]} />
+            </h3>
+            <ChipGroup
+              legend={KIND_LABELS[kind]}
+              options={options}
+              selected={picks.value[kind] ?? ''}
+              onSelect={(next) => {
+                // Tapping the chosen option again clears it, so a tab can be left out.
+                picks.value = { ...picks.value, [kind]: picks.value[kind] === next ? '' : next };
+                message.value = null;
+              }}
+            />
+          </div>
+        );
+      })}
+      <p class="note">{t('pv.post.pickOne')}</p>
       <div class="actions">
-        <button
-          type="button"
-          class="button"
-          disabled={!ready}
-          onClick={() => {
-            sending.value = true;
-            postVolunteerUpdate({ kind: kind.value, ghatId: ghat.value, value: value.value })
-              .then((result) => {
-                sending.value = false;
-                message.value = result === 'ok' ? 'pv.post.done' : RESULT_TEXT[result];
-                if (result === 'ok') value.value = '';
-              })
-              .catch(() => {
-                sending.value = false;
-                message.value = 'pv.error';
-              });
-          }}
-        >
+        <button type="button" class="button" disabled={!ready} onClick={send}>
           {t('pv.post.send')}
         </button>
       </div>
@@ -310,7 +323,7 @@ function PostUpdate() {
         </p>
       )}
       <p class="note">{t('pv.post.note')}</p>
-      {kind.value === 'river' ? <p class="note">{t('pv.strip.river')}</p> : null}
+      {(picks.value.river ?? '') !== '' ? <p class="note">{t('pv.strip.river')}</p> : null}
     </section>
   );
 }

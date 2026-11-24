@@ -6,6 +6,10 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partners update form redesign — 2026-11-24 (staging)
+
+- Owner request after trying staging (approval in the admin tab worked): the report form is now one ghat selector, then Crowd, River level and Free food stacked one under another with their options (tap a chosen option again to clear it), and one Send update button at the bottom that sends every item chosen (at least one). Weather was skipped by the owner decision, so no migration. The 10-minute limit per partner, item and ghat is unchanged; an item refused for that reason stays selected and the others still go through. Strings: pv.kind.river and pv.kind.food reworded, three added, pv.post.value removed (O1 Part F regenerated, 54 strings). PowerShell `npm run check`: 1123 passed, 24 skipped. Not tested by the agent in a browser.
+
 ## Partners phase 2, step 3: app screen and volunteer strip — 2026-11-24 (staging only, flag on in staging)
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) said "resume"; implementation by Claude Code (agent). Independent reviewer: NONE.

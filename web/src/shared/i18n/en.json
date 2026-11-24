@@ -408,15 +408,14 @@
     "pv.post.title": "Tell pilgrims what you see",
     "pv.post.ghat": "Ghat",
     "pv.post.pick": "Choose a ghat",
-    "pv.post.value": "What you see",
     "pv.post.send": "Send update",
     "pv.post.done": "Sent. Pilgrims see it for 3 hours, marked \"From a volunteer\".",
     "pv.post.note": "Fixed choices only. No photos, names, phone numbers or links. Report only what you see yourself.",
     "pv.post.needAvailable": "Switch to Available to send updates.",
     "pv.kind.legend": "About",
     "pv.kind.crowd": "Crowd",
-    "pv.kind.river": "River",
-    "pv.kind.food": "Free food",
+    "pv.kind.river": "River level",
+    "pv.kind.food": "Free food availability",
     "pv.river.normal": "Normal",
     "pv.river.rising": "Rising",
     "pv.river.high": "High",
@@ -460,6 +459,9 @@
     "help.call.button": "Call",
     "settings.language.hint": "Telugu and Hindi show English beside them. Choose English to show English only.",
     "ghats.district.telangana": "Telangana",
-    "ghats.namesUnverified": "Telugu and Hindi names are from an unofficial guide and are unverified until an official list is published."
+    "ghats.namesUnverified": "Telugu and Hindi names are from an unofficial guide and are unverified until an official list is published.",
+    "pv.post.pickOne": "Choose at least one, then send. Leave the others empty.",
+    "pv.post.partial": "Some updates were sent. Any item you updated for this ghat can be updated again after 10 minutes; the ones still selected were not sent.",
+    "pv.post.waitTen": "You already updated this for this ghat. You can update the same item again after 10 minutes."
   }
 }
