@@ -10,6 +10,7 @@ import '../shared/ui/tokens.css';
 import '../shared/ui/fonts.css';
 import '../shared/ui/app.css';
 import '../shared/ui/glass.css';
+import { Splash } from '../shared/ui/Splash';
 import { initTheme } from '../shared/ui/theme';
 import { fitMobileViewport } from '../shared/ui/viewport';
 import { App } from './App';
@@ -37,7 +38,13 @@ async function boot(): Promise<void> {
   watchOnline();
   const root = document.getElementById('app');
   if (root === null) throw new Error('Missing #app mount point');
-  render(<App />, root);
+  render(
+    <>
+      <App />
+      <Splash />
+    </>,
+    root,
+  );
   registerServiceWorker();
   startCounting();
 }

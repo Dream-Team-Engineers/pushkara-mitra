@@ -6,10 +6,27 @@ import type { PublicMeta } from '../data/contracts';
 /** Under this age the stamp says "N min ago"; older items show their date instead. */
 const RECENT_MINUTES = 180;
 
+/** A small spinning ring for a short wait. Decorative: pair it with a text label for readers. */
+export function Spinner() {
+  return <span class="spinner" aria-hidden="true" />;
+}
+
+/** Three bouncing dots, for inline waits such as "updating". Decorative. */
+export function DotsLoader() {
+  return (
+    <span class="dots-loader" aria-hidden="true">
+      <i />
+      <i />
+      <i />
+    </span>
+  );
+}
+
 /** Skeleton while content loads. Announced once through aria-busy and a visually hidden label. */
 export function Skeleton({ lines = 3 }: { readonly lines?: number }) {
   return (
     <div class="skeleton" aria-busy="true">
+      <Spinner />
       <span class="visually-hidden">{t('state.loading')}</span>
       {Array.from({ length: lines }, (_, index) => (
         <span key={index} class="skeleton__line" aria-hidden="true" />
