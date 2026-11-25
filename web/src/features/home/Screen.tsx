@@ -126,10 +126,47 @@ function Ring({
   );
 }
 
+/** Decorative sunrise over the river and ghat steps behind the countdown. Hidden from assistive technology. */
+function Sunrise() {
+  return (
+    <svg
+      class="countdown__art"
+      viewBox="0 0 360 200"
+      preserveAspectRatio="xMidYMax slice"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id="countdown-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fde68a" stop-opacity="0" />
+          <stop offset="1" stop-color="#fb923c" stop-opacity="0.4" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#countdown-sky)" />
+      <circle cx="324" cy="44" r="24" fill="#fde68a" opacity="0.55" />
+      <path
+        d="M0 150c40-14 80 14 120 0s80-14 120 0 80 14 120 0v50H0z"
+        fill="#0b4f2a"
+        opacity="0.5"
+      />
+      <path
+        d="M0 170c40-12 80 12 120 0s80-12 120 0 80 12 120 0v30H0z"
+        fill="#052e1a"
+        opacity="0.65"
+      />
+      <path d="M20 200v-14h40v-14h40v-14h40v42z" fill="#052e1a" opacity="0.75" />
+      <circle cx="52" cy="176" r="3" fill="#fde047" />
+      <circle cx="92" cy="162" r="3" fill="#fde047" />
+      <circle cx="132" cy="148" r="3" fill="#fde047" />
+    </svg>
+  );
+}
+
 function CountdownCard() {
   const state = countdown(now.value);
   return (
     <section class="countdown" aria-labelledby="countdown-title">
+      <Sunrise />
       <h2 id="countdown-title" class="countdown__title">
         <Bi k="home.countdown.title" />
       </h2>

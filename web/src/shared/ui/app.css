@@ -2214,3 +2214,116 @@ details.note summary {
     animation: none;
   }
 }
+
+/* Home: sunrise scene and glowing edge on the countdown, gentle motion on the logo and cards */
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.countdown__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.countdown__title,
+.countdown__note,
+.countdown__phase {
+  position: relative;
+}
+.countdown::after {
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0 75%,
+    #86efac 88%,
+    #fff 93%,
+    transparent 100%
+  );
+  content: '';
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: home-beam 5s linear infinite;
+}
+.hero-logo {
+  animation: home-float 6s ease-in-out infinite;
+}
+.quick-grid > li {
+  animation: home-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.quick-grid > li:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.quick-grid > li:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.quick-grid > li:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.quick-grid > li:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.quick-grid > li:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.quick-grid > li:nth-child(7) {
+  animation-delay: 0.24s;
+}
+.quick-grid > li:nth-child(8) {
+  animation-delay: 0.28s;
+}
+.quick-grid > li:nth-child(9) {
+  animation-delay: 0.32s;
+}
+a.qcard {
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s,
+    border-color 0.25s;
+}
+a.qcard:hover {
+  transform: translateY(-3px);
+}
+@keyframes home-beam {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+@keyframes home-float {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+[data-theme='outdoor'] .countdown__art,
+[data-theme='outdoor'] .countdown::after {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .countdown::after,
+  .hero-logo,
+  .quick-grid > li {
+    animation: none;
+  }
+  a.qcard:hover {
+    transform: none;
+  }
+}
