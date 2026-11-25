@@ -49,6 +49,47 @@
   --navy-soft: #dde6ef;
 }
 
+/* Dark accents tint the whole backdrop, not just the buttons (owner check 2026-11-25) */
+[data-theme='dark'][data-accent='green'] {
+  --dawn-a: #0b2218;
+  --dawn-b: #082418;
+  --dawn-c: #061a12;
+  --glass: rgb(13 42 30 / 0.72);
+  --glass-card: rgb(13 42 30 / 0.84);
+  --sheet-bg: rgb(10 34 24 / 0.97);
+  --navy-soft: #17402f;
+}
+
+[data-theme='dark'][data-accent='saffron'] {
+  --dawn-a: #2a1509;
+  --dawn-b: #24120a;
+  --dawn-c: #1c0e07;
+  --glass: rgb(43 23 14 / 0.72);
+  --glass-card: rgb(43 23 14 / 0.84);
+  --sheet-bg: rgb(34 18 10 / 0.97);
+  --navy-soft: #3d2214;
+}
+
+[data-theme='dark'][data-accent='blue'] {
+  --dawn-a: #121c33;
+  --dawn-b: #0e1a30;
+  --dawn-c: #0b1424;
+  --glass: rgb(19 33 58 / 0.72);
+  --glass-card: rgb(19 33 58 / 0.84);
+  --sheet-bg: rgb(15 27 48 / 0.97);
+  --navy-soft: #1c3052;
+}
+
+[data-theme='dark'][data-accent='gold'] {
+  --dawn-a: #241b0c;
+  --dawn-b: #1f180c;
+  --dawn-c: #17120a;
+  --glass: rgb(39 32 17 / 0.72);
+  --glass-card: rgb(39 32 17 / 0.84);
+  --sheet-bg: rgb(30 25 12 / 0.97);
+  --navy-soft: #3a2e14;
+}
+
 /* Backdrop */
 .app {
   background-color: var(--ground);
@@ -62,7 +103,12 @@
 
 /* Header */
 .app-header {
-  background: linear-gradient(135deg, #0a4a4c 0%, var(--header-bg) 60%, #1b6b74 100%);
+  background: linear-gradient(
+    135deg,
+    var(--header-glow) 0%,
+    var(--header-bg) 60%,
+    var(--header-glow) 100%
+  );
   gap: var(--space-2);
 }
 

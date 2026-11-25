@@ -330,10 +330,10 @@ export function partnersBody(view: PartnersView): string {
   const updates =
     data.updates.length === 0
       ? '<p class="note">No volunteer updates in the last 24 hours.</p>'
-      : `<div class="table-wrap"><table><thead><tr><th scope="col">Ghat</th><th scope="col">What</th><th scope="col">From</th><th scope="col">When</th><th scope="col"></th></tr></thead><tbody>${data.updates
+      : `<div class="table-wrap"><table><thead><tr><th scope="col">Ghat</th><th scope="col">What</th><th scope="col">From</th><th scope="col">When</th></tr></thead><tbody>${data.updates
           .map(
             (u) =>
-              `<tr${u.hidden ? ' class="stale"' : ''}><th scope="row">${escapeHtml(u.ghatId)}</th><td>${escapeHtml(u.kind)}: ${escapeHtml(u.value)}${u.hidden ? ' · hidden' : ''}</td><td>${escapeHtml(u.partnerName)}</td><td>${escapeHtml(ago(u.createdAt, nowMs))}</td><td>${
+              `<tr${u.hidden ? ' class="stale"' : ''}><th scope="row">${escapeHtml(u.ghatId)}${
                 writable
                   ? action(
                       '/partners/hide',
@@ -343,7 +343,7 @@ export function partnersBody(view: PartnersView): string {
                       u.hidden ? 'go' : 'stop',
                     )
                   : ''
-              }</td></tr>`,
+              }</th><td>${escapeHtml(u.kind)}: ${escapeHtml(u.value)}${u.hidden ? ' · hidden' : ''}</td><td>${escapeHtml(u.partnerName)}</td><td>${escapeHtml(ago(u.createdAt, nowMs))}</td></tr>`,
           )
           .join('')}</tbody></table></div>`;
   return `${flash}<section class="hero" aria-label="Partners">

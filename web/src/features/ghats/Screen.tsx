@@ -140,13 +140,6 @@ export default function GhatsScreen() {
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
           return (
             <>
-              <p class="note">{t(note)}</p>
-              <p class="note">
-                {t('crowd.estimate')} {t('ghats.snanamPending')}
-              </p>
-              {items.some((item) => item.nameTe !== null || item.nameHi !== null) ? (
-                <p class="note">{t('ghats.namesUnverified')}</p>
-              ) : null}
               {visible.length === 0 ? (
                 <p class="note">{t('state.empty')}</p>
               ) : (
@@ -156,6 +149,13 @@ export default function GhatsScreen() {
                   ))}
                 </ul>
               )}
+              <p class="note">{t(note)}</p>
+              <p class="note">
+                {t('crowd.estimate')} {t('ghats.snanamPending')}
+              </p>
+              {items.some((item) => item.nameTe !== null || item.nameHi !== null) ? (
+                <p class="note">{t('ghats.namesUnverified')}</p>
+              ) : null}
               {FLAGS.partners ? <VolunteerDisclaimer /> : null}
             </>
           );
