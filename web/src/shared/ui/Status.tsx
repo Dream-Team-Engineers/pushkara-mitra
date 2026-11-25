@@ -11,26 +11,35 @@ export function Spinner() {
   return <span class="spinner" aria-hidden="true" />;
 }
 
-/** Three bouncing dots, for inline waits such as "updating". Decorative. */
-export function DotsLoader() {
-  return (
-    <span class="dots-loader" aria-hidden="true">
-      <i />
-      <i />
-      <i />
-    </span>
-  );
-}
-
-/** Skeleton while content loads. Announced once through aria-busy and a visually hidden label. */
-export function Skeleton({ lines = 3 }: { readonly lines?: number }) {
+/**
+ * Skeleton while content loads. Announced once through aria-busy and a visually hidden label.
+ * `rows` draws list-card placeholders (picture, two lines, a badge) instead of plain lines.
+ */
+export function Skeleton({
+  lines = 3,
+  rows = 0,
+}: {
+  readonly lines?: number;
+  readonly rows?: number;
+}) {
   return (
     <div class="skeleton" aria-busy="true">
       <Spinner />
       <span class="visually-hidden">{t('state.loading')}</span>
-      {Array.from({ length: lines }, (_, index) => (
-        <span key={index} class="skeleton__line" aria-hidden="true" />
-      ))}
+      {rows > 0
+        ? Array.from({ length: rows }, (_, index) => (
+            <span key={index} class="skeleton__row" aria-hidden="true">
+              <span class="skeleton__thumb" />
+              <span class="skeleton__text">
+                <span class="skeleton__line" />
+                <span class="skeleton__line skeleton__line--short" />
+              </span>
+              <span class="skeleton__pill" />
+            </span>
+          ))
+        : Array.from({ length: lines }, (_, index) => (
+            <span key={index} class="skeleton__line" aria-hidden="true" />
+          ))}
     </div>
   );
 }

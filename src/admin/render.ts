@@ -144,13 +144,23 @@ function weekday(day: string, today: string): string {
 const sum = (rows: readonly DayRow[], key: keyof Omit<DayRow, 'day'>): number =>
   rows.reduce((total, row) => total + row[key], 0);
 
+function statCard(value: number | string, label: string): string {
+  const shown = typeof value === 'number' ? num(value) : escapeHtml(value);
+  return `<div class="statcard"><strong>${shown}</strong><span>${escapeHtml(label)}</span></div>`;
+}
+
+/** One language share as a labelled bar; the width is a 5% step class because styles may not be inline. */
+function langBar(label: string, count: number, total: number): string {
+  const pct = total === 0 ? 0 : Math.round((count / total) * 100);
+  return `<div class="lrow"><span>${escapeHtml(label)}</span><span class="ltrack"><span class="lfill pw${String(Math.round(pct / 5))}"></span></span><span class="lpct">${String(pct)}%</span></div>`;
+}
+
 export function growthBody(data: Growth, range: Range, day: string, today: string): string {
   const chip = (value: Range, label: string) =>
     `<a class="chip${range === value ? ' on' : ''}" href="/?tab=growth&amp;range=${value}">${label}</a>`;
   const rows = data.days;
   const opens = sum(rows, 'opens');
   const locales = data.opensByLocale;
-  const share = (n: number) => (opens === 0 ? '0%' : `${String(Math.round((n / opens) * 100))}%`);
   const first = rows[0]?.day ?? today;
   const last = rows[rows.length - 1]?.day ?? today;
   const table = [...rows]
@@ -164,10 +174,9 @@ export function growthBody(data: Growth, range: Range, day: string, today: strin
     .join('');
   return `<div class="chips">${chip('today', 'Today')}${chip('7d', '7 days')}${chip('30d', '30 days')}
 <form class="chip-form${range === 'day' ? ' on' : ''}" method="get" action="/"><input type="hidden" name="tab" value="growth"><input type="hidden" name="range" value="day"><label><span class="visually-hidden">Day</span><input type="date" name="day" value="${escapeHtml(day)}" max="${escapeHtml(today)}"></label><button type="submit">Go</button></form></div>
+<div class="bento">
 <section class="hero" aria-label="Summary">
   <p class="big"><strong>${num(opens)}</strong> App opens</p>
-  <p class="mid"><strong>${num(sum(rows, 'newSignIns'))}</strong> New sign-ins</p>
-  <p class="mid"><strong>${num(sum(rows, 'groupsCreated'))}</strong> Groups created</p>
   ${
     rows.length > 1
       ? sparkline(
@@ -176,15 +185,20 @@ export function growthBody(data: Growth, range: Range, day: string, today: strin
         )
       : ''
   }
-  <div class="grid">
-    ${stat(sum(rows, 'signIns'), 'All sign-ins')}
-    ${stat(sum(rows, 'signIns') - sum(rows, 'newSignIns'), 'Returning sign-ins')}
-    ${stat(sum(rows, 'joins'), 'Joined a group')}
-    ${stat(sum(rows, 'installs'), 'App installs')}
-    ${stat(share(locales.te), 'Telugu')}
-    ${stat(`${share(locales.en)} · ${share(locales.hi)}`, 'English · Hindi')}
-  </div>
 </section>
+<p class="statcard"><strong>${num(sum(rows, 'newSignIns'))}</strong> New sign-ins</p>
+<p class="statcard"><strong>${num(sum(rows, 'groupsCreated'))}</strong> Groups created</p>
+${statCard(sum(rows, 'signIns'), 'All sign-ins')}
+${statCard(sum(rows, 'signIns') - sum(rows, 'newSignIns'), 'Returning sign-ins')}
+${statCard(sum(rows, 'joins'), 'Joined a group')}
+${statCard(sum(rows, 'installs'), 'App installs')}
+<section class="card langcard" aria-label="Screen language">
+  <h2>Screen language</h2>
+  ${langBar('Telugu', locales.te, opens)}
+  ${langBar('English', locales.en, opens)}
+  ${langBar('Hindi', locales.hi, opens)}
+</section>
+</div>
 <h2 class="section">Day by day</h2>
 <div class="table-wrap"><table>
 <thead><tr><th scope="col">Day</th><th scope="col">Opens</th><th scope="col">Sign-ins</th><th scope="col">New</th><th scope="col">Groups</th><th scope="col">Joins</th><th scope="col">Installs</th></tr></thead>
@@ -489,6 +503,21 @@ dd{margin:0}
 .nudge label{display:grid;gap:4px;color:var(--muted);font-size:.85rem}
 .nudge select,.nudge input{min-height:42px;padding:0 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.08);color:var(--text);font:inherit;color-scheme:dark}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #fde047;outline-offset:2px}
+.bento{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
+.bento>.hero{grid-column:span 2}
+.statcard{margin:0;padding:16px 18px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));backdrop-filter:blur(10px);color:var(--muted);font-size:.85rem;font-weight:600;transition:transform .3s,border-color .3s,box-shadow .3s;animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.statcard:hover{transform:translateY(-4px);border-color:rgba(74,222,128,.5);box-shadow:0 18px 50px -18px rgba(34,197,94,.5)}
+.statcard strong{display:block;margin-bottom:2px;color:var(--text);font:700 2rem/1.1 var(--head);letter-spacing:-.02em}
+.langcard{grid-column:span 2}
+.lrow{display:grid;grid-template-columns:70px 1fr 44px;align-items:center;gap:12px;margin-bottom:12px;font-weight:600}
+.lrow:last-child{margin-bottom:0}
+.ltrack{height:10px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.08)}
+.lfill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#16a34a,#bef264);box-shadow:0 0 14px rgba(74,222,128,.5)}
+.lpct{text-align:right;font-variant-numeric:tabular-nums}
+${Array.from({ length: 21 }, (_, i) => `.pw${String(i)}{width:${String(i * 5)}%}`).join('')}
+.chips{width:max-content;max-width:100%;padding:4px;gap:4px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.chips .chip,.chips .chip-form{border-color:transparent;background:transparent}
+.chips .chip.on,.chips .chip-form.on{background:var(--text)}
 @media (min-width:900px){
 body{max-width:1100px;padding:0 24px 24px 288px}
 .top{padding:30px 2px 12px}
@@ -500,6 +529,9 @@ h1{font-size:2.4rem}
 .tabs::before{content:"Pushkara Mitra";position:absolute;top:26px;left:20px;font:700 1.1rem var(--head)}
 .tabs a{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:46px;padding:0 14px;border-radius:12px;font-size:.95rem}
 .table-wrap{border-radius:22px}
+.bento{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bento>.hero{grid-row:span 2}
+.langcard{grid-column:span 2}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.spark__line{stroke-dashoffset:0}.spark__area{opacity:1}}
 `;

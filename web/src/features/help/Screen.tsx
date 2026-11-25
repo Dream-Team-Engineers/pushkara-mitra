@@ -1,8 +1,10 @@
 import { helplinesResource, helpPointsResource } from '../../shared/data/resources';
 import type { HelpPointKind } from '../../shared/data/fixtures';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
+import { hrefFor } from '../../app/router';
 import { Bi } from '../../shared/ui/Bi';
-import { HelplineList } from './HelplineList';
+import { Icon } from '../../shared/ui/Icon';
+import { EmergencyCall, HelplineList } from './HelplineList';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
 import { SourceStamp } from '../../shared/ui/Status';
@@ -31,10 +33,35 @@ export default function HelpScreen() {
         <button type="button" class="sos__button" disabled aria-describedby="sos-note">
           <Bi k="help.sos.button" />
         </button>
+        <EmergencyCall />
         <p id="sos-note" class="note note--flush">
           {t('help.sos.inactive')}
         </p>
       </section>
+      <ul class="card-list card-list--flush help-rows">
+        <li>
+          <a class="card link-card" href={hrefFor('map')}>
+            <span class="link-card__icon">
+              <Icon name="hospital" />
+            </span>
+            <span class="link-card__body">
+              <span class="card__title">{t('help.row.points.title')}</span>
+              <span class="card__meta">{t('help.row.points.sub')}</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href={hrefFor('group')}>
+            <span class="link-card__icon">
+              <Icon name="group" />
+            </span>
+            <span class="link-card__body">
+              <span class="card__title">{t('help.row.lost.title')}</span>
+              <span class="card__meta">{t('help.row.lost.sub')}</span>
+            </span>
+          </a>
+        </li>
+      </ul>
       <section class="section" aria-labelledby="lines-title">
         <h2 id="lines-title" class="section__title">
           <Bi k="help.numbers.title" />

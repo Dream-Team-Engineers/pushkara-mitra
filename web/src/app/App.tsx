@@ -17,7 +17,7 @@ export function App() {
   }, [title]);
 
   return (
-    <div class="app">
+    <div class="app" data-route={state}>
       <a
         class="skip-link"
         href="#main"

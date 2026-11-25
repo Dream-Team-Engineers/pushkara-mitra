@@ -22,6 +22,7 @@ import {
 import { Bi } from '../../shared/ui/Bi';
 import { Icon } from '../../shared/ui/Icon';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
+import { Spinner } from '../../shared/ui/Status';
 import { theme } from '../../shared/ui/theme';
 import type { LiveMapProps } from './LiveMap';
 import { flavorFor, MAP_BOUNDS } from './mapStyle';
@@ -447,7 +448,11 @@ export default function MapScreen() {
       <ScreenHeader titleKey="module.map.title" subtitleKey="module.map.subtitle" />
       {LiveMap === null ? (
         <div class={phase.value === 'pending' ? 'map-pending' : undefined}>
-          {phase.value === 'pending' ? <div class="map-skeleton" aria-hidden="true" /> : null}
+          {phase.value === 'pending' ? (
+            <div class="map-skeleton" aria-hidden="true">
+              <Spinner />
+            </div>
+          ) : null}
           <PrototypeBanner />
           <p class="state-line" role="status">
             <span class="state-line__dot" aria-hidden="true" />

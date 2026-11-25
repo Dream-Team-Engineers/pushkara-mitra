@@ -2143,28 +2143,15 @@ details.note summary {
   border-radius: 50%;
   animation: loader-spin 0.9s linear infinite;
 }
-.dots-loader {
-  display: inline-flex;
-  gap: 6px;
-}
-.dots-loader i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: loader-bounce 1s ease-in-out infinite;
-}
-.dots-loader i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-.dots-loader i:nth-child(3) {
-  animation-delay: 0.3s;
-}
-.skeleton__line {
+.skeleton__line,
+.skeleton__thumb,
+.skeleton__pill {
   position: relative;
   overflow: hidden;
 }
-.skeleton__line::after {
+.skeleton__line::after,
+.skeleton__thumb::after,
+.skeleton__pill::after {
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -2182,18 +2169,6 @@ details.note summary {
     transform: rotate(360deg);
   }
 }
-@keyframes loader-bounce {
-  0%,
-  80%,
-  100% {
-    opacity: 0.4;
-    transform: translateY(0);
-  }
-  40% {
-    opacity: 1;
-    transform: translateY(-8px);
-  }
-}
 @keyframes loader-shimmer {
   to {
     transform: translateX(100%);
@@ -2205,8 +2180,9 @@ details.note summary {
   .splash__tag,
   .splash__ripple,
   .spinner,
-  .dots-loader i,
-  .skeleton__line::after {
+  .skeleton__line::after,
+  .skeleton__thumb::after,
+  .skeleton__pill::after {
     animation: none;
   }
   .splash__bar-fill {
@@ -2326,4 +2302,206 @@ a.qcard:hover {
   a.qcard:hover {
     transform: none;
   }
+}
+
+/* Screens: ghat picture, group code, SOS panel, list motion */
+.ghat-card__thumb {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+}
+.ghat-card__name {
+  flex: 1;
+}
+.code-ticket {
+  justify-content: center;
+  padding: var(--space-3);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  text-align: center;
+}
+.code-ticket__label {
+  flex-basis: 100%;
+  font-size: var(--text-caption);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.code-ticket__value {
+  flex-basis: 100%;
+  font-size: 2rem;
+  letter-spacing: 0.2em;
+}
+.code-ticket__actions {
+  flex-basis: 100%;
+  justify-content: center;
+}
+.sos {
+  padding: var(--space-4);
+  background: linear-gradient(150deg, #dc2626, #7f1d1d);
+  border-radius: var(--radius-feature);
+  color: #fff;
+}
+.sos .note {
+  color: #fff;
+}
+[data-theme='outdoor'] .sos {
+  background: none;
+  color: inherit;
+}
+[data-theme='outdoor'] .sos .note {
+  color: inherit;
+}
+.card-list > li {
+  animation: home-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.card-list > li:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.card-list > li:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.card-list > li:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.card-list > li:nth-child(n + 5) {
+  animation-delay: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-list > li {
+    animation: none;
+  }
+}
+
+@media (max-width: 30rem) {
+  .ghat-card__top {
+    flex-wrap: wrap;
+  }
+  .ghat-card__thumb {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  .ghat-card__actions {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.sos__call {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.5rem;
+  background: #fff;
+  color: #991b1b;
+  border: 0;
+  border-radius: 18px;
+  font: inherit;
+  font-size: var(--text-card-title);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Conditions and Map: lift, glow and a live pulse, matching the flow design */
+.cond-card,
+.place-card,
+.tile {
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s,
+    border-color 0.25s;
+}
+.cond-card:hover,
+.place-card:hover,
+.tile:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
+.tile {
+  background: var(--glass-card);
+  border-color: var(--glass-edge);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+}
+.tile-grid > li {
+  animation: home-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.meter__bar.is-on {
+  box-shadow: 0 0 10px currentColor;
+}
+.meter--low {
+  color: #2e8b57;
+}
+.meter--moderate {
+  color: #b8740a;
+}
+.meter--high {
+  color: var(--danger);
+}
+.meter__label,
+.meter__text {
+  color: var(--text);
+}
+.map-sheet {
+  animation: home-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.locate-fab.is-on {
+  box-shadow: 0 0 0 0 rgb(37 99 235 / 0.5);
+  animation: locate-pulse 2s infinite;
+}
+@keyframes locate-pulse {
+  70% {
+    box-shadow: 0 0 0 14px rgb(37 99 235 / 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-grid > li,
+  .map-sheet,
+  .locate-fab.is-on {
+    animation: none;
+  }
+  .cond-card:hover,
+  .place-card:hover,
+  .tile:hover {
+    transform: none;
+  }
+}
+
+.skeleton__row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--glass-card);
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+}
+.skeleton__thumb {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  background: var(--line);
+  border-radius: 14px;
+}
+.skeleton__text {
+  display: grid;
+  flex: 1;
+  gap: var(--space-2);
+}
+.skeleton__line--short {
+  width: 60%;
+}
+.skeleton__pill {
+  flex: none;
+  width: 4.5rem;
+  height: 1.5rem;
+  background: var(--line);
+  border-radius: 999px;
+}
+.map-skeleton .spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
 }

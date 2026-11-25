@@ -1,3 +1,4 @@
+import { signal } from '@preact/signals';
 import type { ComponentChildren } from 'preact';
 import { Bi } from './Bi';
 import { current, hrefFor, type RouteId } from '../../app/router';
@@ -6,7 +7,7 @@ import { pair, t, type MessageKey } from '../i18n/i18n';
 import { BrandMark, Icon, type IconName } from './Icon';
 import { LanguageButton } from './LanguageSheet';
 import { accent, setAccent, setTheme, theme } from './theme';
-import { ACCENTS, type Accent } from '../prefs/preferences';
+import { ACCENTS, THEMES, type Accent, type Theme } from '../prefs/preferences';
 
 /**
  * Header (owner request 2026-11-23): row one is the logo, the app name in large type and the
@@ -21,7 +22,10 @@ export function AppHeader() {
       <div class="app-header__top">
         <a class="app-header__brand" href={hrefFor('home')}>
           <BrandMark size={32} />
-          <span>{t('app.name')}</span>
+          <span class="app-header__name">
+            <b>{t('app.name')}</b>
+            <small>{t('app.tagline')}</small>
+          </span>
         </a>
         <a
           class="account-link"
@@ -51,10 +55,23 @@ const ACCENT_LABEL = {
   gold: 'theme.accent.gold',
 } as const satisfies Record<Accent, MessageKey>;
 
-/** Colour choice, light/dark switch and language, in one strip under the app name. */
+const THEME_LABEL = {
+  light: 'settings.theme.light',
+  dark: 'settings.theme.dark',
+  outdoor: 'settings.theme.outdoor',
+} as const satisfies Record<Theme, MessageKey>;
+
+const appearanceOpen = signal(false);
+
+/**
+ * Appearance and language in one strip under the app name (owner request 2026-11-25, replacing the
+ * always-visible colour dots and L/D switch): one button opens a panel with the theme (light, dark,
+ * outdoor) and the colour; the language button beside it opens the language sheet.
+ */
 export function ThemeStrip() {
   const chosen = accent.value;
-  const dark = theme.value === 'dark';
+  const mode = theme.value;
+  const open = appearanceOpen.value;
   const move = (step: number) => {
     const index = ACCENTS.indexOf(chosen);
     const next = ACCENTS[(index + step + ACCENTS.length) % ACCENTS.length] ?? 'green';
@@ -62,57 +79,94 @@ export function ThemeStrip() {
     document.getElementById(`accent-${next}`)?.focus();
   };
   return (
-    <div class="theme-strip">
-      <div
-        class={`accent-picker accent-picker--${chosen}`}
-        role="radiogroup"
-        aria-label={t('theme.colour')}
-        onKeyDown={(event) => {
-          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-            event.preventDefault();
-            move(1);
-          } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            move(-1);
-          }
-        }}
-      >
-        {ACCENTS.map((option) => (
-          <button
-            key={option}
-            id={`accent-${option}`}
-            type="button"
-            role="radio"
-            class={`accent-swatch accent-swatch--${option}`}
-            aria-checked={chosen === option}
-            aria-label={t(ACCENT_LABEL[option])}
-            tabIndex={chosen === option ? 0 : -1}
-            onClick={() => {
-              setAccent(option);
-            }}
+    <>
+      <div class="theme-strip">
+        <button
+          type="button"
+          class="appearance-button"
+          id="appearance-button"
+          aria-expanded={open}
+          aria-controls="appearance-panel"
+          onClick={() => {
+            appearanceOpen.value = !open;
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 2-2 0-1.5-1-1.6-1-3a2 2 0 0 1 2-2h2.5A3.5 3.5 0 0 0 21 10.5C21 6.4 17 3 12 3z" />
+            <path d="M7.5 11h.01M10 7.5h.01M14.5 7.5h.01" />
+          </svg>
+          <span>{t('settings.theme.title')}</span>
+          <span
+            class={`appearance-button__dot appearance-button__dot--${chosen}`}
+            aria-hidden="true"
           />
-        ))}
+        </button>
+        <LanguageButton />
       </div>
-      <button
-        type="button"
-        class={`mode-toggle${dark ? ' is-dark' : ''}`}
-        role="switch"
-        aria-checked={dark}
-        aria-label={t('theme.darkSwitch')}
-        onClick={() => {
-          setTheme(dark ? 'light' : 'dark');
-        }}
-      >
-        <span class="mode-toggle__thumb" aria-hidden="true" />
-        <span class="mode-toggle__label mode-toggle__label--l" aria-hidden="true">
-          L
-        </span>
-        <span class="mode-toggle__label mode-toggle__label--d" aria-hidden="true">
-          D
-        </span>
-      </button>
-      <LanguageButton />
-    </div>
+      {open ? (
+        <div
+          class="appearance-panel"
+          id="appearance-panel"
+          role="group"
+          aria-label={t('settings.theme.title')}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              appearanceOpen.value = false;
+              document.getElementById('appearance-button')?.focus();
+            }
+          }}
+        >
+          <p class="appearance-panel__label">{t('settings.theme.title')}</p>
+          <div class="segmented" role="radiogroup" aria-label={t('settings.theme.title')}>
+            {THEMES.map((option) => (
+              <button
+                key={option}
+                type="button"
+                role="radio"
+                class="segmented__option"
+                aria-checked={mode === option}
+                onClick={() => {
+                  setTheme(option);
+                }}
+              >
+                {t(THEME_LABEL[option])}
+              </button>
+            ))}
+          </div>
+          <p class="appearance-panel__label">{t('theme.colour')}</p>
+          <div
+            class={`accent-picker accent-picker--${chosen}`}
+            role="radiogroup"
+            aria-label={t('theme.colour')}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                move(1);
+              } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                move(-1);
+              }
+            }}
+          >
+            {ACCENTS.map((option) => (
+              <button
+                key={option}
+                id={`accent-${option}`}
+                type="button"
+                role="radio"
+                class={`accent-swatch accent-swatch--${option}`}
+                aria-checked={chosen === option}
+                aria-label={t(ACCENT_LABEL[option])}
+                tabIndex={chosen === option ? 0 : -1}
+                onClick={() => {
+                  setAccent(option);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 

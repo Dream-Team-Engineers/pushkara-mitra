@@ -14,7 +14,7 @@ export function ResourceView<T>({
   readonly render: (data: T) => ComponentChildren;
 }) {
   const state = useResource(resource);
-  if (state.status === 'loading') return <Skeleton />;
+  if (state.status === 'loading') return <Skeleton rows={4} />;
   if (state.status === 'error') {
     return (
       <ErrorState

@@ -19,10 +19,11 @@ import { ScreenHeader } from '../../shared/ui/Layout';
 import { ResourceView } from '../../shared/ui/ResourceView';
 import { SourceStamp } from '../../shared/ui/Status';
 
-type Filter = 'all' | District;
+type Filter = 'all' | 'favourites' | District;
 
 const FILTERS: readonly ChipOption<Filter>[] = [
   { value: 'all', label: 'action.all' },
+  { value: 'favourites', label: 'ghats.filter.favourites' },
   { value: 'east', label: 'ghats.district.east' },
   { value: 'west', label: 'ghats.district.west' },
   { value: 'telangana', label: 'ghats.district.telangana' },
@@ -44,8 +45,14 @@ const FACILITY_LABELS = {
   parking: 'facility.parking',
 } as const satisfies Record<Facility, MessageKey>;
 
-export function filterGhats(items: readonly GhatFixture[], filter: Filter): readonly GhatFixture[] {
-  return filter === 'all' ? items : items.filter((item) => item.district === filter);
+export function filterGhats(
+  items: readonly GhatFixture[],
+  filter: Filter,
+  starred: readonly string[] = [],
+): readonly GhatFixture[] {
+  if (filter === 'all') return items;
+  if (filter === 'favourites') return items.filter((item) => starred.includes(item.id));
+  return items.filter((item) => item.district === filter);
 }
 
 /** The name in the chosen language, when the data has one; English is shown beneath it. */
@@ -53,6 +60,19 @@ function localName(ghat: GhatFixture): string | null {
   if (locale.value === 'te') return ghat.nameTe;
   if (locale.value === 'hi') return ghat.nameHi;
   return null;
+}
+
+/** Small river-and-steps picture on each ghat card. Decorative. */
+function GhatThumb() {
+  return (
+    <svg class="ghat-card__thumb" viewBox="0 0 56 56" aria-hidden="true" focusable="false">
+      <rect width="56" height="56" fill="#fde68a" opacity="0.7" />
+      <circle cx="40" cy="18" r="7" fill="#fb923c" />
+      <path d="M0 34c8-6 14 6 28 0s20-6 28 0v22H0z" fill="#38bdf8" />
+      <path d="M0 44c8-5 14 5 28 0s20-5 28 0v12H0z" fill="#0284c7" />
+      <path d="M0 56v-8h18v-6h14v-6h24v20z" fill="#0b4f2a" />
+    </svg>
+  );
 }
 
 function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: LiveCrowd | null }) {
@@ -65,6 +85,7 @@ function GhatCard({ ghat, live }: { readonly ghat: GhatFixture; readonly live: L
       <details class="card ghat-card">
         <summary class="ghat-card__summary">
           <span class="ghat-card__top">
+            <GhatThumb />
             <h2 class="card__title ghat-card__name">
               {local === null ? (
                 ghat.name
@@ -135,7 +156,10 @@ export default function GhatsScreen() {
         resource={ghatsResource}
         render={(items) => {
           if (items.length === 0) return <p class="note">{t('state.empty')}</p>;
-          const visible = favouritesFirst(filterGhats(items, filter.value), favourites.value);
+          const visible = favouritesFirst(
+            filterGhats(items, filter.value, [...favourites.value]),
+            favourites.value,
+          );
           // Samples say they are samples; approved data says what the source does not cover.
           const note = items.some((item) => item.synthetic) ? 'ghats.note' : 'ghats.noteVerified';
           return (

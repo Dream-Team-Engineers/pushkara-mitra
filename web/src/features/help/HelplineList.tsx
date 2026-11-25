@@ -34,7 +34,7 @@ export function dialTarget(number: string): string {
   return number.replace(/[^0-9+]/g, '');
 }
 
-function CallConfirm({
+export function CallConfirm({
   kind,
   number,
   onClose,
@@ -153,6 +153,44 @@ export function HelplineList({ lines }: { readonly lines: readonly HelplineFixtu
           }}
         />
       )}
+    </>
+  );
+}
+
+/** The national emergency number (112), always one confirmed tap away on the Help screen (owner request 2026-11-25). */
+export const NATIONAL_EMERGENCY = '112';
+
+/** One large call button for 112. It opens the same confirmation as the helpline list; nothing dials by itself. */
+export function EmergencyCall() {
+  const asking = useSignal(false);
+  return (
+    <>
+      <button
+        type="button"
+        class="sos__call"
+        aria-haspopup="dialog"
+        aria-label={t('help.call.aria', {
+          name: t(LINES.emergency.label),
+          number: NATIONAL_EMERGENCY,
+        })}
+        onClick={() => {
+          asking.value = true;
+        }}
+      >
+        <Icon name="phone" size={22} />
+        <span>
+          {t('help.call.button')} {NATIONAL_EMERGENCY}
+        </span>
+      </button>
+      {asking.value ? (
+        <CallConfirm
+          kind="emergency"
+          number={NATIONAL_EMERGENCY}
+          onClose={() => {
+            asking.value = false;
+          }}
+        />
+      ) : null}
     </>
   );
 }
