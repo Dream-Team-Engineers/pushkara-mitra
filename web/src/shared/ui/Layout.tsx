@@ -100,6 +100,10 @@ export function ThemeStrip() {
             class={`appearance-button__dot appearance-button__dot--${chosen}`}
             aria-hidden="true"
           />
+          {/* Down arrow, as on the language button, so it reads as a menu (owner 2026-11-26). */}
+          <span class="appearance-button__chev">
+            <Icon name="chevron" size={14} />
+          </span>
         </button>
         <LanguageButton />
       </div>
