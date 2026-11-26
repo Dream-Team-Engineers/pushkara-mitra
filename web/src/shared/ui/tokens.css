@@ -8,7 +8,8 @@
 :root,
 [data-theme='light'] {
   color-scheme: light;
-  --ground: #f7f4ec;
+  /* Design B (owner choice 2026-11-26): a cool off-white page under white cards. */
+  --ground: #f4f6f2;
   --surface: #ffffff;
   --text: #12304a;
   --text-muted: #51616e;

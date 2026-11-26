@@ -13,7 +13,7 @@ import { FLAGS, isEnabled } from '../../shared/flags/flags';
 import { ContactUs } from '../contact/ContactUs';
 import { t } from '../../shared/i18n/i18n';
 import { Bi } from '../../shared/ui/Bi';
-import { Icon } from '../../shared/ui/Icon';
+import { Icon, type IconName } from '../../shared/ui/Icon';
 import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
 
 /**
@@ -24,44 +24,90 @@ import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
  */
 type Age = 'adult' | 'minor';
 
-/** A clear way in to Partners / Volunteers (priest, vendor, moderator, volunteer) from Me. */
-function PartnerLink() {
-  if (!FLAGS.partners) return null;
+/** One menu row (Design B): icon tile, label with an optional second line, chevron. */
+function MenuRow({
+  href,
+  icon,
+  label,
+  meta,
+  tone,
+}: {
+  readonly href: string;
+  readonly icon: IconName;
+  readonly label: string;
+  readonly meta?: string;
+  readonly tone?: 'saffron' | 'danger';
+}) {
   return (
-    <a class="card link-card" href={hrefFor('partners')}>
-      <span class="link-card__icon">
-        <Icon name="group" />
-      </span>
-      <span class="link-card__body">
-        <span class="card__title">{t('me.partner.title')}</span>
-        <span class="card__meta">{t('me.partner.note')}</span>
-      </span>
-      <span class="link-card__go">
-        <Icon name="chevron" size={20} />
-      </span>
-    </a>
+    <li>
+      <a class={tone === 'danger' ? 'b-row b-row--danger' : 'b-row'} href={href}>
+        <span class={tone === undefined ? 'b-tile' : `b-tile b-tile--${tone}`}>
+          <Icon name={icon} size={20} />
+        </span>
+        <span class="b-row__label">
+          {label}
+          {meta === undefined ? null : <span class="b-row__meta">{meta}</span>}
+        </span>
+        <span class="b-row__go">
+          <Icon name="next" size={18} />
+        </span>
+      </a>
+    </li>
   );
 }
 
+/** Partners / Volunteers (when on), privacy, and, once signed in, deleting the account. */
+function MeMenu({ signedIn }: { readonly signedIn: boolean }) {
+  return (
+    <ul class="b-menu b-card" aria-label={t('nav.me')}>
+      {FLAGS.partners ? (
+        <MenuRow
+          href={hrefFor('partners')}
+          icon="partners"
+          label={t('me.partner.title')}
+          meta={t('me.partner.note')}
+          tone="saffron"
+        />
+      ) : null}
+      <MenuRow href={hrefFor('privacy')} icon="shield" label={t('account.privacyLink')} />
+      {signedIn ? (
+        <MenuRow
+          href={hrefFor('deleteAccount')}
+          icon="trash"
+          label={t('account.deleteLink')}
+          tone="danger"
+        />
+      ) : null}
+    </ul>
+  );
+}
+
+/** The signed-in person on a header-coloured card (Design B), with Sign out. */
 function SignedIn() {
   const person = user.value;
   if (person === null) return null;
   return (
-    <section class="account-card" aria-labelledby="account-name">
-      <span class="account-card__avatar" aria-hidden="true">
+    <section class="b-profile" aria-labelledby="account-name">
+      <span class="b-profile__avatar" aria-hidden="true">
         {person.name === '' ? (
-          <Icon name="group" size={20} />
+          <Icon name="person" size={22} />
         ) : (
           person.name.slice(0, 1).toUpperCase()
         )}
       </span>
-      <div class="account-card__text">
-        <h2 id="account-name">{person.name === '' ? t('account.signedIn') : person.name}</h2>
-        {person.email === '' ? null : <p class="card__meta">{person.email}</p>}
+      <div class="b-profile__text">
+        <h2 id="account-name" class="b-profile__name">
+          {person.name === '' ? t('account.signedIn') : person.name}
+        </h2>
+        <p class="b-profile__meta">
+          {person.email === ''
+            ? t(remembered.value ? 'me.profile.remembered' : 'me.profile.session')
+            : person.email}
+        </p>
       </div>
       <button
         type="button"
-        class="button button--secondary"
+        class="b-profile__action"
         onClick={() => {
           void signOut();
         }}
@@ -98,10 +144,7 @@ export default function MeScreen() {
         <p class="note">
           {remembered.value ? t('account.rememberedNote') : t('account.memoryOnly')}
         </p>
-        <p class="note">
-          <a href={hrefFor('deleteAccount')}>{t('account.deleteLink')}</a>
-        </p>
-        <PartnerLink />
+        <MeMenu signedIn />
         <ContactUs />
         <p class="build-id">Build {BUILD_ID}</p>
       </>
@@ -185,9 +228,7 @@ export default function MeScreen() {
           {t('account.loadFailed')}
         </p>
       ) : null}
-      <p class="note">
-        <a href={hrefFor('privacy')}>{t('account.privacyLink')}</a>
-      </p>
+      <MeMenu signedIn={false} />
       <ContactUs />
       <p class="build-id">Build {BUILD_ID}</p>
     </>

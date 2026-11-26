@@ -35,7 +35,8 @@ export function App() {
         </p>
       )}
       <UpdateBanner />
-      <InstallBanner />
+      {/* Home only: on inner screens the floating language button sits where the banner's button is. */}
+      {state === 'home' ? <InstallBanner /> : null}
       <main id="main" tabIndex={-1}>
         <RouteView />
       </main>

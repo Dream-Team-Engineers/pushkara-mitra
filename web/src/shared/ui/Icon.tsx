@@ -34,7 +34,14 @@ export type IconName =
   | 'chevron'
   | 'share'
   | 'copy'
-  | 'person';
+  | 'person'
+  | 'mail'
+  | 'megaphone'
+  | 'bulb'
+  | 'alert'
+  | 'shield'
+  | 'trash'
+  | 'next';
 
 const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   home: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
@@ -107,6 +114,17 @@ const PATHS: Readonly<Record<IconName, readonly string[]>> = {
   book: ['M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', 'M5 17a3 3 0 0 1 3-3h11'],
   chevron: ['M6 9l6 6 6-6'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'],
+  mail: ['M3 5h18v14H3z', 'M3 7l9 6 9-6'],
+  megaphone: ['M3 10v4h4l6 4V6l-6 4z', 'M17 9a4 4 0 0 1 0 6'],
+  bulb: [
+    'M9 18h6',
+    'M10 21h4',
+    'M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z',
+  ],
+  alert: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z', 'M12 8v5', 'M12 16h.01'],
+  shield: ['M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'],
+  trash: ['M4 7h16', 'M9 7V4h6v3', 'M6 7l1 13h10l1-13z'],
+  next: ['M9 6l6 6-6 6'],
 };
 
 export function Icon({ name, size = 24 }: { readonly name: IconName; readonly size?: number }) {

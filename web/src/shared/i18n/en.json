@@ -517,6 +517,8 @@
     "contact.noMail": "No email app opened? Write to {email}.",
     "contact.privacy": "This app does not send or save what you type here. It goes only into the email you send from your own email app.",
     "contact.subject": "Pushkara Mitra: {topic}",
-    "contact.mail.topic": "Topic"
+    "contact.mail.topic": "Topic",
+    "me.profile.remembered": "Signed in on this phone for up to 7 days",
+    "me.profile.session": "Signed in while this page is open"
   }
 }

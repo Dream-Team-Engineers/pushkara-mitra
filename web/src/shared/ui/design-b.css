@@ -1,0 +1,422 @@
+/*
+ * Design B (owner choice 2026-11-26; mock at claude.ai/artifact/5dyhuMTyA4b4sP3eRPgkMM): the staff
+ * dashboard's greens, icons and rounded cards on a light, solid base. Loaded last, after app.css and
+ * glass.css, and meant to become the single theme layer once those are merged into it.
+ *
+ * Rules: solid surfaces only (no backdrop blur), so long screens stay smooth on low-end phones and
+ * readable in sunlight; colours come from tokens.css so the four colour choices keep working; the
+ * dark theme gets the dashboard's "aurora" glow behind solid cards; the outdoor theme keeps hard
+ * edges, no shadows and no gradients. Text never sits on a gradient lighter than --header-glow.
+ */
+:root,
+[data-theme='light'] {
+  --b-card-shadow: 0 6px 18px rgb(16 40 30 / 0.08);
+  --b-bar-shadow: 0 8px 24px rgb(16 40 30 / 0.14);
+  --b-field: #f1f4f0;
+  --b-field-edge: #d5ddd3;
+  --b-radius: 20px;
+  --b-radius-control: 14px;
+}
+
+[data-theme='dark'] {
+  --b-card-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  --b-bar-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+  --b-field: rgb(255 255 255 / 0.06);
+  --b-field-edge: rgb(255 255 255 / 0.16);
+  --b-radius: 20px;
+  --b-radius-control: 14px;
+}
+
+[data-theme='outdoor'] {
+  --b-card-shadow: none;
+  --b-bar-shadow: none;
+  --b-field: #ffffff;
+  --b-field-edge: var(--line-strong);
+  --b-radius: 16px;
+  --b-radius-control: 12px;
+}
+
+/* ---- Page ---- */
+.app {
+  background-image: none;
+  box-shadow: none;
+}
+
+[data-theme='dark'] .app {
+  background-image:
+    radial-gradient(120% 40rem at 0% 0%, var(--primary-soft) 0%, transparent 60%),
+    radial-gradient(90% 30rem at 100% 35%, var(--header-glow) 0%, transparent 65%);
+  background-attachment: fixed;
+}
+
+/* ---- Cards: white (or solid dark), soft shadow, no border, no blur ---- */
+.card,
+.qcard,
+.weather,
+.marquee,
+.locate,
+.group-panel,
+.member-row,
+.map-sheet,
+.b-card {
+  background-color: var(--surface);
+  border-color: transparent;
+  border-radius: var(--b-radius);
+  box-shadow: var(--b-card-shadow);
+  backdrop-filter: none;
+}
+
+.marquee--ad {
+  background-color: var(--accent-soft);
+}
+
+[data-theme='outdoor'] .card,
+[data-theme='outdoor'] .qcard,
+[data-theme='outdoor'] .weather,
+[data-theme='outdoor'] .marquee,
+[data-theme='outdoor'] .locate,
+[data-theme='outdoor'] .group-panel,
+[data-theme='outdoor'] .member-row,
+[data-theme='outdoor'] .map-sheet,
+[data-theme='outdoor'] .b-card {
+  border: 1px solid var(--line-strong);
+}
+
+/* A flush list placed straight on the page (Help rows) still keeps the page gutter. */
+main > .card-list--flush {
+  padding-inline: var(--space-4);
+}
+
+a.link-card:hover,
+a.qcard:hover {
+  border-color: transparent;
+  box-shadow:
+    var(--b-card-shadow),
+    0 0 0 2px var(--primary);
+}
+
+/* ---- Headings ---- */
+.screen-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* ---- Buttons ---- */
+.button {
+  border-radius: var(--b-radius-control);
+  border-color: var(--primary-fill);
+}
+
+.button--secondary {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: transparent;
+}
+
+[data-theme='outdoor'] .button--secondary {
+  border-color: var(--primary);
+}
+
+.button[disabled] {
+  background: var(--b-field);
+  border-color: transparent;
+}
+
+/* Outdoor: a disabled button keeps a visible edge, or it reads as plain text in the sun. */
+[data-theme='outdoor'] .button[disabled] {
+  border: 1px dashed var(--line-strong);
+}
+
+/* ---- Chips: filled, no heavy outline; the chosen one is solid ---- */
+.choice {
+  background: var(--b-field);
+  border: 1px solid transparent;
+  border-radius: var(--b-radius-control);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.choice[aria-pressed='true'] {
+  background: var(--primary-fill);
+  color: var(--on-primary);
+  border-color: var(--primary-fill);
+  box-shadow: none;
+}
+
+[data-theme='outdoor'] .choice {
+  border-color: var(--line-strong);
+}
+
+/* The English line inside a filled control takes the control's own text colour, not muted grey. */
+.choice[aria-pressed='true'] .bi__sec,
+.button .bi__sec {
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* ---- Fields: soft fill with a light edge; the edge turns to the accent on focus ---- */
+.field input,
+.field select,
+.field textarea {
+  background: var(--b-field);
+  border: 1px solid var(--b-field-edge);
+  border-radius: var(--b-radius-control);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--primary);
+}
+
+/* ---- Tab bar: solid, soft shadow, tinted pill for the open tab ---- */
+.bottom-bar {
+  background: var(--surface);
+  border-color: transparent;
+  box-shadow: var(--b-bar-shadow);
+  backdrop-filter: none;
+}
+
+[data-theme='outdoor'] .bottom-bar {
+  border-color: var(--line-strong);
+}
+
+/* ---- Home ---- */
+/* The logo keeps clear of the strips above it, float animation included (owner report 2026-11-26). */
+.hero {
+  padding-block: var(--space-4) var(--space-2);
+}
+
+.hero-logo {
+  border-color: transparent;
+  box-shadow: var(--b-card-shadow);
+}
+
+/* The English line in the countdown title sits on the dark panel: light, not the muted grey. */
+.countdown .bi__sec {
+  color: rgb(255 255 255 / 0.85);
+}
+
+/* ---- Me: profile header, menu rows, Contact us ---- */
+.b-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-2) var(--space-4) 0;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--header-bg) 0%, var(--header-glow) 100%);
+  color: var(--header-text);
+  border-radius: var(--b-radius);
+  box-shadow: var(--b-card-shadow);
+}
+
+[data-theme='outdoor'] .b-profile {
+  background: var(--header-bg);
+}
+
+.b-profile__avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: var(--accent);
+  color: #3b2300;
+  border: 3px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.b-profile__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.b-profile__name {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.b-profile__meta {
+  margin: 0;
+  /* Full header text colour: the muted one can fall under 4.5:1 on the lighter end of the gradient. */
+  color: var(--header-text);
+  font-size: var(--text-caption);
+}
+
+.b-profile__action {
+  min-height: var(--target-min);
+  padding: 0 var(--space-4);
+  background: rgb(255 255 255 / 0.18);
+  color: var(--header-text);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.b-profile__action:hover {
+  background: rgb(255 255 255 / 0.26);
+}
+
+.b-menu {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-3) var(--space-4) 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.b-menu li + li {
+  border-top: 1px solid var(--line);
+}
+
+.b-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.5rem;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.b-row:hover {
+  background: var(--b-field);
+}
+
+.b-row__label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.b-row__meta {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 400;
+}
+
+.b-row__go {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.b-row--danger {
+  color: var(--danger);
+}
+
+.b-tile {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 12px;
+}
+
+.b-tile--saffron {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.b-tile--danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.b-tile .icon__fill {
+  fill: currentColor;
+  fill-opacity: 0.16;
+}
+
+.b-card {
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-4);
+}
+
+.b-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-2);
+}
+
+.b-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.b-card .note {
+  margin-inline: 0;
+}
+
+.b-card .field {
+  margin-inline: 0;
+}
+
+.b-card .actions {
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.b-label {
+  margin: var(--space-3) 0 var(--space-2);
+  font-size: var(--text-caption);
+  font-weight: 700;
+}
+
+/* Topic chips in two columns with an icon each */
+.b-chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.b-chips .choice {
+  justify-content: flex-start;
+  min-width: 0;
+  padding-inline: var(--space-3);
+  font-size: var(--text-caption);
+  text-align: start;
+}
+
+.b-chips .choice .icon {
+  flex: none;
+  color: var(--primary);
+}
+
+.b-chips .choice[aria-pressed='true'] .icon {
+  color: var(--on-primary);
+}
+
+.b-button-wide {
+  width: 100%;
+}
+
+@media (max-width: 21rem) {
+  .b-chips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

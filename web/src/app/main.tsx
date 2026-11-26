@@ -10,6 +10,7 @@ import '../shared/ui/tokens.css';
 import '../shared/ui/fonts.css';
 import '../shared/ui/app.css';
 import '../shared/ui/glass.css';
+import '../shared/ui/design-b.css';
 import { Splash } from '../shared/ui/Splash';
 import { initTheme } from '../shared/ui/theme';
 import { fitMobileViewport } from '../shared/ui/viewport';

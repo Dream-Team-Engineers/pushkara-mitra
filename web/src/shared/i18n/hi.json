@@ -517,6 +517,8 @@
     "contact.noMail": "ईमेल ऐप नहीं खुला? {email} पर लिखें।",
     "contact.privacy": "यह ऐप यहाँ लिखी बातें न भेजता है, न सहेजता है। वे केवल उस ईमेल में जाती हैं जो आप अपने ईमेल ऐप से भेजते हैं।",
     "contact.subject": "पुष्कर मित्र: {topic}",
-    "contact.mail.topic": "विषय"
+    "contact.mail.topic": "विषय",
+    "me.profile.remembered": "इस फ़ोन पर अधिकतम 7 दिन साइन इन",
+    "me.profile.session": "यह पेज खुले रहने तक साइन इन"
   }
 }
