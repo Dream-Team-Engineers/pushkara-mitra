@@ -309,16 +309,28 @@ export function LiveMap({
     for (const person of shown) {
       let entry = personMarkers.current.get(person.id);
       if (entry === undefined) {
+        // A pin: a round badge with the initial, and the first name underneath.
         const element = document.createElement('div');
-        element.className = person.you ? 'person-dot person-dot--you' : 'person-dot';
+        element.className = person.you ? 'person-pin person-pin--you' : 'person-pin';
         element.setAttribute('role', 'img');
-        const marker = new Marker({ element }).setLngLat([person.lng, person.lat]).addTo(instance);
+        const badge = document.createElement('span');
+        badge.className = 'person-pin__dot';
+        badge.setAttribute('aria-hidden', 'true');
+        const name = document.createElement('span');
+        name.className = 'person-pin__name';
+        name.setAttribute('aria-hidden', 'true');
+        element.append(badge, name);
+        const marker = new Marker({ element, anchor: 'top' })
+          .setLngLat([person.lng, person.lat])
+          .addTo(instance);
         entry = { marker, element };
         personMarkers.current.set(person.id, entry);
       } else {
         entry.marker.setLngLat([person.lng, person.lat]);
       }
-      entry.element.textContent = person.you ? '' : person.label.slice(0, 1).toUpperCase();
+      const [badge, name] = entry.element.children;
+      if (badge !== undefined) badge.textContent = person.label.slice(0, 1).toUpperCase();
+      if (name !== undefined) name.textContent = person.label;
       entry.element.setAttribute('aria-label', person.label);
       entry.element.title = person.label;
     }

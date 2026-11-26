@@ -25,6 +25,7 @@ import {
  *   POST   /api/v1/groups/{id}/invite  owner gets the group's (permanent) code [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
+ *   GET    /api/v1/groups/{id}/members everyone in the group: handle, role, first name [FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
  *   POST   /api/v1/ping                count one app open or install         [flag FLAG_METRICS]
  *   /api/v1/partners/...               priests and volunteers (ADR 0019)      [flag FLAG_PARTNERS]
@@ -34,7 +35,8 @@ import {
  *
  * Everything fails closed: a flag that is not exactly `enabled` answers 404; a missing database or
  * session secret answers 503 and never pretends to have stored or sent anything. Ownership comes from
- * the signed session. No coordinates, names or free text are accepted or stored. Errors use the fixed
+ * the signed session. No coordinates or free text are accepted or stored; the only person name kept is
+ * a group member's first name, taken from the signed session (never from the request). Errors use the fixed
  * envelope with reviewed constant messages that never echo input.
  */
 export const V1_PREFIX = '/api/v1/';
@@ -45,7 +47,23 @@ const GROUP_LIFETIME_SECONDS = 14 * 24 * 60 * 60; // PROPOSAL: should match the 
 /** One code per group for its whole life (owner decision 2026-11-23); the 10-member limit caps joins. */
 const INVITE_USES = 10_000;
 const GROUP_ID = /^[a-z2-7]{26}$/;
-const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove)$/;
+const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove|members)$/;
+/** Longest first name kept for a member (ADR 0017, migration 0009). */
+const MEMBER_NAME_MAX = 20;
+
+/** The first word of the sign-in name, at most 20 characters, or null when there is none. */
+export function memberFirstName(raw: string): string | null {
+  const first = raw.normalize('NFC').trim().split(/\s+/)[0] ?? '';
+  // At most 20 code points, as SQLite's length() counts them (the column's CHECK).
+  let clipped = '';
+  let count = 0;
+  for (const char of first) {
+    if (count === MEMBER_NAME_MAX) break;
+    clipped += char;
+    count++;
+  }
+  return clipped === '' ? null : clipped;
+}
 const MEMBER_HANDLE = /^[a-f0-9]{16}$/;
 /** Group name: letters and digits in any script (with their combining marks), single spaces, 16 max. */
 const GROUP_NAME = /^[\p{L}\p{M}\p{N}]+(?: [\p{L}\p{M}\p{N}]+)*$/u;
@@ -418,6 +436,33 @@ async function removeMember(
   return new Response(null, { status: 204, headers: NO_STORE });
 }
 
+/**
+ * Everyone in the group, for its members only: per-group handle, role and first name. Never the
+ * pseudonym, email or anything about position; who is online comes from the live room.
+ */
+async function members(
+  request: Request,
+  repo: Repository,
+  now: number,
+  signed: Signed,
+  groupId: string,
+): Promise<Response> {
+  if (request.method !== 'GET') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'GET' });
+  // Not a member, or the group is closed or gone: the same answer, so ids cannot be probed.
+  const rows = await repo.listMembers(signed.subjectRef, groupId, iso(now));
+  if (rows === null) return fail('NOT_FOUND', 404);
+  return ok({
+    members: await Promise.all(
+      rows.map(async (row) => ({
+        id: await memberHandle(groupId, row.subjectRef),
+        name: row.name ?? '',
+        role: row.role,
+        you: row.subjectRef === signed.subjectRef,
+      })),
+    ),
+  });
+}
+
 async function groups(
   request: Request,
   deps: V1Deps,
@@ -441,15 +486,18 @@ async function groups(
     return code;
   };
 
+  const firstName = memberFirstName(signed.name);
+
   if (rest === '') {
     if (request.method === 'GET') {
       const list = await repo.listGroups(signed.subjectRef, iso(now));
       const withCodes = await Promise.all(
-        list.map(async (group) =>
-          group.state === 'active'
-            ? { ...group, joinCode: await codeFor(group.id, group.expiresAt) }
-            : group,
-        ),
+        list.map(async (group) => {
+          if (group.state !== 'active') return group;
+          // Keeps the person's first name current for the member list (and fills it for older groups).
+          await repo.setMemberName(group.id, signed.subjectRef, firstName);
+          return { ...group, joinCode: await codeFor(group.id, group.expiresAt) };
+        }),
       );
       return ok({ groups: withCodes });
     }
@@ -476,6 +524,7 @@ async function groups(
       expires,
       INVITE_USES,
     );
+    await repo.setMemberName(id, signed.subjectRef, firstName);
     return ok({ id, joinCode: code }, 201);
   }
 
@@ -494,17 +543,21 @@ async function groups(
       await sha256Hex(`join.v1|${code}`),
       iso(now),
     );
-    if (result.ok) return ok({ id: result.groupId });
+    if (result.ok) {
+      await repo.setMemberName(result.groupId, signed.subjectRef, firstName);
+      return ok({ id: result.groupId });
+    }
     if (result.reason === 'already_member') return fail('ALREADY_MEMBER', 409);
     if (result.reason === 'full') return fail('GROUP_FULL', 409);
     return fail('INVALID_CODE', 400);
   }
 
-  const match = /^\/([a-z2-7]{26})\/(invite|leave|live|remove)$/.exec(rest);
+  const match = /^\/([a-z2-7]{26})\/(invite|leave|live|remove|members)$/.exec(rest);
   if (match !== null) {
     const id = match[1] ?? '';
     if (!GROUP_ID.test(id)) return fail('NOT_FOUND', 404);
     if (match[2] === 'live') return live(request, deps, repo, now, signed, id);
+    if (match[2] === 'members') return members(request, repo, now, signed, id);
     if (request.method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'POST' });
     if (!sameOrigin(request)) return fail('FORBIDDEN', 403);
     if (match[2] === 'leave') {

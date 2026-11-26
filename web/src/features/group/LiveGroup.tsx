@@ -10,7 +10,6 @@ import {
   connectLive,
   createGroup,
   disconnectLive,
-  distanceM,
   GROUP_NAME_MAX,
   joinGroup,
   leaveGroup,
@@ -18,26 +17,22 @@ import {
   liveMembers,
   liveStatus,
   loadGroup,
-  recordGroupConsent,
+  mergeMembers,
+  refreshRoster,
   removeMember,
-  sharing,
-  startSharing,
+  roster,
   stopSharing,
   type GroupLoad,
   type JoinOutcome,
-  type LiveMember,
 } from '../../shared/group/groupClient';
-import { formatNumber, locale, t } from '../../shared/i18n/i18n';
-import {
-  deviceLocation,
-  startDeviceLocation,
-  stopDeviceLocation,
-} from '../../shared/location/deviceLocation';
+import { formatNumber, t } from '../../shared/i18n/i18n';
+import { stopDeviceLocation } from '../../shared/location/deviceLocation';
 import { Icon } from '../../shared/ui/Icon';
 import { ScreenHeader } from '../../shared/ui/Layout';
 import { theme } from '../../shared/ui/theme';
-import type { LiveMapProps, MapPerson } from '../map/LiveMap';
+import type { LiveMapProps } from '../map/LiveMap';
 import { flavorFor } from '../map/mapStyle';
+import { mapPeople, memberLabel, memberLine, ordered, ShareControl } from './members';
 
 /**
  * My Group, real version (flag `myGroup`, staging build only; ADR 0017). Groups and join codes come
@@ -51,52 +46,6 @@ import { flavorFor } from '../map/mapStyle';
 type Load = GroupLoad | { readonly status: 'loading' } | { readonly status: 'error' };
 
 const MAX_MEMBERS = 10;
-
-function memberLabel(member: LiveMember): string {
-  return member.you ? t('group.live.you') : member.name || t('group.live.member');
-}
-
-function memberLine(member: LiveMember, me: LiveMember | undefined): string {
-  if (member.pos === null) return t('group.live.notSharing');
-  const parts = [
-    t('group.live.sharing'),
-    t('group.live.updated', { s: formatNumber(member.pos.ageS) }),
-  ];
-  if (!member.you && me?.pos != null) {
-    const metres = distanceM(me.pos, member.pos);
-    parts.push(
-      metres < 1000
-        ? t('group.live.awayM', { m: formatNumber(Math.round(metres / 10) * 10) })
-        : t('group.live.awayKm', { km: (metres / 1000).toFixed(1) }),
-    );
-  }
-  return parts.join(' · ');
-}
-
-/** Members who are sharing, as map markers. Positions stay in memory, as everywhere on this screen. */
-function mapPeople(members: readonly LiveMember[]): readonly MapPerson[] {
-  return members.flatMap((member) =>
-    member.pos === null
-      ? []
-      : [
-          {
-            id: member.id,
-            label: memberLabel(member),
-            lat: member.pos.lat,
-            lng: member.pos.lng,
-            you: member.you,
-          },
-        ],
-  );
-}
-
-/** Leader first, then you, then everyone else by name. */
-function ordered(members: readonly LiveMember[]): readonly LiveMember[] {
-  const rank = (member: LiveMember) => (member.role === 'owner' ? 0 : member.you ? 1 : 2);
-  return [...members].sort(
-    (a, b) => rank(a) - rank(b) || memberLabel(a).localeCompare(memberLabel(b)),
-  );
-}
 
 /** The invitation text: group name, code and how to use it, in the person's language. */
 function shareText(name: string, code: string): string {
@@ -136,8 +85,6 @@ export default function LiveGroup() {
   const joinResult = useSignal<JoinOutcome | null>(null);
   const busy = useSignal(false);
   const actionFailed = useSignal(false);
-  const agreed = useSignal(false);
-  const consentRecorded = useSignal(false);
   const confirmLeave = useSignal(false);
   const confirmRemove = useSignal<string | null>(null);
   const wasRemoved = useSignal(false);
@@ -362,9 +309,9 @@ export default function LiveGroup() {
 
   const group = current.group;
   const isLeader = group.role === 'owner';
-  const members = ordered(liveMembers.value);
+  const members = ordered(mergeMembers(roster.value, liveMembers.value));
+  const onlineCount = members.filter((member) => member.online).length;
   const me = members.find((member) => member.you);
-  const location = deviceLocation.value;
   const people = mapPeople(members);
   const GroupMap = liveMap.value;
   const shownCode = group.joinCode;
@@ -389,7 +336,7 @@ export default function LiveGroup() {
               max: formatNumber(MAX_MEMBERS),
             })}
             {' · '}
-            {t('group.live.online', { n: formatNumber(members.length) })}
+            {t('group.live.online', { n: formatNumber(onlineCount) })}
           </p>
 
           {shownCode === null ? null : (
@@ -459,7 +406,13 @@ export default function LiveGroup() {
             {members.map((member) => (
               <li
                 key={member.id}
-                class={member.role === 'owner' ? 'member-row member-row--owner' : 'member-row'}
+                class={[
+                  'member-row',
+                  member.role === 'owner' ? 'member-row--owner' : '',
+                  member.online ? '' : 'member-row--offline',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
               >
                 <span class="member-row__avatar" aria-hidden="true">
                   {memberLabel(member).slice(0, 1).toUpperCase()}
@@ -489,6 +442,7 @@ export default function LiveGroup() {
                               if (!removed) return false;
                               confirmRemove.value = null;
                               await refresh();
+                              await refreshRoster(group.id);
                               return true;
                             })
                           }
@@ -539,56 +493,7 @@ export default function LiveGroup() {
             <h2 id="share-title" class="group-section__title">
               {t('group.share.title')}
             </h2>
-            {consentRecorded.value ? null : (
-              <label class="consent-line">
-                <input
-                  type="checkbox"
-                  checked={agreed.value}
-                  onChange={(event) => {
-                    agreed.value = event.currentTarget.checked;
-                  }}
-                />
-                <span>{t('group.live.consent')}</span>
-              </label>
-            )}
-            <div class="share-row">
-              <button
-                type="button"
-                class="switch"
-                role="switch"
-                aria-checked={sharing.value}
-                aria-describedby="share-note"
-                disabled={busy.value || (!consentRecorded.value && !agreed.value)}
-                onClick={() => {
-                  if (sharing.value) {
-                    stopSharing();
-                    return;
-                  }
-                  void run(async () => {
-                    if (!consentRecorded.value) {
-                      if (!(await recordGroupConsent(locale.value))) return false;
-                      consentRecorded.value = true;
-                    }
-                    startDeviceLocation();
-                    startSharing();
-                    return true;
-                  });
-                }}
-              >
-                <span class="switch__knob" aria-hidden="true" />
-                <span class="visually-hidden">{t('group.share.title')}</span>
-              </button>
-              <span>{t(sharing.value ? 'group.live.sharingOn' : 'group.live.sharingOff')}</span>
-            </div>
-            {sharing.value && location.status === 'off' ? (
-              <p id="share-note" class="group-panel__hint group-panel__hint--alert">
-                {t(`map.locate.${location.reason}`)}
-              </p>
-            ) : (
-              <p id="share-note" class="group-panel__hint">
-                {t('group.live.shareNote')}
-              </p>
-            )}
+            <ShareControl id="group-share" />
           </section>
         ) : null}
 

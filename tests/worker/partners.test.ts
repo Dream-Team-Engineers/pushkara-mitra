@@ -270,6 +270,35 @@ describe('applying', () => {
     expect(await repo.getPartner(person.ref)).toBeNull();
   });
 
+  it('lets an approved partner ask for another role, which waits for staff again', async () => {
+    const sub = uniq();
+    const person = await signIn(sub, 'Gopal');
+    expect((await applyAs(person, sub)).status).toBe(201);
+    await approve(person.ref);
+    await DB.prepare('UPDATE partner SET available_until = ? WHERE subject_ref = ?')
+      .bind(new Date((NOW + 3600) * 1000).toISOString(), person.ref)
+      .run();
+
+    // The same role and ghat again changes nothing.
+    expect((await applyAs(person, sub)).status).toBe(409);
+    expect((await repo.getPartner(person.ref))?.status).toBe('approved');
+
+    // A different role goes back to staff, and the old access (availability) stops at once.
+    expect((await applyAs(person, sub, { role: 'priest' })).status).toBe(201);
+    expect(await repo.getPartner(person.ref)).toMatchObject({
+      role: 'priest',
+      status: 'pending',
+      availableUntil: null,
+    });
+
+    // A suspended partner cannot switch role to get round the suspension.
+    await DB.prepare("UPDATE partner SET status = 'suspended' WHERE subject_ref = ?")
+      .bind(person.ref)
+      .run();
+    expect((await applyAs(person, sub, { role: 'volunteer' })).status).toBe(409);
+    expect((await repo.getPartner(person.ref))?.status).toBe('suspended');
+  });
+
   it('allows one live application, and a rejected person only after 30 days', async () => {
     const sub = uniq();
     const person = await signIn(sub, 'Sita');

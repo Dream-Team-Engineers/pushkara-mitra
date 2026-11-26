@@ -9,7 +9,8 @@ import {
   user,
 } from '../../shared/auth/google';
 import { hrefFor } from '../../app/router';
-import { isEnabled } from '../../shared/flags/flags';
+import { FLAGS, isEnabled } from '../../shared/flags/flags';
+import { ContactUs } from '../contact/ContactUs';
 import { t } from '../../shared/i18n/i18n';
 import { Bi } from '../../shared/ui/Bi';
 import { Icon } from '../../shared/ui/Icon';
@@ -22,6 +23,25 @@ import { PrototypeBanner, ScreenHeader } from '../../shared/ui/Layout';
  * The age and consent choices live in component memory only. The signed-in person lives in memory only.
  */
 type Age = 'adult' | 'minor';
+
+/** A clear way in to Partners / Volunteers (priest, vendor, moderator, volunteer) from Me. */
+function PartnerLink() {
+  if (!FLAGS.partners) return null;
+  return (
+    <a class="card link-card" href={hrefFor('partners')}>
+      <span class="link-card__icon">
+        <Icon name="group" />
+      </span>
+      <span class="link-card__body">
+        <span class="card__title">{t('me.partner.title')}</span>
+        <span class="card__meta">{t('me.partner.note')}</span>
+      </span>
+      <span class="link-card__go">
+        <Icon name="chevron" size={20} />
+      </span>
+    </a>
+  );
+}
 
 function SignedIn() {
   const person = user.value;
@@ -81,6 +101,8 @@ export default function MeScreen() {
         <p class="note">
           <a href={hrefFor('deleteAccount')}>{t('account.deleteLink')}</a>
         </p>
+        <PartnerLink />
+        <ContactUs />
         <p class="build-id">Build {BUILD_ID}</p>
       </>
     );
@@ -166,6 +188,7 @@ export default function MeScreen() {
       <p class="note">
         <a href={hrefFor('privacy')}>{t('account.privacyLink')}</a>
       </p>
+      <ContactUs />
       <p class="build-id">Build {BUILD_ID}</p>
     </>
   );

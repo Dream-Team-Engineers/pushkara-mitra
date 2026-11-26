@@ -41,6 +41,12 @@ const PARTNER_ROLES: readonly ChipOption<Exclude<PartnerRole, 'volunteer'>>[] = 
   { value: 'vendor', label: 'pv.role.vendor' },
   { value: 'moderator', label: 'pv.role.moderator' },
 ];
+const ROLE_NAME: Readonly<Record<PartnerRole, MessageKey>> = {
+  priest: 'pv.roleName.priest',
+  volunteer: 'pv.roleName.volunteer',
+  vendor: 'pv.roleName.vendor',
+  moderator: 'pv.roleName.moderator',
+};
 type Availability = 'on' | 'off';
 const AVAILABILITY: readonly ChipOption<Availability>[] = [
   { value: 'on', label: 'pv.available.on' },
@@ -93,8 +99,14 @@ function GhatSelect({
   );
 }
 
-function ApplyForm({ onApplied }: { readonly onApplied: () => void }) {
-  const mode = useSignal<Mode>('volunteer');
+function ApplyForm({
+  onApplied,
+  initialMode = 'volunteer',
+}: {
+  readonly onApplied: () => void;
+  readonly initialMode?: Mode;
+}) {
+  const mode = useSignal<Mode>(initialMode);
   const kind = useSignal<Exclude<PartnerRole, 'volunteer'>>('priest');
   const ghat = useSignal('');
   const consent = useSignal(false);
@@ -359,7 +371,7 @@ function ApprovedView({
   const problem = useSignal<MessageKey | null>(null);
   return (
     <>
-      <p class="note">{t('pv.status.approved')}</p>
+      <p class="note">{t('pv.status.approvedAs', { role: t(ROLE_NAME[me.role]) })}</p>
       <section class="section" aria-labelledby="pv-avail-title">
         <h2 id="pv-avail-title" class="section__title">
           <Bi k="pv.available.title" />
@@ -388,7 +400,52 @@ function ApprovedView({
       </section>
       <Inbox unread={me.unread} onRead={reload} />
       {me.available ? <PostUpdate /> : <p class="note">{t('pv.post.needAvailable')}</p>}
+      <ChangeRole onApplied={reload} />
     </>
+  );
+}
+
+/**
+ * Another role (owner request 2026-11-26): an approved or waiting partner can ask to be a priest,
+ * vendor, moderator or volunteer instead. The new request waits for staff like the first one.
+ */
+function ChangeRole({ onApplied }: { readonly onApplied: () => void }) {
+  const open = useSignal(false);
+  return (
+    <section class="section" aria-labelledby="pv-change-title">
+      <h2 id="pv-change-title" class="section__title">
+        <Bi k="pv.change.title" />
+      </h2>
+      <p class="note">{t('pv.change.note')}</p>
+      {open.value ? (
+        <>
+          <ApplyForm onApplied={onApplied} initialMode="partner" />
+          <div class="actions">
+            <button
+              type="button"
+              class="button button--secondary"
+              onClick={() => {
+                open.value = false;
+              }}
+            >
+              {t('pv.change.cancel')}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div class="actions">
+          <button
+            type="button"
+            class="button button--secondary"
+            onClick={() => {
+              open.value = true;
+            }}
+          >
+            {t('pv.change.start')}
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -439,6 +496,13 @@ export default function LivePartners() {
     body = <ApplyForm onApplied={reload} />;
   } else if (me.value.status === 'approved') {
     body = <ApprovedView me={me.value} reload={reload} />;
+  } else if (me.value.status === 'pending') {
+    body = (
+      <>
+        <p class="notice">{t('pv.status.pending')}</p>
+        <ChangeRole onApplied={reload} />
+      </>
+    );
   } else {
     body = <p class="notice">{t(`pv.status.${me.value.status}`)}</p>;
   }

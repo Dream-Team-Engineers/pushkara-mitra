@@ -4,6 +4,7 @@ import core from '../../migrations/0002_backend_core.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
 import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import partnersMigration from '../../migrations/0007_partners.sql?raw';
+import memberName from '../../migrations/0009_member_name.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import { parseMessage } from '../../src/durable-objects/GroupLocation';
@@ -127,7 +128,7 @@ async function createGroup(cookie: string): Promise<{ id: string; joinCode: stri
 }
 
 beforeAll(async () => {
-  const migration = [core, groupName, groupBlock, partnersMigration].join('\n\n');
+  const migration = [core, groupName, groupBlock, partnersMigration, memberName].join('\n\n');
   for (const statement of migration.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql === '') continue;

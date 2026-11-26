@@ -19,7 +19,8 @@ The risks are different from groups. A false crowd or river report can send peop
 6. **Hide.** An admin can hide an update with one tap; hidden updates stop showing at once and are deleted after 24 hours. Three hidden updates for one partner suspend them automatically until an admin reviews.
 7. **No location, no tracking.** Partners are never asked for position; no partner location can exist in any table. No partner list is public. Partner identity stays a pseudonym in pilgrim-facing responses (the update carries only the label and age).
 8. **Kill switches.** Worker variable `FLAG_PARTNERS` must be exactly `enabled` for any partner route (apply, availability, inbox, update, and the pilgrim read of updates); the frontend `partners` flag is on only in the staging build. The admin Worker's write actions refuse when `FLAG_PARTNERS` is not enabled.
-9. **Erasure.** "Delete my account and data" removes the person's application, profile, inbox and updates and replaces their audit rows' subject with a removal marker (audit rows keep the admin's decision, not the person).
+9. **Changing role (added 2026-11-26, owner request).** An approved or pending partner can send a new request for a different role (priest, vendor, moderator or volunteer) or home ghat from the Partners screen. It goes back to `pending` for staff approval, and availability is cleared at once, so a role is never held without approval. The same role and ghat again is refused (`ALREADY_APPLIED`), and a suspended or rejected person cannot use it to get round a decision. The Me tab links to Partners / Volunteers.
+10. **Erasure.** "Delete my account and data" removes the person's application, profile, inbox and updates and replaces their audit rows' subject with a removal marker (audit rows keep the admin's decision, not the person).
 
 ## Threat model
 

@@ -79,7 +79,12 @@ describe('Me tab', () => {
     expect(html).toContain(t('account.age.adult'));
     expect(html).toContain(t('account.age.minor'));
     expect(html).toContain(t('account.pending'));
-    expect(html).not.toContain('type="tel"');
+    // Sign-in never asks for a phone. The only number field is in "Contact us" (owner request
+    // 2026-11-26), which goes into the person's own email and is never sent by the app: no form.
+    const [signIn = '', contact = ''] = html.split('<section class="section contact"');
+    expect(signIn).not.toContain('type="tel"');
+    expect(contact).toContain('id="contact-phone"');
+    expect(contact).not.toMatch(/<form\b/i);
     expect(html).not.toMatch(/OTP (login|send)|id="pass-/i);
     expect(html).not.toMatch(/value="[^"]+"/);
     expect(html).toMatch(/<button[^>]*disabled[^>]*>/);

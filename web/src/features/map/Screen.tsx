@@ -10,6 +10,18 @@ import {
   type PlaceCategory,
 } from '../../shared/data/places';
 import { osmPointUrl, osmSearchUrl } from '../../shared/data/sourceLinks';
+import { user } from '../../shared/auth/google';
+import {
+  connectLive,
+  disconnectLive,
+  liveMembers,
+  loadGroup,
+  mergeMembers,
+  roster,
+  sharing,
+  type GroupMember,
+} from '../../shared/group/groupClient';
+import { mapPeople, memberLabel, memberLine, ordered, ShareControl } from '../group/members';
 import { FLAGS, SHOW_SAMPLES } from '../../shared/flags/flags';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { offlineMapStatus, saveOfflineMap } from '../../shared/pwa/offlineMap';
@@ -29,10 +41,10 @@ import { flavorFor, MAP_BOUNDS } from './mapStyle';
 import { PLACE_ICON } from './placeIcons';
 
 /**
- * Maps (flag `liveMap` stays off: nobody else's position is shown). The base map is public: when
- * the regional archive is on this site (/maps/godavari.pmtiles) the real map loads on demand;
- * otherwise a schematic drawing stands in. The member list below is the accessible alternative
- * for the sample group and stays a prototype. Showing the device's own position needs the
+ * Maps. The base map is public: when the regional archive is on this site (/maps/godavari.pmtiles)
+ * the real map loads on demand; otherwise a schematic drawing stands in. With My Group on (flag
+ * `myGroup`), the person's own group members who share are drawn as named pins and listed below
+ * (ADR 0017 item 4, amended 2026-11-26); positions come only from the in-memory live room. Showing the device's own position needs the
  * `geolocation` flag (staging build only until legal review) and an explicit tap; the position is
  * never sent or stored, and without it the map still works.
  */
@@ -398,7 +410,120 @@ function Schematic() {
   );
 }
 
+type MapGroupState = 'off' | 'loading' | 'signin' | 'none' | 'unavailable' | 'in';
+
+/**
+ * My Group on the Map tab (owner request 2026-11-26, ADR 0017 item 4 amended): while this screen is
+ * open and the person is in a group, the app joins the group's live room, exactly as the Group screen
+ * does. Members who share appear as named pins; everyone is listed. Memory only, left on close.
+ */
+function useMapGroup(): {
+  readonly state: MapGroupState;
+  readonly members: readonly GroupMember[];
+} {
+  const state = useSignal<MapGroupState>(FLAGS.myGroup ? 'loading' : 'off');
+  const groupId = useSignal<string | null>(null);
+  const signedIn = user.value !== null;
+
+  useEffect(() => {
+    if (!FLAGS.myGroup) return undefined;
+    if (!signedIn) {
+      state.value = 'signin';
+      return undefined;
+    }
+    const mounted = { current: true };
+    loadGroup()
+      .then((load) => {
+        if (!mounted.current) return;
+        if (load.status === 'in') {
+          groupId.value = load.group.id;
+          state.value = 'in';
+        } else {
+          state.value = load.status;
+        }
+      })
+      .catch(() => {
+        if (mounted.current) state.value = 'unavailable';
+      });
+    return () => {
+      mounted.current = false;
+    };
+  }, [signedIn]);
+
+  const id = groupId.value;
+  useEffect(() => {
+    if (id === null) return undefined;
+    connectLive(id);
+    return () => {
+      disconnectLive();
+    };
+  }, [id]);
+
+  const members =
+    state.value === 'in' ? ordered(mergeMembers(roster.value, liveMembers.value)) : [];
+  return { state: state.value, members };
+}
+
+/** The group's members under the map: name, online or sharing, distance; and the share switch. */
+function GroupOnMap({
+  state,
+  members,
+}: {
+  readonly state: MapGroupState;
+  readonly members: readonly GroupMember[];
+}) {
+  if (state === 'off' || state === 'loading' || state === 'unavailable') return null;
+  const me = members.find((member) => member.you);
+  const anyoneSharing = members.some((member) => member.pos !== null);
+  return (
+    <section class="section group-map-section" aria-labelledby="map-members-title">
+      <h2 id="map-members-title" class="section__title">
+        <Bi k="map.group.title" />
+      </h2>
+      {state === 'signin' ? (
+        <p class="note">
+          {t('map.group.signin')} <a href={hrefFor('pass')}>{t('nav.me')}</a>
+        </p>
+      ) : state === 'none' ? (
+        <p class="note">
+          {t('map.group.none')} <a href={hrefFor('group')}>{t('module.group.title')}</a>
+        </p>
+      ) : (
+        <>
+          <ul class="member-list">
+            {members.map((member) => (
+              <li
+                key={member.id}
+                class={member.online ? 'member-row' : 'member-row member-row--offline'}
+              >
+                <span class="member-row__avatar" aria-hidden="true">
+                  {memberLabel(member).slice(0, 1).toUpperCase()}
+                </span>
+                <div class="member-row__body">
+                  <p class="member-row__name">
+                    {memberLabel(member)}
+                    {member.role === 'owner' ? (
+                      <span class="role-badge role-badge--leader">
+                        {t('group.live.roleLeader')}
+                      </span>
+                    ) : null}
+                  </p>
+                  <p class="member-row__meta">{memberLine(member, me)}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {anyoneSharing ? null : <p class="note">{t('map.group.noneSharing')}</p>}
+          {FLAGS.geolocation ? <ShareControl id="map-share" /> : null}
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function MapScreen() {
+  const group = useMapGroup();
+  const people = mapPeople(group.members);
   const live = useSignal<ComponentType<LiveMapProps> | null>(null);
   // 'pending' until we know whether the real map can load, so the schematic sample is not flashed first.
   const phase = useSignal<'pending' | 'fallback'>('pending');
@@ -475,6 +600,7 @@ export default function MapScreen() {
               onOutside={(value) => {
                 outside.value = value;
               }}
+              people={people}
             />
             {places.value.length > 0 ? (
               <CategoryChips
@@ -500,11 +626,20 @@ export default function MapScreen() {
             />
           ) : null}
           <p class="note">{t('map.live.area')}</p>
-          <PrototypeBanner />
-          <p class="state-line" role="status">
-            <span class="state-line__dot" aria-hidden="true" />
-            {t('map.sharing.off')}
-          </p>
+          {group.state === 'in' ? (
+            <p class={sharing.value ? 'state-line is-on' : 'state-line'} role="status">
+              <span class="state-line__dot" aria-hidden="true" />
+              {t(sharing.value ? 'group.live.sharingOn' : 'map.sharing.off')}
+            </p>
+          ) : (
+            <>
+              <PrototypeBanner />
+              <p class="state-line" role="status">
+                <span class="state-line__dot" aria-hidden="true" />
+                {t('map.sharing.off')}
+              </p>
+            </>
+          )}
         </>
       )}
       {FLAGS.geolocation ? <LocateControl outside={outside.value} /> : null}
@@ -527,8 +662,9 @@ export default function MapScreen() {
           <span class="visually-hidden">{t('links.opensNewTab')}</span>
         </span>
       </a>
-      {/* Placeholder members: not shown in production (OQ-044). */}
-      {SHOW_SAMPLES ? (
+      <GroupOnMap state={group.state} members={group.members} />
+      {/* Placeholder members: only where real groups are off, and not in production (OQ-044). */}
+      {SHOW_SAMPLES && group.state === 'off' ? (
         <>
           <section class="section" aria-labelledby="map-members-title">
             <h2 id="map-members-title" class="section__title">

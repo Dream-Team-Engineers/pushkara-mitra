@@ -29,7 +29,15 @@ const NETWORK_ALLOW_LIST: readonly string[] = [];
  * but only from the confirmation dialog in HelplineList after an explicit tap. No other file may
  * dial, text or mail, and the dialled number comes only from approved, officially sourced data.
  */
-const DIAL_ALLOW_LIST: readonly string[] = ['features/help/HelplineList.tsx'];
+const DIAL_ALLOW_LIST: readonly string[] = [
+  'features/help/HelplineList.tsx',
+  // Owner request 2026-11-26: "Contact us" on Me opens the person's own email app with a mail link
+  // to the address already published on the Privacy screen. Mail links only (checked below); the
+  // app itself sends and stores nothing.
+  'features/contact/ContactUs.tsx',
+];
+/** Files allowed only a mail link: never tel: or sms:. */
+const MAIL_ONLY: readonly string[] = ['features/contact/ContactUs.tsx'];
 
 /**
  * The only file allowed to read the device position. Owner decision 2026-11-19: show the device's
@@ -84,6 +92,16 @@ describe('frontend privacy guard: real sources', () => {
       )
       .map((file) => file.path);
     expect(offenders).toEqual([]);
+  });
+
+  it('lets the contact screen build mail links only, never dial or text links', () => {
+    for (const path of MAIL_ONLY) {
+      const file = files.find((candidate) => candidate.path === path);
+      expect(file, path).toBeDefined();
+      const code = file?.source ?? '';
+      expect(code).toMatch(/\bmailto:/);
+      expect(code).not.toMatch(/\b(?:tel|sms):/);
+    }
   });
 
   it('keeps feature (prototype) code off the network and forms inert', () => {

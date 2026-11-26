@@ -4,6 +4,7 @@ import core from '../../migrations/0002_backend_core.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
 import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import partnersMigration from '../../migrations/0007_partners.sql?raw';
+import memberName from '../../migrations/0009_member_name.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import worker, { type Env } from '../../src/index';
@@ -46,7 +47,10 @@ function post(path: string, body: unknown, cookie?: string, e: Env = ENABLED): P
 }
 
 /** A signed-in cookie for a synthetic person, with the matching server-side session row. */
-async function signIn(sub: string): Promise<{ cookie: string; sid: string; subject: string }> {
+async function signIn(
+  sub: string,
+  name = 'Test Person',
+): Promise<{ cookie: string; sid: string; subject: string }> {
   const now = Math.floor(Date.now() / 1000);
   const sid = `sid-${sub}-${crypto.randomUUID()}`;
   const subject = await pseudonymFor(sub, SECRET);
@@ -56,7 +60,7 @@ async function signIn(sub: string): Promise<{ cookie: string; sid: string; subje
     createdAt: new Date(now * 1000).toISOString(),
     expiresAt: new Date((now + 3600) * 1000).toISOString(),
   });
-  const token = await createSessionToken({ sub, name: 'Test Person' }, SECRET, now, sid);
+  const token = await createSessionToken({ sub, name }, SECRET, now, sid);
   return { cookie: `${SESSION_COOKIE}=${token}`, sid, subject };
 }
 
@@ -66,7 +70,7 @@ async function columnsOf(table: string): Promise<string> {
 }
 
 beforeAll(async () => {
-  const migration = [core, groupName, groupBlock, partnersMigration].join('\n\n');
+  const migration = [core, groupName, groupBlock, partnersMigration, memberName].join('\n\n');
   for (const statement of migration.split(/;\s*\n\s*\n/)) {
     const sql = statement.replaceAll(/^--.*$/gm, '').trim();
     if (sql !== '') await DB.prepare(sql).run();
@@ -333,6 +337,61 @@ describe('groups (metadata only)', () => {
     expect(
       (await post('/api/v1/groups/join', { code: created.joinCode }, late.cookie)).status,
     ).toBe(400);
+  });
+
+  it('lists every member with their first name to members only', async () => {
+    const owner = await signIn('roster-owner', 'Asha Rani Rao');
+    const guest = await signIn('roster-guest', '  Ravi   Kumar ');
+    const stranger = await signIn('roster-stranger', 'Mallory');
+    const created = await (
+      await post('/api/v1/groups', {}, owner.cookie)
+    ).json<{ id: string; joinCode: string }>();
+    await post('/api/v1/groups/join', { code: created.joinCode }, guest.cookie);
+
+    const res = await call(`/api/v1/groups/${created.id}/members`, {
+      headers: { Cookie: guest.cookie },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json<{
+      members: { id: string; name: string; role: string; you: boolean }[];
+    }>();
+    expect(body.members.map(({ name, role, you }) => ({ name, role, you }))).toEqual([
+      { name: 'Asha', role: 'owner', you: false },
+      { name: 'Ravi', role: 'member', you: true },
+    ]);
+    for (const member of body.members) expect(member.id).toMatch(/^[a-f0-9]{16}$/);
+    // Never the pseudonym itself.
+    expect(JSON.stringify(body)).not.toContain(guest.subject);
+
+    // A non-member, an unknown id and a non-GET all learn nothing.
+    const outside = await call(`/api/v1/groups/${created.id}/members`, {
+      headers: { Cookie: stranger.cookie },
+    });
+    expect(outside.status).toBe(404);
+    const unknown = await call(`/api/v1/groups/${'a'.repeat(26)}/members`, {
+      headers: { Cookie: guest.cookie },
+    });
+    expect(unknown.status).toBe(404);
+    expect((await post(`/api/v1/groups/${created.id}/members`, {}, guest.cookie)).status).toBe(405);
+    expect((await call(`/api/v1/groups/${created.id}/members`)).status).toBe(401);
+
+    // Leaving removes the person and their name.
+    await post(`/api/v1/groups/${created.id}/leave`, {}, guest.cookie);
+    const stored = await DB.prepare(
+      'SELECT COUNT(*) AS n FROM membership WHERE group_id = ? AND display_name = ?',
+    )
+      .bind(created.id, 'Ravi')
+      .first<{ n: number }>();
+    expect(stored?.n).toBe(0);
+  });
+
+  it('keeps at most a 20-character first name', async () => {
+    const owner = await signIn('long-name-owner', `${'X'.repeat(30)} Surname`);
+    const created = await (await post('/api/v1/groups', {}, owner.cookie)).json<{ id: string }>();
+    const row = await DB.prepare('SELECT display_name FROM membership WHERE group_id = ?')
+      .bind(created.id)
+      .first<{ display_name: string }>();
+    expect(row?.display_name).toBe('X'.repeat(20));
   });
 
   it('has no column that could hold a position', async () => {

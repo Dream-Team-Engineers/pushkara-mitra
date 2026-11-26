@@ -1,8 +1,10 @@
 /**
  * The only module that talks to D1. Routes never contain SQL; every statement is parameterised and
  * ownership always comes from the verified session, never from an id the client supplies.
- * No coordinate, person name, email or phone column exists (ADR 0004, ADR 0006). The only free text
- * is the group name the leader types (16 characters at most, ADR 0017, data inventory DI-17).
+ * No coordinate or phone column exists (ADR 0004, ADR 0006). The only free text is the group name the
+ * leader types (16 characters at most, ADR 0017, data inventory DI-17). Person names: a member's first
+ * name from sign-in on their membership row (shown to that group only, migration 0009) and a partner
+ * applicant's name and email (admins only, ADR 0019).
  */
 import { randomId } from './ids';
 
@@ -32,6 +34,12 @@ export interface GroupSummary {
   readonly state: 'active' | 'closed';
   readonly expiresAt: string;
   readonly memberCount: number;
+}
+
+export interface GroupMemberRow {
+  readonly subjectRef: string;
+  readonly role: 'owner' | 'member';
+  readonly name: string | null;
 }
 
 export type JoinResult =
@@ -115,6 +123,17 @@ export interface Repository {
   /** Removes a non-owner member and blocks them from joining this group again with its code. */
   removeMember(groupId: string, subjectRef: string, nowIso: string): Promise<boolean>;
   listGroups(subjectRef: string, nowIso: string): Promise<readonly GroupSummary[]>;
+  /** Keeps the member's first name (from sign-in) on their membership row, shown to the group only. */
+  setMemberName(groupId: string, subjectRef: string, name: string | null): Promise<void>;
+  /**
+   * Everyone in this active, unexpired group (pseudonym, role, first name), only when `subjectRef`
+   * is a member; otherwise null. Owner first, then by joining time.
+   */
+  listMembers(
+    subjectRef: string,
+    groupId: string,
+    nowIso: string,
+  ): Promise<readonly GroupMemberRow[] | null>;
   /** The person's role in this active, unexpired group, or null when they are not a member. */
   memberRole(
     subjectRef: string,
@@ -147,7 +166,10 @@ export interface Repository {
 
   /** Partners (ADR 0019). The applicant's name and email are stored for admins only. */
   getPartner(subjectRef: string): Promise<PartnerRecord | null>;
-  /** A new or renewed application. A rejected person may apply again only after `cooldownBeforeIso`. */
+  /**
+   * A new or renewed application. A rejected person may apply again only after `cooldownBeforeIso`.
+   * An approved or pending partner may ask for a different role or ghat; it waits for staff again.
+   */
   applyPartner(input: {
     subjectRef: string;
     role: PartnerRole;
@@ -427,6 +449,34 @@ export function d1Repository(db: D1Database): Repository {
       }));
     },
 
+    async setMemberName(groupId, subjectRef, name) {
+      await run(
+        'UPDATE membership SET display_name = ? WHERE group_id = ? AND subject_ref = ? AND display_name IS NOT ?',
+        name,
+        groupId,
+        subjectRef,
+        name,
+      );
+    },
+
+    async listMembers(subjectRef, groupId, nowIso) {
+      const rows = await all<{
+        subject_ref: string;
+        role: 'owner' | 'member';
+        display_name: string | null;
+      }>(
+        `SELECT m.subject_ref, m.role, m.display_name FROM membership m JOIN group_ g ON g.id = m.group_id
+         WHERE m.group_id = ? AND g.state = 'active' AND g.expires_at > ?
+           AND EXISTS (SELECT 1 FROM membership me WHERE me.group_id = m.group_id AND me.subject_ref = ?)
+         ORDER BY CASE m.role WHEN 'owner' THEN 0 ELSE 1 END, m.joined_at, m.subject_ref`,
+        groupId,
+        nowIso,
+        subjectRef,
+      );
+      if (rows.length === 0) return null;
+      return rows.map((r) => ({ subjectRef: r.subject_ref, role: r.role, name: r.display_name }));
+    },
+
     async memberRole(subjectRef, groupId, nowIso) {
       const rows = await all<{ role: 'owner' | 'member' }>(
         `SELECT m.role FROM membership m JOIN group_ g ON g.id = m.group_id
@@ -534,6 +584,24 @@ export function d1Repository(db: D1Database): Repository {
         cooldownBeforeIso,
       );
       if (renewed.meta.changes === 1) return 'created';
+      // An approved or waiting partner may ask for another role or ghat (owner request 2026-11-26).
+      // The request waits for staff again; until then the old access stops, so a role is never
+      // taken without approval.
+      const changed = await run(
+        `UPDATE partner SET role = ?, ghat_id = ?, status = 'pending', name = ?, email = ?,
+                applied_at = ?, decided_at = NULL, decided_by = NULL, available_until = NULL
+         WHERE subject_ref = ? AND status IN ('approved', 'pending')
+           AND (role <> ? OR ghat_id IS NOT ?)`,
+        role,
+        ghatId,
+        name,
+        email,
+        nowIso,
+        subjectRef,
+        role,
+        ghatId,
+      );
+      if (changed.meta.changes === 1) return 'created';
       const rows = await all<{ status: PartnerStatus }>(
         'SELECT status FROM partner WHERE subject_ref = ?',
         subjectRef,

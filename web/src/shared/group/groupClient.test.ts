@@ -5,6 +5,8 @@ import {
   distanceM,
   joinGroup,
   loadGroup,
+  loadMembers,
+  mergeMembers,
   parseRoomState,
   positionMessage,
   recordGroupConsent,
@@ -23,6 +25,63 @@ function fake(status: number, body: unknown = {}) {
   }) as typeof fetch;
   return { request, calls };
 }
+
+describe('group client: member list', () => {
+  const A = 'aaaaaaaaaaaaaaaa';
+  const B = 'bbbbbbbbbbbbbbbb';
+  const C = 'cccccccccccccccc';
+
+  it('reads the member list and rejects anything off contract', async () => {
+    const body = {
+      members: [
+        { id: A, name: 'Asha', role: 'owner', you: false },
+        { id: B, name: 'Ravi', role: 'member', you: true },
+      ],
+    };
+    const ok = fake(200, body);
+    expect(await loadMembers(GROUP_ID, ok.request)).toEqual(body.members);
+    expect(ok.calls[0]?.url).toBe(`/api/v1/groups/${GROUP_ID}/members`);
+    expect(await loadMembers(GROUP_ID, fake(404).request)).toBeNull();
+    expect(
+      await loadMembers(
+        GROUP_ID,
+        fake(200, { members: [{ id: 'x', name: 'A', role: 'owner', you: false }] }).request,
+      ),
+    ).toBeNull();
+    expect(await loadMembers('not-a-group', fake(200, body).request)).toBeNull();
+  });
+
+  it('shows everyone, online or not, with positions only from the live room', () => {
+    const merged = mergeMembers(
+      [
+        { id: A, name: 'Asha', role: 'owner', you: false },
+        { id: B, name: 'Ravi', role: 'member', you: true },
+      ],
+      [
+        { id: B, name: 'Ravi', role: 'member', you: true, pos: null },
+        {
+          id: C,
+          name: 'Sita',
+          role: 'member',
+          you: false,
+          pos: { lat: 17, lng: 81.8, acc: 5, ageS: 3 },
+        },
+      ],
+    );
+    expect(merged).toEqual([
+      { id: A, name: 'Asha', role: 'owner', you: false, online: false, pos: null },
+      { id: B, name: 'Ravi', role: 'member', you: true, online: true, pos: null },
+      {
+        id: C,
+        name: 'Sita',
+        role: 'member',
+        you: false,
+        online: true,
+        pos: { lat: 17, lng: 81.8, acc: 5, ageS: 3 },
+      },
+    ]);
+  });
+});
 
 describe('group client: groups API', () => {
   it('reads the active group and treats 404/503 as unavailable and 401 as sign-in', async () => {

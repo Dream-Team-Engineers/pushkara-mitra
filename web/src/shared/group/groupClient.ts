@@ -50,6 +50,7 @@ export const SEND_INTERVAL_MS = 10_000;
 const RECONNECT_MS = 5000;
 const GROUP_ID = /^[a-z2-7]{26}$/;
 const CODE = /^[A-HJKMNP-Z2-9]{8}$/;
+const HANDLE = /^[a-f0-9]{16}$/;
 export const GROUP_NOTICE_VERSION = 'group-1';
 
 type Fetch = typeof fetch;
@@ -188,8 +189,6 @@ export async function leaveGroup(groupId: string, request: Fetch = defaultFetch)
   return response.status === 204;
 }
 
-const HANDLE = /^[a-f0-9]{16}$/;
-
 /** The owner removes a member, named by the handle the live room shows. True when removed. */
 export async function removeMember(
   groupId: string,
@@ -200,6 +199,90 @@ export async function removeMember(
   const response = await send(request, `${BASE}/${groupId}/remove`, 'POST', { member: handle });
   return response.status === 204;
 }
+
+/** One person in the group as the server lists them: no position, no online state. */
+export interface RosterMember {
+  readonly id: string;
+  readonly name: string;
+  readonly role: 'owner' | 'member';
+  readonly you: boolean;
+}
+
+/** A person as the screens show them: the server's list joined with the live room. */
+export interface GroupMember extends RosterMember {
+  readonly online: boolean;
+  readonly pos: MemberPosition | null;
+}
+
+/** Everyone in the group (members only). Null when the list cannot be had. */
+export async function loadMembers(
+  groupId: string,
+  request: Fetch = defaultFetch,
+): Promise<readonly RosterMember[] | null> {
+  if (!GROUP_ID.test(groupId)) return null;
+  const response = await send(request, `${BASE}/${groupId}/members`, 'GET');
+  if (response.status !== 200) return null;
+  const body: unknown = await response.json();
+  const list = isRecord(body) ? body['members'] : undefined;
+  if (!Array.isArray(list)) return null;
+  const members: RosterMember[] = [];
+  for (const row of list) {
+    if (!isRecord(row)) return null;
+    const { id, name, role, you } = row;
+    if (
+      typeof id !== 'string' ||
+      !HANDLE.test(id) ||
+      typeof name !== 'string' ||
+      (role !== 'owner' && role !== 'member') ||
+      typeof you !== 'boolean'
+    ) {
+      return null;
+    }
+    members.push({ id, name, role, you });
+  }
+  return members;
+}
+
+/**
+ * The server's list joined with the live room: everyone appears, online or not, with a position
+ * only while they share. Someone in the room but not yet in the list (just joined) is added.
+ */
+export function mergeMembers(
+  roster: readonly RosterMember[],
+  live: readonly LiveMember[],
+): readonly GroupMember[] {
+  const byId = new Map(live.map((member) => [member.id, member]));
+  const merged: GroupMember[] = roster.map((member) => {
+    const online = byId.get(member.id);
+    return {
+      ...member,
+      name: member.name || online?.name || '',
+      online: online !== undefined,
+      pos: online?.pos ?? null,
+    };
+  });
+  const known = new Set(roster.map((member) => member.id));
+  for (const member of live) {
+    if (!known.has(member.id)) merged.push({ ...member, online: true });
+  }
+  return merged;
+}
+
+/** The members of the person's group, from the server; kept in memory while a screen shows them. */
+export const roster = signal<readonly RosterMember[]>([]);
+
+/** Fetches the member list again. Keeps the last good list when the fetch fails. */
+export async function refreshRoster(groupId: string): Promise<void> {
+  try {
+    const list = await loadMembers(groupId);
+    if (list !== null) roster.value = list;
+  } catch {
+    // The live room still shows who is online.
+  }
+}
+
+/** True once the person agreed to share in this page load (Group or Map screen), so it is asked once. */
+export const groupConsentRecorded = signal(false);
 
 /** Records the person's agreement to share their position with the group (append-only record). */
 export async function recordGroupConsent(
@@ -284,6 +367,7 @@ let retry: ReturnType<typeof setTimeout> | null = null;
 let heartbeat: ReturnType<typeof setInterval> | null = null;
 let stopEffect: (() => void) | null = null;
 let lastSent = 0;
+let lastRosterFetch = 0;
 
 function sendPosition(force: boolean): void {
   if (socket?.readyState !== WebSocket.OPEN || !sharing.value) return;
@@ -307,7 +391,15 @@ function open(groupId: string): void {
   });
   ws.addEventListener('message', (event) => {
     const members = parseRoomState(event.data);
-    if (members !== null) liveMembers.value = members;
+    if (members === null) return;
+    liveMembers.value = members;
+    // Somebody new is in the room: fetch the member list again so their name shows.
+    const known = new Set(roster.value.map((member) => member.id));
+    const now = Date.now();
+    if (members.some((member) => !known.has(member.id)) && now - lastRosterFetch > 15_000) {
+      lastRosterFetch = now;
+      void refreshRoster(groupId);
+    }
   });
   ws.addEventListener('close', (event) => {
     if (socket !== ws) return;
@@ -340,6 +432,8 @@ export function connectLive(groupId: string): void {
   disconnectLive();
   liveEnded.value = null;
   wanted = groupId;
+  lastRosterFetch = Date.now();
+  void refreshRoster(groupId);
   open(groupId);
   stopEffect = effect(() => {
     const on = sharing.value;
@@ -379,5 +473,6 @@ export function disconnectLive(): void {
   socket = null;
   ws?.close(1000, 'closed');
   liveMembers.value = [];
+  roster.value = [];
   liveStatus.value = 'off';
 }
