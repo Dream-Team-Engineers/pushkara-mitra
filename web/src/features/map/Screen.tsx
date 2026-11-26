@@ -21,7 +21,14 @@ import {
   sharing,
   type GroupMember,
 } from '../../shared/group/groupClient';
-import { mapPeople, memberLabel, memberLine, ordered, ShareControl } from '../group/members';
+import {
+  mapPeople,
+  MemberAvatar,
+  memberLabel,
+  memberLine,
+  ordered,
+  ShareControl,
+} from '../group/members';
 import { FLAGS, SHOW_SAMPLES } from '../../shared/flags/flags';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import { offlineMapStatus, saveOfflineMap } from '../../shared/pwa/offlineMap';
@@ -496,9 +503,7 @@ function GroupOnMap({
                 key={member.id}
                 class={member.online ? 'member-row' : 'member-row member-row--offline'}
               >
-                <span class="member-row__avatar" aria-hidden="true">
-                  {memberLabel(member).slice(0, 1).toUpperCase()}
-                </span>
+                <MemberAvatar member={member} />
                 <div class="member-row__body">
                   <p class="member-row__name">
                     {memberLabel(member)}

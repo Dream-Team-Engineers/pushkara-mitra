@@ -17,6 +17,25 @@ import type { MapPerson } from '../map/LiveMap';
  * pins, and the share switch. Positions come from the in-memory live room only.
  */
 
+/** Number of member colours in styles.css (.tone-0 to .tone-5). */
+export const MEMBER_TONES = 6;
+
+/** The member's colour: from their per-group handle, so it is the same on every phone in the group. */
+export function memberTone(id: string): number {
+  let sum = 0;
+  for (const char of id) sum = (sum * 31 + char.charCodeAt(0)) % 9973;
+  return sum % MEMBER_TONES;
+}
+
+/** The round avatar with the member's initial, in their colour. */
+export function MemberAvatar({ member }: { readonly member: GroupMember }) {
+  return (
+    <span class={`member-row__avatar tone-${String(memberTone(member.id))}`} aria-hidden="true">
+      {memberLabel(member).slice(0, 1).toUpperCase()}
+    </span>
+  );
+}
+
 /** The member's first name; for the person themselves "Name (you)". */
 export function memberLabel(member: GroupMember): string {
   const name = member.name || t('group.live.member');
@@ -55,6 +74,7 @@ export function mapPeople(members: readonly GroupMember[]): readonly MapPerson[]
             lat: member.pos.lat,
             lng: member.pos.lng,
             you: member.you,
+            tone: memberTone(member.id),
           },
         ],
   );

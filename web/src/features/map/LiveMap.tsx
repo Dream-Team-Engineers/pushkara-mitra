@@ -74,6 +74,8 @@ export interface MapPerson {
   readonly lat: number;
   readonly lng: number;
   readonly you: boolean;
+  /** The member's colour (0 to 5), matching their avatar in the member list. */
+  readonly tone?: number;
 }
 
 export interface LiveMapProps {
@@ -311,7 +313,8 @@ export function LiveMap({
       if (entry === undefined) {
         // A pin: a round badge with the initial, and the first name underneath.
         const element = document.createElement('div');
-        element.className = person.you ? 'person-pin person-pin--you' : 'person-pin';
+        const tone = person.tone === undefined ? '' : ` tone-${String(person.tone)}`;
+        element.className = (person.you ? 'person-pin person-pin--you' : 'person-pin') + tone;
         element.setAttribute('role', 'img');
         const badge = document.createElement('span');
         badge.className = 'person-pin__dot';

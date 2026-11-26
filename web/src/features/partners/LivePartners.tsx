@@ -236,7 +236,7 @@ function Inbox({ unread, onRead }: { readonly unread: number; readonly onRead: (
   }, [unread]);
 
   return (
-    <section class="section" aria-labelledby="pv-inbox-title">
+    <section class="b-card" aria-labelledby="pv-inbox-title">
       <h2 id="pv-inbox-title" class="section__title">
         <Bi k="pv.inbox.title" />
       </h2>
@@ -306,7 +306,7 @@ function PostUpdate() {
   };
 
   return (
-    <section class="section" aria-labelledby="pv-post-title">
+    <section class="b-card" aria-labelledby="pv-post-title">
       <h2 id="pv-post-title" class="section__title">
         <Bi k="pv.post.title" />
       </h2>
@@ -372,7 +372,7 @@ function ApprovedView({
   return (
     <>
       <p class="note">{t('pv.status.approvedAs', { role: t(ROLE_NAME[me.role]) })}</p>
-      <section class="section" aria-labelledby="pv-avail-title">
+      <section class="b-card" aria-labelledby="pv-avail-title">
         <h2 id="pv-avail-title" class="section__title">
           <Bi k="pv.available.title" />
         </h2>
@@ -412,7 +412,7 @@ function ApprovedView({
 function ChangeRole({ onApplied }: { readonly onApplied: () => void }) {
   const open = useSignal(false);
   return (
-    <section class="section" aria-labelledby="pv-change-title">
+    <section class="b-card" aria-labelledby="pv-change-title">
       <h2 id="pv-change-title" class="section__title">
         <Bi k="pv.change.title" />
       </h2>

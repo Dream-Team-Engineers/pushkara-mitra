@@ -32,7 +32,7 @@ import { ScreenHeader } from '../../shared/ui/Layout';
 import { theme } from '../../shared/ui/theme';
 import type { LiveMapProps } from '../map/LiveMap';
 import { flavorFor } from '../map/mapStyle';
-import { mapPeople, memberLabel, memberLine, ordered, ShareControl } from './members';
+import { mapPeople, MemberAvatar, memberLabel, memberLine, ordered, ShareControl } from './members';
 
 /**
  * My Group, real version (flag `myGroup`, staging build only; ADR 0017). Groups and join codes come
@@ -414,9 +414,7 @@ export default function LiveGroup() {
                   .filter(Boolean)
                   .join(' ')}
               >
-                <span class="member-row__avatar" aria-hidden="true">
-                  {memberLabel(member).slice(0, 1).toUpperCase()}
-                </span>
+                <MemberAvatar member={member} />
                 <div class="member-row__body">
                   <p class="member-row__name">
                     {memberLabel(member)}
