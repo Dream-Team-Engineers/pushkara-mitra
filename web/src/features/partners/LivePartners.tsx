@@ -30,9 +30,16 @@ import { KIND_LABELS, valueLabel } from './VolunteerStrip';
  * text, photo, contact detail or position is asked for or sent. Name and email are never typed here:
  * the server takes them from a fresh Google token (DI-20). Nothing is kept in the browser.
  */
-const ROLES: readonly ChipOption<PartnerRole>[] = [
+type Mode = 'volunteer' | 'partner';
+const MODES: readonly ChipOption<Mode>[] = [
+  { value: 'volunteer', label: 'pv.mode.volunteer' },
+  { value: 'partner', label: 'pv.mode.partner' },
+];
+/** The kinds of partner; a volunteer is chosen with the toggle above them. */
+const PARTNER_ROLES: readonly ChipOption<Exclude<PartnerRole, 'volunteer'>>[] = [
   { value: 'priest', label: 'pv.role.priest' },
-  { value: 'volunteer', label: 'pv.role.volunteer' },
+  { value: 'vendor', label: 'pv.role.vendor' },
+  { value: 'moderator', label: 'pv.role.moderator' },
 ];
 type Availability = 'on' | 'off';
 const AVAILABILITY: readonly ChipOption<Availability>[] = [
@@ -87,7 +94,8 @@ function GhatSelect({
 }
 
 function ApplyForm({ onApplied }: { readonly onApplied: () => void }) {
-  const role = useSignal<PartnerRole>('volunteer');
+  const mode = useSignal<Mode>('volunteer');
+  const kind = useSignal<Exclude<PartnerRole, 'volunteer'>>('priest');
   const ghat = useSignal('');
   const consent = useSignal(false);
   const problem = useSignal<MessageKey | null>(null);
@@ -106,7 +114,7 @@ function ApplyForm({ onApplied }: { readonly onApplied: () => void }) {
       sending.value = true;
       applyAsPartner({
         credential,
-        role: role.value,
+        role: mode.value === 'volunteer' ? 'volunteer' : kind.value,
         ghatId: ghat.value === '' ? null : ghat.value,
         locale: locale.value,
       })
@@ -128,14 +136,26 @@ function ApplyForm({ onApplied }: { readonly onApplied: () => void }) {
   return (
     <>
       <p class="note">{t('pv.intro')}</p>
-      <ChipGroup
-        legend="pv.role.legend"
-        options={ROLES}
-        selected={role.value}
-        onSelect={(value) => {
-          role.value = value;
-        }}
-      />
+      <div class="pv-mode">
+        <ChipGroup
+          legend="pv.mode.legend"
+          options={MODES}
+          selected={mode.value}
+          onSelect={(value) => {
+            mode.value = value;
+          }}
+        />
+        {mode.value === 'partner' ? (
+          <ChipGroup
+            legend="pv.mode.kind"
+            options={PARTNER_ROLES}
+            selected={kind.value}
+            onSelect={(value) => {
+              kind.value = value;
+            }}
+          />
+        ) : null}
+      </div>
       <GhatSelect
         id="pv-ghat"
         label="pv.ghat.label"

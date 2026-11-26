@@ -1,3 +1,5 @@
+import type { PartnerRole } from './repository';
+
 /**
  * Partner administration for the staff dashboard (ADR 0019, amending ADR 0018 section 3). This is the
  * only admin module that writes, and it touches only the partner tables: partner, partner_nudge,
@@ -12,7 +14,7 @@ export interface PartnerRow {
   readonly ref: string;
   readonly name: string;
   readonly email: string;
-  readonly role: 'priest' | 'volunteer';
+  readonly role: PartnerRole;
   readonly ghatId: string | null;
   readonly status: 'pending' | 'approved' | 'rejected' | 'suspended';
   readonly appliedAt: string;
@@ -61,7 +63,7 @@ interface RawPartner {
   readonly subject_ref: string;
   readonly name: string | null;
   readonly email: string | null;
-  readonly role: 'priest' | 'volunteer';
+  readonly role: PartnerRole;
   readonly ghat_id: string | null;
   readonly status: 'pending' | 'approved' | 'rejected' | 'suspended';
   readonly applied_at: string;

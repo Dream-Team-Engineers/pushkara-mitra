@@ -290,8 +290,15 @@ function action(
   return `<form class="act" method="post" action="${escapeHtml(path)}">${csrfField(csrf)}${hidden}<button class="btn btn--${tone}" type="submit">${escapeHtml(label)}</button></form>`;
 }
 
+const ROLE_LABEL = {
+  priest: 'Priest',
+  volunteer: 'Volunteer',
+  vendor: 'Vendor',
+  moderator: 'Moderator',
+} as const;
+
 function partnerCard(p: PartnerRow, csrf: string, writable: boolean, nowMs: number): string {
-  const who = `${p.role === 'priest' ? 'Priest' : 'Volunteer'}${p.ghatId === null ? '' : ` · ${p.ghatId}`}`;
+  const who = `${ROLE_LABEL[p.role]}${p.ghatId === null ? '' : ` · ${p.ghatId}`}`;
   const buttons = !writable
     ? ''
     : p.status === 'pending'

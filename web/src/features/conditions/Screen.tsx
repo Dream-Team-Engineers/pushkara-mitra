@@ -9,6 +9,7 @@ import {
   VolunteerUpdatesLoader,
 } from '../partners/VolunteerStrip';
 import { favourites, favouritesFirst } from '../../shared/prefs/favourites';
+import { GhatThumb } from '../../shared/ui/GhatThumb';
 import { StarButton } from '../../shared/ui/StarButton';
 import { Bi } from '../../shared/ui/Bi';
 import { t, type MessageKey } from '../../shared/i18n/i18n';
@@ -92,7 +93,8 @@ function GhatConditions({
   return (
     <li class="card cond-card">
       <div class="ghat-card__top">
-        <h3 class="card__title">{ghat.name}</h3>
+        <GhatThumb ghatId={ghat.id} />
+        <h3 class="card__title ghat-card__name">{ghat.name}</h3>
         <StarButton ghatId={ghat.id} />
       </div>
       <div class="meter-row">

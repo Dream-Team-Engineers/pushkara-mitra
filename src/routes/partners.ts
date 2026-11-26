@@ -39,7 +39,7 @@ export const PARTNER_PATHS: readonly string[] = [
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 const GHAT_ID = /^[a-z0-9][a-z0-9/-]{0,63}$/;
 const LOCALES = ['te', 'en', 'hi'] as const;
-const ROLES: readonly PartnerRole[] = ['priest', 'volunteer'];
+const ROLES: readonly PartnerRole[] = ['priest', 'volunteer', 'vendor', 'moderator'];
 export const PARTNER_NOTICE_VERSION = 'partner-1';
 
 /** Values a partner may report, by kind. */

@@ -38,7 +38,7 @@ export type JoinResult =
   | { readonly ok: true; readonly groupId: string }
   | { readonly ok: false; readonly reason: 'invalid_code' | 'already_member' | 'full' };
 
-export type PartnerRole = 'priest' | 'volunteer';
+export type PartnerRole = 'priest' | 'volunteer' | 'vendor' | 'moderator';
 export type PartnerStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type PartnerKind = 'crowd' | 'river' | 'food';
 

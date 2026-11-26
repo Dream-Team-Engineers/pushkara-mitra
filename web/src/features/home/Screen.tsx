@@ -247,6 +247,14 @@ export default function HomeScreen() {
         <Marquee tone="ad" badge={t('home.sponsored')} label={t('home.sponsored')} items={ADS} />
       ) : null}
       <section class="hero">
+        <img
+          class="hero-logo"
+          src="/hero-logo.png"
+          width={200}
+          height={239}
+          alt="Pushkara Mitra, your companion at the Godavari"
+          decoding="async"
+        />
         <h1 id="screen-title" tabIndex={-1} class="visually-hidden">
           <Bi k="app.name" />
         </h1>

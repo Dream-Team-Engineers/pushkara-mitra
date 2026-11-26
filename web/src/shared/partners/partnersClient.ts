@@ -6,7 +6,7 @@ import { createResource } from '../data/resource';
  * of volunteer updates is public and carries no partner identity.
  */
 export type PartnerKind = 'crowd' | 'river' | 'food';
-export type PartnerRole = 'priest' | 'volunteer';
+export type PartnerRole = 'priest' | 'volunteer' | 'vendor' | 'moderator';
 
 /** Values a partner may report, by kind. Must match the Worker (src/routes/partners.ts). */
 export const UPDATE_VALUES: Readonly<Record<PartnerKind, readonly string[]>> = {
@@ -154,7 +154,7 @@ export async function loadMe(request: Fetch = defaultFetch): Promise<PartnerMe> 
   const { role, ghatId, available, availableUntil, unread } = body;
   if (
     status !== 'approved' ||
-    (role !== 'priest' && role !== 'volunteer') ||
+    (role !== 'priest' && role !== 'volunteer' && role !== 'vendor' && role !== 'moderator') ||
     (ghatId !== null && typeof ghatId !== 'string') ||
     typeof available !== 'boolean' ||
     (availableUntil !== null && typeof availableUntil !== 'string') ||
