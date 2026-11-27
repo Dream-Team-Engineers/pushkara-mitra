@@ -1,9 +1,3 @@
-**Ordering:** newest update first; older entries follow below. All entry-heading times are IST (UTC+05:30). Historical entry timestamps are their recorded Git commit times, not invented execution times. Where exact execution time or individual attribution is unavailable, say so explicitly.
-
-**Standing update convention:** on every completed task, prepend a new timestamped entry immediately below this reporting guide. Use `YYYY-MM-DD HH:mm:ss IST`. Preserve earlier entries below it; do not append new progress at the bottom. Update through a reviewed PR, never directly on main. Historical instructions to append entries are superseded by this convention.
-
-**Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
-
 ## STATUS AT A GLANCE — end of day 2026-11-27 21:55 IST
 
 **Overall: about 50% finished, about 50% left** (14 of 28 checklist items). This counts checklist items, not hours of effort; it is the agent's estimate and the owner decides what counts as done.
@@ -28,49 +22,53 @@
 
 **Where the full old text is:** [docs/archive/PROJECT_STATUS_FULL_2026-11-27.md](docs/archive/PROJECT_STATUS_FULL_2026-11-27.md). Older entries below are shortened (long lines cut, long tables trimmed); the newest entries (2026-11-25 to 2026-11-27) are unchanged.
 
-## WHO DID WHAT — all contributors, from git history (429 commits, 20 active days, 2026-11-02 to 2026-11-27)
+## WHO DID WHAT — three people, from git history (429 commits, 20 active days, 2026-11-02 to 2026-11-27)
 
-Times are IST (commit times). "Owner machine (Twisted_Arrow)" is the owner's GitHub identity; from 2026-11-14 most of its commits are agent-run (Claude Code) sessions with the owner's direction, so the name alone does not show who typed a change. No independent reviewer is recorded unless an entry says so.
+Times are IST (commit times). The work is grouped under the three people: **GKM Raju** (GitHub `gkmraju`, git name `Twisted_Arrow`; includes the Codex and Claude agent sessions), **Aditya** (includes Siddhu, same person) and **Amrutha** (`amruthamudunuru39`; the entries credit them as LEAD). Claude and Codex commits are counted under the person whose session they belong to. Git does not record whose session each agent commit came from, so all Claude and Codex commits are placed under GKM Raju (owner-directed work: ADR 0011 decisions, the 2026-11-14 direct-deploy rule); correct this if a session belonged to someone else. No independent reviewer is recorded unless an entry says so.
 
-| Contributor                                         | Commits | Active days                              | Work (from commit messages; not independently reviewed)                                                                                                                                                                                                                                                                  |
-| --------------------------------------------------- | ------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Owner machine (Twisted_Arrow), Claude Code sessions | 279     | 11-02 to 11-27                           | Governance, content, map, Google sign-in, Group, Partners, admin dashboard, Design B, retention; all entries from 11-14                                                                                                                                                                                                  |
-| Claude (agent, GitHub author)                       | 39      | 11-03, 11-10, 11-11, 11-12, 11-14        | Frontend phase 0, design tokens, Ghats/Stay/Travel/Culture/Conditions screens, backend first slice, ADR 0011, staging Durable Object fix                                                                                                                                                                                 |
-| Aditya                                              | 38      | 11-03, 11-05, 11-07, 11-21, 11-25, 11-26 | Standards v3 docs, vitest 5 upgrade, backend contracts merge; 11-21 UI work (18 commits); 11-25 admin restyle, splash, home countdown (CSS only; reviewed 11-27 in `docs/operations/review-aditya-motion-text-2026-11-27.md`); 11-26 00:08 "apply flow design to admin growth and pilgrim app" (not separately reviewed) |
-| Siddhu                                              | 24      | 11-03, 11-05, 11-07, 11-14               | Merged pull requests: standards docs, security (worker-first routing, locked scan evidence, paused PR preview credentials), delivery plan                                                                                                                                                                                |
-| amruthamudunuru39                                   | 18      | 11-02, 11-03, 11-05, 11-10, 11-15        | Repository scaffold and CI/CD, V1 status report and roadmap, licence-check and SCA fixes, staging smoke test                                                                                                                                                                                                             |
-| Codex (agent)                                       | 4       | 11-06                                    | Local integration review snapshot, ghat review draft recovery                                                                                                                                                                                                                                                            |
-| dependabot, github-actions                          | 27      | various                                  | Dependency updates, release pull requests                                                                                                                                                                                                                                                                                |
+| Person                           | Commits | Active days                                     | Work (from commit messages; not independently reviewed)                                                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------------------------- | ------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GKM Raju** (+ Codex, + Claude) | 322     | 11-02 to 11-27                                  | Governance, content, map, Google sign-in, Group, Partners, admin dashboard, Design B, retention; all entries from 11-14. With Claude (39 commits): frontend phase 0, design tokens, Ghats/Stay/Travel/Culture/Conditions screens, backend first slice, ADR 0011, Access verifier, staging Durable Object fix (11-03, 11-10 to 11-12, 11-14). With Codex (4 commits, 11-06): local integration review snapshot, ghat review draft recovery                           |
+| **Aditya** (+ Siddhu)            | 62      | 11-03, 11-05, 11-07, 11-14, 11-21, 11-25, 11-26 | Standards v3 docs, vitest 5 upgrade, backend contracts merge; merged pull requests (standards docs, security: worker-first routing, locked scan evidence, paused PR preview credentials, delivery plan); 11-21 UI work (18 commits); 11-25 admin restyle, splash, home countdown (CSS only; reviewed 11-27 in `docs/operations/review-aditya-motion-text-2026-11-27.md`); 11-26 00:08 "apply flow design to admin growth and pilgrim app" (not separately reviewed) |
+| **Amrutha**                      | 18      | 11-02, 11-03, 11-05, 11-10, 11-15               | Repository scaffold and CI/CD, V1 status report and roadmap, licence-check and SCA fixes, staging smoke test                                                                                                                                                                                                                                                                                                                                                        |
+
+Not a person: 27 commits by dependabot and github-actions (dependency updates, release pull requests) are listed as "automation" in the timeline below.
 
 ## TIMELINE BY DAY — every active day, commit times (IST)
 
 Entries that say "time not recorded" fall on these days. No commits on 11-08, 11-13, 11-16 to 11-18, 11-22.
 
-| Date       | Commits | First to last commit                 | By                                                                                                                          |
-| ---------- | ------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-27 | 13      | 08:20 to 21:42                       | Owner machine (Twisted_Arrow) 13                                                                                            |
-| 2026-11-26 | 9       | 00:08 to 21:44                       | Owner machine (Twisted_Arrow) 8, Aditya 1                                                                                   |
-| 2026-11-25 | 5       | 18:41 to 22:23                       | Aditya 3, Owner machine (Twisted_Arrow) 2                                                                                   |
-| 2026-11-24 | 21      | 07:08 to 22:35                       | Owner machine (Twisted_Arrow) 21                                                                                            |
-| 2026-11-23 | 14      | 18:44 to 23:08                       | Owner machine (Twisted_Arrow) 14                                                                                            |
-| 2026-11-21 | 25      | 15:35 to 22:49                       | Aditya 18, Owner machine (Twisted_Arrow) 7                                                                                  |
-| 2026-11-20 | 20      | 12:05 to 22:09                       | Owner machine (Twisted_Arrow) 20                                                                                            |
-| 2026-11-19 | 15      | 19:31 to 23:06                       | Owner machine (Twisted_Arrow) 14, dependabot 1                                                                              |
-| 2026-11-15 | 52      | 10:06 to 23:08                       | Owner machine (Twisted_Arrow) 46, amruthamudunuru39 6                                                                       |
-| 2026-11-14 | 33      | 00:34 to 23:31                       | Owner machine (Twisted_Arrow) 25, github-actions 5, Siddhu 2, Claude (agent) 1                                              |
-| 2026-11-12 | 8       | 19:43 to 20:12                       | Claude (agent) 4, Owner machine (Twisted_Arrow) 4                                                                           |
-| 2026-11-11 | 20      | 19:38 to 22:47                       | Owner machine (Twisted_Arrow) 11, Claude (agent) 8, github-actions 1                                                        |
-| 2026-11-10 | 62      | 07:27 to 22:29                       | Owner machine (Twisted_Arrow) 26, Claude (agent) 25, github-actions 6, amruthamudunuru39 4, dependabot 1                    |
-| 2026-11-09 | 5       | 13:58 to 19:25                       | Owner machine (Twisted_Arrow) 3, dependabot 2                                                                               |
-| 2026-11-07 | 13      | 11:43 to 20:09                       | Siddhu 6, Aditya 3, Owner machine (Twisted_Arrow) 2, github-actions 2                                                       |
-| 2026-11-06 | 7       | 07:11 to 19:07                       | Codex (agent) 4, Owner machine (Twisted_Arrow) 3                                                                            |
-| 2026-11-05 | 30      | 05:40 to 22:54                       | Siddhu 11, Owner machine (Twisted_Arrow) 10, Aditya 5, github-actions 3, amruthamudunuru39 1                                |
-| 2026-11-04 | 35      | 08:23 to 23:43                       | Owner machine (Twisted_Arrow) 33, github-actions 2                                                                          |
-| 2026-11-03 | 32      | 10:48 to 23:49                       | Owner machine (Twisted_Arrow) 15, Aditya 8, Siddhu 5, github-actions 1, Claude (agent) 1, amruthamudunuru39 1, dependabot 1 |
-| 2026-11-02 | 10      | 13:16 to 23:36                       | amruthamudunuru39 6, Owner machine (Twisted_Arrow) 2, dependabot 2                                                          |
-| **Total**  | **429** | 2026-11-02 13:16 to 2026-11-27 21:42 |                                                                                                                             |
+| Date       | Commits | First to last commit                 | By                                                 |
+| ---------- | ------- | ------------------------------------ | -------------------------------------------------- |
+| 2026-11-27 | 13      | 08:20 to 21:42                       | GKM Raju 13                                        |
+| 2026-11-26 | 9       | 00:08 to 21:44                       | GKM Raju 8, Aditya 1                               |
+| 2026-11-25 | 5       | 18:41 to 22:23                       | Aditya 3, GKM Raju 2                               |
+| 2026-11-24 | 21      | 07:08 to 22:35                       | GKM Raju 21                                        |
+| 2026-11-23 | 14      | 18:44 to 23:08                       | GKM Raju 14                                        |
+| 2026-11-21 | 25      | 15:35 to 22:49                       | Aditya 18, GKM Raju 7                              |
+| 2026-11-20 | 20      | 12:05 to 22:09                       | GKM Raju 20                                        |
+| 2026-11-19 | 15      | 19:31 to 23:06                       | GKM Raju 14, automation 1                          |
+| 2026-11-15 | 52      | 10:06 to 23:08                       | GKM Raju 46, Amrutha 6                             |
+| 2026-11-14 | 33      | 00:34 to 23:31                       | GKM Raju 26, automation 5, Aditya 2                |
+| 2026-11-12 | 8       | 19:43 to 20:12                       | GKM Raju 8                                         |
+| 2026-11-11 | 20      | 19:38 to 22:47                       | GKM Raju 19, automation 1                          |
+| 2026-11-10 | 62      | 07:27 to 22:29                       | GKM Raju 51, automation 7, Amrutha 4               |
+| 2026-11-09 | 5       | 13:58 to 19:25                       | GKM Raju 3, automation 2                           |
+| 2026-11-07 | 13      | 11:43 to 20:09                       | Aditya 9, GKM Raju 2, automation 2                 |
+| 2026-11-06 | 7       | 07:11 to 19:07                       | GKM Raju 7                                         |
+| 2026-11-05 | 30      | 05:40 to 22:54                       | Aditya 16, GKM Raju 10, automation 3, Amrutha 1    |
+| 2026-11-04 | 35      | 08:23 to 23:43                       | GKM Raju 33, automation 2                          |
+| 2026-11-03 | 32      | 10:48 to 23:49                       | GKM Raju 16, Aditya 13, automation 2, Amrutha 1    |
+| 2026-11-02 | 10      | 13:16 to 23:36                       | Amrutha 6, GKM Raju 2, automation 2                |
+| **Total**  | **429** | 2026-11-02 13:16 to 2026-11-27 21:42 | GKM Raju 322, Aditya 62, Amrutha 18, automation 27 |
 
 # Entries (newest first)
+
+**Ordering:** newest update first; older entries follow below. All entry-heading times are IST (UTC+05:30). Historical entry timestamps are their recorded Git commit times, not invented execution times. Where exact execution time or individual attribution is unavailable, say so explicitly.
+
+**Standing update convention:** on every completed task, prepend a new timestamped entry immediately below this reporting guide. Use `YYYY-MM-DD HH:mm:ss IST`. Preserve earlier entries below it; do not append new progress at the bottom. Update through a reviewed PR, never directly on main. Historical instructions to append entries are superseded by this convention.
+
+**Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
 ## Records refreshed for default-on sharing and contact emails — 2026-11-27 21:18 IST (`76989d1`; runbook 21:42 `a71ea2d`)
 
