@@ -6,6 +6,12 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Records refreshed for default-on sharing and contact emails — 2026-11-27
+
+- **Who:** owner said go ahead; Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Done:** ADR 0017 item 3 and its coercion row, and CON-02 in the consent register, now describe sharing as off until the first recorded agreement and on when the screen opens afterwards; DI-25 added for Contact us emails (held in the owner's mailbox, at least one year). DI-11 and DI-16 needed no change: they do not mention sharing defaults. OQ-047 already records the accepted wording. Documentation only; prettier clean, no code changed.
+- **Open for the owner:** deletion of Contact us emails after a year is manual; say if it should go into `docs/operations/runbook.md`. Counsel items stay for launch day.
+
 ## Partner retention sweep built — 2026-11-27
 
 - **Who:** owner gave the dates ("26 June 2027 till 07 July 2027, buffer of one more week"); Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
