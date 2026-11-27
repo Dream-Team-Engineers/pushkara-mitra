@@ -4,3 +4,7 @@
 # credential: Access tokens are signed by Cloudflare's keys; knowing the AUD grants nothing.
 # Owner approved this entry on 2026-11-23.
 d4fb3fb8f80d0305a2e47c4b3a5f43aceab3790c:wrangler.admin.toml:generic-api-key:19
+# False positives: a slash-separated list of screen names after the words "design tokens" in a status
+# table, read as a key. Not a credential. Owner approved these entries on 2026-11-28.
+151d1f3b6cb3b5665bf2f3ce3f07f94bb2f3f7f2:PROJECT_STATUS.md:generic-api-key:31
+4ed9bc88aae6c265b59dfa00a8de5b199d374454:PROJECT_STATUS.md:generic-api-key:38
