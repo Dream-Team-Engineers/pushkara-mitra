@@ -113,7 +113,12 @@ describe('writes', () => {
       spy,
     );
     expect(result).toBe('ok');
-    expect(JSON.parse(sent)).toMatchObject({ consent: true, role: 'volunteer', ghatId: null });
+    expect(JSON.parse(sent)).toMatchObject({
+      consent: true,
+      adult: true,
+      role: 'volunteer',
+      ghatId: null,
+    });
   });
 
   it('maps statuses to results', async () => {

@@ -145,6 +145,7 @@ async function applyAs(
       ghatId: 'kotilingala',
       locale: 'en',
       consent: true,
+      adult: true,
       ...extra,
     },
     `${person.cookie}; ${NONCE_COOKIE}=${nonceCookie}`,
@@ -238,6 +239,7 @@ describe('applying', () => {
     const sub = uniq();
     const person = await signIn(sub, 'Ravi');
     expect((await applyAs(person, sub, { consent: false })).status).toBe(400);
+    expect((await applyAs(person, sub, { adult: false })).status).toBe(400);
     expect((await applyAs(person, sub, { role: 'official' })).status).toBe(400);
     expect((await applyAs(person, sub, { ghatId: 'Bad Ghat!' })).status).toBe(400);
     expect((await applyAs(person, sub, { note: 'hello' })).status).toBe(400);
@@ -252,7 +254,7 @@ describe('applying', () => {
     const token = await googleToken(sub, 'Ravi', 'x');
     const noNonce = await post(
       '/api/v1/partners/apply',
-      { credential: token, role: 'priest', ghatId: null, locale: 'en', consent: true },
+      { credential: token, role: 'priest', ghatId: null, locale: 'en', consent: true, adult: true },
       person.cookie,
     );
     expect(noNonce.status).toBe(401);

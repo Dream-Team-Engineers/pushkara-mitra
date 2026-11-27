@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partner 18+ confirmation built — 2026-11-27
+
+- **Who:** owner said yes to starting with it; Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Done:** the partner apply form has a second required tick, "I confirm that I am 18 years old or older" (`pv.adult`, en/te/hi); the button appears only when both are ticked; the client sends `adult: true` and the server (`src/routes/partners.ts`) answers 400 without it. Nothing new is stored: it is a declaration at apply time. Tests updated and one added (`adult: false` refused).
+- **Check (PowerShell, `npm run check`):** 76 test files passed, 1 skipped; 1162 tests passed, 24 skipped; lint, typecheck and format clean.
+- **Not verified:** the form on staging (owner to look after the deploy). **Pending owner review:** te and hi `pv.adult` (listed in `language-review-o1.md`).
+- **Next:** partner retention sweep (needs the event end date), then refresh DI-11, DI-16 and OQ-047 text on default sharing.
+
 ## Owner decisions and review record — 2026-11-27
 
 - **Who:** owner (`gkmraju`) gave the answers below in the session; recorded by Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.

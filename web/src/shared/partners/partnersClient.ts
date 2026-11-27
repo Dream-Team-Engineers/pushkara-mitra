@@ -175,7 +175,7 @@ export async function applyAsPartner(
   },
   request: Fetch = defaultFetch,
 ): Promise<PartnerResult> {
-  const response = await send(request, '/apply', 'POST', { ...input, consent: true });
+  const response = await send(request, '/apply', 'POST', { ...input, consent: true, adult: true });
   return response.status === 201 ? 'ok' : resultFor(response.status);
 }
 

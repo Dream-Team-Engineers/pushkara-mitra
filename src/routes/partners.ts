@@ -117,10 +117,10 @@ async function apply(ctx: PartnerContext, subjectRef: string): Promise<Response>
   if (!ctx.sameOrigin()) return fail('FORBIDDEN', 403);
   const body = await ctx.readJson();
   if (body instanceof Response) return body;
-  if (!ctx.hasOnlyKeys(body, ['credential', 'role', 'ghatId', 'locale', 'consent'])) {
+  if (!ctx.hasOnlyKeys(body, ['credential', 'role', 'ghatId', 'locale', 'consent', 'adult'])) {
     return fail('INVALID_REQUEST', 400);
   }
-  const { credential, role, ghatId, locale, consent } = body;
+  const { credential, role, ghatId, locale, consent, adult } = body;
   if (
     typeof credential !== 'string' ||
     typeof role !== 'string' ||
@@ -128,7 +128,8 @@ async function apply(ctx: PartnerContext, subjectRef: string): Promise<Response>
     (ghatId !== null && (typeof ghatId !== 'string' || !GHAT_ID.test(ghatId))) ||
     typeof locale !== 'string' ||
     !(LOCALES as readonly string[]).includes(locale) ||
-    consent !== true
+    consent !== true ||
+    adult !== true
   ) {
     return fail('INVALID_REQUEST', 400);
   }

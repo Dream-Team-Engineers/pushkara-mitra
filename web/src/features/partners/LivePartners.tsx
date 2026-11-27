@@ -110,13 +110,14 @@ function ApplyForm({
   const kind = useSignal<Exclude<PartnerRole, 'volunteer'>>('priest');
   const ghat = useSignal('');
   const consent = useSignal(false);
+  const adult = useSignal(false);
   const problem = useSignal<MessageKey | null>(null);
   const sending = useSignal(false);
   const slot = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const parent = slot.current;
-    if (!consent.value || parent === null) return;
+    if (!consent.value || !adult.value || parent === null) return;
     problem.value = null;
     renderCredentialButton(parent, (credential) => {
       if (credential === null) {
@@ -143,7 +144,7 @@ function ApplyForm({
       problem.value = 'pv.error';
     });
     // The button is drawn once consent is given; later choices are read when the token arrives.
-  }, [consent.value]);
+  }, [consent.value, adult.value]);
 
   return (
     <>
@@ -188,7 +189,18 @@ function ApplyForm({
         />
         <label for="pv-consent">{t('pv.consent')}</label>
       </div>
-      {consent.value ? (
+      <div class="field field--check">
+        <input
+          id="pv-adult"
+          type="checkbox"
+          checked={adult.value}
+          onChange={(event) => {
+            adult.value = event.currentTarget.checked;
+          }}
+        />
+        <label for="pv-adult">{t('pv.adult')}</label>
+      </div>
+      {consent.value && adult.value ? (
         <>
           <p class="note">{t('pv.apply.hint')}</p>
           <div ref={slot} />
