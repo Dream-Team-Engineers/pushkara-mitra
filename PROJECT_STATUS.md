@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partner retention sweep built — 2026-11-27
+
+- **Who:** owner gave the dates ("26 June 2027 till 07 July 2027, buffer of one more week"); Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Assumption to confirm:** the one-week buffer is added to the event end (7 July 2027 becomes 14 July 2027) and the one-year retention then runs to **14 July 2028**. Say if you meant the retention to end at 7 July 2028 plus a week instead (the same date) or something else.
+- **Done:** `src/retention.ts` holds the dates; `purgePartners` in `src/db/repository.ts` does nothing before 14 July 2028 and then deletes all partner rows, their reads and updates and blanks them in the audit trail; the existing daily cron (`src/index.ts`) calls it. Test: `tests/worker/partner-purge.test.ts` (before the date nothing is deleted, on the date everything is).
+- **Check (PowerShell, `npm run check`):** 77 test files passed, 1 skipped; 1164 tests passed, 24 skipped; lint, typecheck and format clean. Not run against staging data.
+- **Next:** refresh DI-11, DI-16 and OQ-047 text on default sharing; add a data-inventory row for contact emails.
+
 ## Partner 18+ confirmation built — 2026-11-27
 
 - **Who:** owner said yes to starting with it; Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.

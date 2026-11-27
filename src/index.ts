@@ -7,6 +7,7 @@ import { handlePublicContent, PUBLIC_CONTENT_PREFIX } from './routes/publicConte
 import { handlePublicInformation, PUBLIC_INFORMATION_PATH } from './routes/publicInformation';
 import { handleV1, V1_PREFIX } from './routes/v1';
 import { withSecurityHeaders } from './security/headers';
+import { PARTNER_RETENTION_ENDS_AT } from './retention';
 import { bindingRateLimiter, type RateLimitBinding } from './security/rateLimit';
 
 export { GroupLocation };
@@ -164,9 +165,12 @@ export default {
     const deviceLocation = env.DEVICE_LOCATION === 'enabled';
     return withSecurityHeaders(await route(request, env), googleSignIn, deviceLocation);
   },
-  /** Daily retention sweep: ended groups, and the first names on them, are deleted. */
+  /** Daily retention sweep: ended groups and their first names; partners one year after the event. */
   async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
     const repo = repositoryFor(env);
-    if (repo !== undefined) await repo.purgeEndedGroups(new Date().toISOString());
+    if (repo === undefined) return;
+    const now = new Date().toISOString();
+    await repo.purgeEndedGroups(now);
+    await repo.purgePartners(now, PARTNER_RETENTION_ENDS_AT);
   },
 } satisfies ExportedHandler<Env>;

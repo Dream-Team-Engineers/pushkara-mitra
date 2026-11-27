@@ -210,6 +210,13 @@ export interface Repository {
    */
   purgeEndedGroups(nowIso: string): Promise<number>;
 
+  /**
+   * Retention (OQ-046): once `nowIso` reaches `endsAtIso`, deletes every partner row (name and email
+   * included), their reads and their updates, and blanks them in the audit trail. Before that date
+   * it does nothing. Returns how many partner rows were deleted.
+   */
+  purgePartners(nowIso: string, endsAtIso: string): Promise<number>;
+
   /** Erasure: removes everything held for this subject. Returns row counts. */
   eraseSubject(subjectRef: string): Promise<{ sessions: number; consents: number; groups: number }>;
 }
@@ -720,6 +727,23 @@ export function d1Repository(db: D1Database): Repository {
         value: r.value,
         reportedAt: r.created_at,
       }));
+    },
+
+    async purgePartners(nowIso, endsAtIso) {
+      if (nowIso < endsAtIso) return 0;
+      const results = await db.batch([
+        db.prepare(
+          "UPDATE partner_audit SET target = 'removed' WHERE target IN (SELECT subject_ref FROM partner)",
+        ),
+        db.prepare(
+          'DELETE FROM partner_nudge_read WHERE subject_ref IN (SELECT subject_ref FROM partner)',
+        ),
+        db.prepare(
+          'DELETE FROM partner_update WHERE subject_ref IN (SELECT subject_ref FROM partner)',
+        ),
+        db.prepare('DELETE FROM partner'),
+      ]);
+      return results[3]?.meta.changes ?? 0;
     },
 
     async purgeEndedGroups(nowIso) {

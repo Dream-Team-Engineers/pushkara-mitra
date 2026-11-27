@@ -71,5 +71,4 @@ If this notice changes in a way that matters, the app will show the new version 
 ## Still to build to match this text
 
 - An 18+ confirmation on the partner apply screen (new Telugu and Hindi strings; consent `partner-1` may need `partner-2`).
-- A sweep that deletes partner rows one year after the event end date (the date is not recorded in the repo).
 - Update DI-11, DI-16 and OQ-047 text that still describes location sharing as off by default, and add a data-inventory row for contact emails.
