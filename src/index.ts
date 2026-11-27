@@ -164,4 +164,9 @@ export default {
     const deviceLocation = env.DEVICE_LOCATION === 'enabled';
     return withSecurityHeaders(await route(request, env), googleSignIn, deviceLocation);
   },
+  /** Daily retention sweep: ended groups, and the first names on them, are deleted. */
+  async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
+    const repo = repositoryFor(env);
+    if (repo !== undefined) await repo.purgeEndedGroups(new Date().toISOString());
+  },
 } satisfies ExportedHandler<Env>;

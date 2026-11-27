@@ -57,6 +57,9 @@ FLAG_GROUP_LOCATION = "enabled"
 FLAG_METRICS = "enabled"
 # Partners (ADR 0019): apply, availability, inbox, volunteer updates. Staging only; stays off in production.
 FLAG_PARTNERS = "enabled"
+# Daily sweep (03:30 UTC) that deletes ended groups and the first names on them. No location involved.
+[env.staging.triggers]
+crons = ["30 3 * * *"]
 [env.staging.assets]
 directory = "./dist/web"
 binding = "ASSETS"

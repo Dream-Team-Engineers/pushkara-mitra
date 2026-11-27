@@ -204,6 +204,12 @@ export interface Repository {
   /** Latest unhidden update per kind and ghat from approved partners, newer than `sinceIso`. */
   listPublicPartnerUpdates(sinceIso: string): Promise<readonly PublicPartnerUpdate[]>;
 
+  /**
+   * Retention: deletes every group whose end time has passed, with its members (and their first
+   * names), invitations and removal blocks. Returns how many groups were deleted.
+   */
+  purgeEndedGroups(nowIso: string): Promise<number>;
+
   /** Erasure: removes everything held for this subject. Returns row counts. */
   eraseSubject(subjectRef: string): Promise<{ sessions: number; consents: number; groups: number }>;
 }
@@ -714,6 +720,18 @@ export function d1Repository(db: D1Database): Repository {
         value: r.value,
         reportedAt: r.created_at,
       }));
+    },
+
+    async purgeEndedGroups(nowIso) {
+      // Children are deleted explicitly so nothing depends on foreign-key cascade being enforced.
+      const due = '(SELECT id FROM group_ WHERE expires_at <= ?)';
+      const results = await db.batch([
+        db.prepare(`DELETE FROM membership WHERE group_id IN ${due}`).bind(nowIso),
+        db.prepare(`DELETE FROM invitation WHERE group_id IN ${due}`).bind(nowIso),
+        db.prepare(`DELETE FROM group_block WHERE group_id IN ${due}`).bind(nowIso),
+        db.prepare('DELETE FROM group_ WHERE expires_at <= ?').bind(nowIso),
+      ]);
+      return results[3]?.meta.changes ?? 0;
     },
 
     async eraseSubject(subjectRef) {
