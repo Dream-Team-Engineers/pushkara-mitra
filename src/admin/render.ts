@@ -540,5 +540,5 @@ h1{font-size:2.4rem}
 .bento>.hero{grid-row:span 2}
 .langcard{grid-column:span 2}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.spark__line{stroke-dashoffset:0}.spark__area{opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.spark__line{stroke-dashoffset:0}.spark__area{opacity:1}}
 `;

@@ -3153,6 +3153,16 @@ main > a.link-card {
  * drops its buttons to a second row, the tab bar becomes a two-column grid, long words break.
  */
 @media (max-width: 18rem) {
+  /* Home countdown: two rows of two rings, so the unit words and three-digit days do not collide. */
+  .countdown__rings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ring__label {
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
   .app-header {
     flex-wrap: wrap;
     row-gap: var(--space-1);
