@@ -65,13 +65,24 @@ To switch a feature off, remove the variable (or set it to anything other than `
 | Map or pages stale for users            | Old service worker cache                                     | Check `web/build/sw.ts` cache version; redeploy with a bumped version    |
 | Location or coordinates seen in any log | SEV1, breach of hard rule 1                                  | Follow `docs/security/incident-response.md` immediately                  |
 
+## Scheduled data deletion and manual deletion
+
+| What                                | How it is deleted                                                                                                                              | Owner check                                                                                    |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Ended groups and member first names | Daily cron (03:30 UTC) `purgeEndedGroups`                                                                                                      | After the first run, confirm no ended groups remain (Cloudflare cron log)                      |
+| Partner data (all partners)         | Daily cron `purgePartners`; acts from 14 July 2028 (`src/retention.ts`: event end 7 July 2027, plus a one-week buffer, plus one year, OQ-046)  | Check the cron ran on or just after 14 July 2028 and the `partner` table is empty              |
+| Rejected applicants' name and email | 30 days after the decision (cleared when an admin opens the Partners tab)                                                                      | None                                                                                           |
+| **Contact us emails (manual)**      | **The emails sit in the owner's mailbox (DI-25). Once a year, after the retention period, delete every Contact us email older than one year.** | Owner: set a yearly reminder; first review on 2027-12-01 and then each 1 December; log it here |
+
+Contact us emails are kept at least one year (owner decision 2026-11-27). Do not keep them longer than needed; when and how they are finally deleted, and who may read them, is a counsel question (OQ-047, OQ-024).
+
 ## Secrets
 
 - `SESSION_SECRET` is set per environment with `npx wrangler secret put SESSION_SECRET --env <name>`. The production value must be different from staging. Never put it in the repo, a log or a ticket.
 - Rotating `SESSION_SECRET` signs everyone out. Do it deliberately and tell the owner first.
 - Rotate the Cloudflare deploy token per environment if it may be exposed, then review the account audit log.
 
-## Event-window rules (dates unconfirmed, OQ-004)
+## Event-window rules (owner gave the dates 2026-11-27: 26 June to 7 July 2027; official source still to be linked, OQ-004)
 
 - Code freeze from M7 (2027-06-01). Only LEAD-approved critical fixes.
 - Two named responders on call at all times. Contact details TBD.
