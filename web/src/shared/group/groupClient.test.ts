@@ -5,6 +5,7 @@ import {
   distanceM,
   joinGroup,
   loadGroup,
+  loadGroupConsent,
   loadMembers,
   mergeMembers,
   parseRoomState,
@@ -25,6 +26,48 @@ function fake(status: number, body: unknown = {}) {
   }) as typeof fetch;
   return { request, calls };
 }
+
+describe('group client: sharing on by default only after agreement', () => {
+  const record = (
+    decision: string,
+    at: string,
+    noticeVersion = 'group-1',
+    purposeId = 'group',
+  ) => ({
+    purposeId,
+    noticeVersion,
+    locale: 'en',
+    decision,
+    at,
+  });
+
+  it('is true only when the latest group record for this notice version is a grant', async () => {
+    const granted = fake(200, { consents: [record('granted', '2026-11-01T00:00:00Z')] });
+    expect(await loadGroupConsent(granted.request)).toBe(true);
+    expect(granted.calls[0]?.url).toBe('/api/v1/me/consents');
+
+    const withdrawn = fake(200, {
+      consents: [
+        record('withdrawn', '2026-11-03T00:00:00Z'),
+        record('granted', '2026-11-01T00:00:00Z'),
+      ],
+    });
+    expect(await loadGroupConsent(withdrawn.request)).toBe(false);
+  });
+
+  it('is false for another purpose, an old notice version, no records or a failed request', async () => {
+    const other = fake(200, {
+      consents: [
+        record('granted', '2026-11-01T00:00:00Z', 'group-1', 'sign-in'),
+        record('granted', '2026-11-01T00:00:00Z', 'group-0'),
+      ],
+    });
+    expect(await loadGroupConsent(other.request)).toBe(false);
+    expect(await loadGroupConsent(fake(200, { consents: [] }).request)).toBe(false);
+    expect(await loadGroupConsent(fake(401).request)).toBe(false);
+    expect(await loadGroupConsent(() => Promise.reject(new Error('offline')))).toBe(false);
+  });
+});
 
 describe('group client: member list', () => {
   const A = 'aaaaaaaaaaaaaaaa';

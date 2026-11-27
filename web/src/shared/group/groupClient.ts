@@ -1,5 +1,9 @@
 import { effect, signal } from '@preact/signals';
-import { deviceLocation, type LocationState } from '../location/deviceLocation';
+import {
+  deviceLocation,
+  startDeviceLocation,
+  type LocationState,
+} from '../location/deviceLocation';
 
 /**
  * My Group client (ADR 0017). Talks to /api/v1/groups and to the group's live room over a WebSocket.
@@ -9,7 +13,9 @@ import { deviceLocation, type LocationState } from '../location/deviceLocation';
  *   person has switched `sharing` on, on this screen, to their own group's room. Never stored in the
  *   browser, never logged, never sent anywhere else.
  * - Members and positions received from the room live in memory and are cleared on disconnect.
- * - Sharing starts off every time; turning it off sends "stop" so the room forgets the position.
+ * - Sharing is on by default only for a person who already agreed (consent record, owner decision
+ *   2026-11-27); the first time needs their tick and tap. Turning it off sends "stop" so the room
+ *   forgets the position, and it stays off until the screen is opened again.
  */
 export interface MemberPosition {
   readonly lat: number;
@@ -284,6 +290,37 @@ export async function refreshRoster(groupId: string): Promise<void> {
 /** True once the person agreed to share in this page load (Group or Map screen), so it is asked once. */
 export const groupConsentRecorded = signal(false);
 
+/**
+ * True when the person's latest group-sharing record, for the current notice version, is a grant.
+ * Sharing starts on by default only for people who already agreed (owner decision 2026-11-27).
+ */
+export async function loadGroupConsent(request: Fetch = defaultFetch): Promise<boolean> {
+  try {
+    const response = await send(request, '/api/v1/me/consents', 'GET');
+    if (response.status !== 200) return false;
+    const body: unknown = await response.json();
+    const list = isRecord(body) ? body['consents'] : undefined;
+    if (!Array.isArray(list)) return false;
+    let latest: { at: string; granted: boolean } | null = null;
+    for (const row of list) {
+      if (
+        !isRecord(row) ||
+        row['purposeId'] !== 'group' ||
+        row['noticeVersion'] !== GROUP_NOTICE_VERSION ||
+        typeof row['at'] !== 'string'
+      ) {
+        continue;
+      }
+      if (latest === null || row['at'] >= latest.at) {
+        latest = { at: row['at'], granted: row['decision'] === 'granted' };
+      }
+    }
+    return latest?.granted === true;
+  } catch {
+    return false;
+  }
+}
+
 /** Records the person's agreement to share their position with the group (append-only record). */
 export async function recordGroupConsent(
   locale: 'te' | 'en' | 'hi',
@@ -358,8 +395,13 @@ export const liveMembers = signal<readonly LiveMember[]>([]);
 export const liveStatus = signal<LiveStatus>('off');
 /** Why the room closed this person's connection: they left, or the owner removed them. */
 export const liveEnded = signal<'left' | 'removed' | null>(null);
-/** Off every time the screen opens; only a tap by the person turns it on. */
+/**
+ * Starts off, and is switched on when the screen opens only for a person who already agreed
+ * (see `connectLive`). The first time, only the person's tick and tap turn it on.
+ */
 export const sharing = signal(false);
+/** Set when the person switches sharing off on this visit, so it is not switched on again. */
+let stoppedByPerson = false;
 
 let socket: WebSocket | null = null;
 let wanted: string | null = null;
@@ -432,9 +474,11 @@ export function connectLive(groupId: string): void {
   disconnectLive();
   liveEnded.value = null;
   wanted = groupId;
+  stoppedByPerson = false;
   lastRosterFetch = Date.now();
   void refreshRoster(groupId);
   open(groupId);
+  void shareByDefault(groupId);
   stopEffect = effect(() => {
     const on = sharing.value;
     const state = deviceLocation.value;
@@ -446,6 +490,15 @@ export function connectLive(groupId: string): void {
   }, SEND_INTERVAL_MS * 3);
 }
 
+/** Sharing is on by default for a person who already agreed; the browser still asks for the position. */
+async function shareByDefault(groupId: string): Promise<void> {
+  const agreed = groupConsentRecorded.value || (await loadGroupConsent());
+  if (!agreed || wanted !== groupId || stoppedByPerson || sharing.value) return;
+  groupConsentRecorded.value = true;
+  startDeviceLocation();
+  startSharing();
+}
+
 /** Turns sharing on after the person's tap and sends the position as soon as there is one. */
 export function startSharing(): void {
   sharing.value = true;
@@ -455,6 +508,7 @@ export function startSharing(): void {
 
 /** Turns sharing off and tells the room to forget this person's position. */
 export function stopSharing(): void {
+  stoppedByPerson = true;
   sharing.value = false;
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ t: 'stop' }));
 }

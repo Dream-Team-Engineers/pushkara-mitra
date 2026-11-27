@@ -16,13 +16,13 @@ We delete it when you leave the group, when the leader removes you, when the gro
 
 Pins for ghats and other places are the same for everyone and come from the app's own data. They are not about you.
 
-If you choose to share your position with your group, other members who share also appear as pins with their first names. Positions are held in memory only while the group room is open. They are never written to a database, file or log, and are gone when you stop sharing or close the app. Sharing is off until you switch it on. The app does not use your position for anything else.
+If you choose to share your position with your group, other members who share also appear as pins with their first names. Positions are held in memory only while the group room is open. They are never written to a database, file or log, and are gone when you stop sharing or close the app. The first time, sharing starts only after you tick that you agree and switch it on; your agreement is recorded. After that, sharing is on by default: it starts when you open the Group or Map screen, your browser still asks for permission to use your position, and you can switch it off on the screen at any time (it then stays off until you open the screen again). The app does not use your position for anything else. [NEEDS REVIEW: owner decision 2026-11-27, sharing on by default. Counsel to confirm that a recorded earlier agreement, shown again in the notice, is enough, and whether the agreement should be asked again each time the notice version changes or after a set period.]
 
 ## 3. Contact us (NEEDS REVIEW)
 
 The Contact us form helps you write an email to dreamteamtech@zohomail.in. What you type (topic, your name, an optional mobile number, your message) is placed in a new email in your own email app. The app does not send or store it. Nothing is sent until you send that email yourself.
 
-If you send it, we receive the email and whatever your email provider adds, such as your address. We use it only to reply and to deal with your request. [NEEDS REVIEW: counsel to set how long contact emails are kept and who may read them. No retention period is decided yet.]
+If you send it, we receive the email and whatever your email provider adds, such as your address. We use it only to reply and to deal with your request. We keep emails you send for at least one year. [NEEDS REVIEW: owner decision 2026-11-27 is "at least one year"; counsel to confirm this period, say when the emails are then deleted, and say who may read them. The emails sit in the owner's own mailbox, not in this app, so deletion is a manual step to be written into the operations runbook.]
 
 Please do not put medical details or details about children in the message.
 
@@ -49,8 +49,14 @@ Your choice of colour (green, saffron, blue or gold), like your language and lig
 | Favourites are ghat ids in `pm.favs`, at most 30            | `web/src/shared/prefs/preferences.ts`; DI-11                                                                                            |
 | Colour is `pm.accent` on the device only                    | `web/src/shared/prefs/preferences.ts`; DI-11                                                                                            |
 
+## Changes made 2026-11-27 after owner direction
+
+- The in-app notice (`privacy.keep.p`, English, Telugu, Hindi) no longer says "Nothing is stored in a database". It now names groups, first names, partner applications, counters and contact emails. The Telugu and Hindi are agent translations and need native review.
+- Contact emails are kept for at least one year (owner decision). `contact.intro` says so in all three languages.
+- Location sharing is on by default for a person who already agreed (`web/src/shared/group/groupClient.ts`, `shareByDefault`, `loadGroupConsent`). The first agreement still needs the tick and tap. This was kept on purpose: a recorded agreement is the gate, and the browser's own permission prompt still applies. Location is still never stored or logged.
+
 ## Not yet checked
 
-- The sharing switch default for group location: confirm in the live app that it is off until chosen.
 - Whether the sweep has run on staging: it is scheduled for 03:30 UTC; check the Cloudflare cron log after the first run.
-- Contact email retention and the age rule for people who write in (OQ-046 covers partners only).
+- The age rule for people who write in through Contact us (OQ-046 covers partners only).
+- The data inventory (DI-11, DI-16) and OQ-047 still describe sharing as off by default and have no row for contact emails. Update them with this change.
