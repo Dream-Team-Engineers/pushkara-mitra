@@ -22,6 +22,13 @@
 
 **Where the full old text is:** [docs/archive/PROJECT_STATUS_FULL_2026-11-27.md](docs/archive/PROJECT_STATUS_FULL_2026-11-27.md). Older entries below are shortened (long lines cut, long tables trimmed); the newest entries (2026-11-25 to 2026-11-27) are unchanged.
 
+## Production configuration added to the repository (A12) — 2026-11-28 02:21:17 IST
+
+- **Who:** owner said "do the changes now"; Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Done:** production D1 binding and daily cron in `wrangler.toml`, no flags or sign-in; production admin Worker in `wrangler.admin.toml` without Access values, so it answers 503. Nothing applied to the Cloudflare account, nothing deployed.
+- **Check (PowerShell, `npm run check`):** 77 test files passed, 1 skipped; 1164 tests passed, 24 skipped. Production dry run of both Workers succeeded (admin dry run before the last comment-only edit to `wrangler.toml`).
+- **Next (owner):** Access application for the production admin Worker, production Google client and domain, approval to apply migrations 0007 to 0009. The at-a-glance counts above are not yet updated.
+
 ## WHO DID WHAT — three people, from git history (429 commits, 20 active days, 2026-11-02 to 2026-11-27)
 
 Times are IST (commit times). The work is grouped under the three people: **GKM Raju** (GitHub `gkmraju`, git name `Twisted_Arrow`; includes the Codex and Claude agent sessions), **Aditya** (includes Siddhu, same person) and **Amrutha** (`amruthamudunuru39`; the entries credit them as LEAD). Claude and Codex commits are counted under the person whose session they belong to. Git does not record whose session each agent commit came from, so all Claude and Codex commits are placed under GKM Raju (owner-directed work: ADR 0011 decisions, the 2026-11-14 direct-deploy rule); correct this if a session belonged to someone else. No independent reviewer is recorded unless an entry says so.

@@ -82,6 +82,11 @@ migrations_dir = "migrations"
 [env.production]
 name = "pushkara-mitra-production"
 workers_dev = false
+# Production has no vars block on purpose: every FLAG_*, DEVICE_LOCATION and sign-in stay off until
+# the owner turns each one on. SESSION_SECRET is set with `wrangler secret put`, never here.
+# Daily sweep (03:30 UTC) for ended groups and the partner retention date. No location involved.
+[env.production.triggers]
+crons = ["30 3 * * *"]
 [env.production.assets]
 directory = "./dist/web"
 binding = "ASSETS"
@@ -93,3 +98,10 @@ class_name = "GroupLocation"
 [[env.production.migrations]]
 tag = "v1"
 new_classes = ["GroupLocation"]
+# D1 for production (created 2026-11-24, APAC; OQ-026). Migrations 0007 to 0009 are applied
+# separately, with the owner's go, before any release. No location.
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "pushkara-mitra-production"
+database_id = "d3117bbc-34d9-4212-bac1-3bf8f35044d1"
+migrations_dir = "migrations"

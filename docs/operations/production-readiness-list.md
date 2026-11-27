@@ -1,13 +1,13 @@
 # Production readiness list (2026-11-27)
 
-Planning list only. **Nothing here has been applied.** Production stays undeployed until the owner explicitly approves a release and the legal gates in [release-readiness](release-readiness.md) are met. Engineering readiness and legal sign-off are reported separately; this file certifies no legal compliance.
+Planning list. **Nothing here has been applied to the Cloudflare account.** Production stays undeployed until the owner explicitly approves a release and the legal gates in [release-readiness](release-readiness.md) are met. Engineering readiness and legal sign-off are reported separately; this file certifies no legal compliance.
 
 ## State today
 
-- Production D1: **created and migrated to 0006, not bound** (PROJECT_STATUS 2026-11-24: `pushkara-mitra-production`, id `d3117bbc-34d9-4212-bac1-3bf8f35044d1`, APAC, empty tables). `wrangler.toml` has no `[[env.production.d1_databases]]` binding. Migration state was not re-read from the account today (UNKNOWN until checked).
-- Production Worker has no D1 binding, no cron trigger, no flags and no `GOOGLE_CLIENT_ID`. With no `DB`, group, partner and sign-in routes answer 503 by design.
+- Production D1: **created and migrated to 0006** (PROJECT_STATUS 2026-11-24: `pushkara-mitra-production`, id `d3117bbc-34d9-4212-bac1-3bf8f35044d1`, APAC, empty tables). Its binding is now in `wrangler.toml` (repository only). Migration state was not re-read from the account (UNKNOWN until checked).
+- `wrangler.toml` production has the D1 binding and the daily cron, no flags and no `GOOGLE_CLIENT_ID`. Apply migrations 0007 to 0009 before the first deploy, or the cron sweep will meet a missing table or column.
 - `deploy-production.yml` is a fail-closed job. `npm run ship:production` exists but is for the owner only after approval (CLAUDE.md).
-- `wrangler.admin.toml` has a staging environment only; no production admin Worker.
+- `wrangler.admin.toml` has a production environment with no Access values, so it answers 503. No Access application exists for it and it is not deployed.
 
 ## Steps, in order (each needs the owner's go)
 

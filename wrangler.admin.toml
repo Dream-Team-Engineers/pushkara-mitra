@@ -7,6 +7,21 @@ main = "src/admin/index.ts"
 compatibility_date = "2026-08-22"
 workers_dev = false
 
+# Production: not deployed. ACCESS_TEAM_DOMAIN and ACCESS_AUD are left out until the owner creates a
+# separate Access application for it, so every request answers 503. FLAG_PARTNERS stays unset.
+[env.production]
+name = "pushkara-mitra-admin-production"
+workers_dev = false
+
+[env.production.vars]
+ENVIRONMENT_NAME = "production"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "pushkara-mitra-production"
+database_id = "d3117bbc-34d9-4212-bac1-3bf8f35044d1"
+migrations_dir = "migrations"
+
 [env.staging]
 name = "pushkara-mitra-admin-staging"
 workers_dev = true
