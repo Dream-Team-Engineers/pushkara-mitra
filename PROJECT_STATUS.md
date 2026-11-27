@@ -6,6 +6,14 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Owner decisions and review record — 2026-11-27
+
+- **Who:** owner (`gkmraju`) gave the answers below in the session; recorded by Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Owner statements:** phones checked working fine; "Telugu and Hindi review done by GKM Raju on 26.11.2026" (recorded in `language-review-o1.md` and the `reviewedBy` meta of te.json and hi.json; the statement named no keys, so recorded as covering strings added up to 2026-11-26, no corrections).
+- **Decided:** OQ-045 keep volunteer river reports with current wording; OQ-046 partners kept one year after the event, adults only; OQ-047 names, Map pins and Contact us accepted as built; OQ-026 accept D1 in APAC and disclose it; OQ-029 one consolidated English notice (`docs/legal/privacy-notice-consolidated-draft.md`, NEEDS REVIEW). **Still open:** OQ-028 (paid plan; owner chose to decide later); counsel items on launch day (OQ-024).
+- **Not built yet (agent tasks):** 18+ confirmation on partner apply with te/hi strings; partner retention sweep (needs the event end date); refresh DI-11, DI-16, OQ-047 text on default sharing; te/hi of the consolidated notice after the English is settled.
+- **Checks:** prettier clean on edited docs; no code changed.
+
 ## Production readiness list — 2026-11-27
 
 - **Who:** owner said "Next"; Claude Code (agent) took task 4 of the 2026-11-26 list (tasks 1 to 3 are already committed: `36ea08c`, `c3f7b88`, `f824276`). Independent reviewer: NONE.
