@@ -60,3 +60,10 @@ Your choice of colour (green, saffron, blue or gold), like your language and lig
 - Whether the sweep has run on staging: it is scheduled for 03:30 UTC; check the Cloudflare cron log after the first run.
 - The age rule for people who write in through Contact us (OQ-046 covers partners only).
 - The data inventory (DI-11, DI-16) and OQ-047 still describe sharing as off by default and have no row for contact emails. Update them with this change.
+
+## Owner decisions 2026-11-27 to carry into the notice (NEEDS REVIEW)
+
+- **Where data is held (OQ-026):** account data is held in Cloudflare D1 in the Asia-Pacific region; Cloudflare gives no guarantee that it stays in India. The notice must say this plainly. Location is never stored.
+- **Partners (OQ-046):** approved partners' first name and email are kept for one year after the event ends (earlier on request); rejected applicants' details are deleted after 30 days; partners must be 18 or older. The apply screen does not yet ask for an 18+ confirmation and no sweep deletes partner rows yet.
+- **Volunteer reports (OQ-045):** river level, crowd and free food from volunteers are shown labelled "From a volunteer" and "Not an official figure".
+- **Names and Map pins, Contact us (OQ-047):** accepted as built.
