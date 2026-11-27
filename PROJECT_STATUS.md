@@ -6,6 +6,13 @@
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Production readiness list — 2026-11-27
+
+- **Who:** owner said "Next"; Claude Code (agent) took task 4 of the 2026-11-26 list (tasks 1 to 3 are already committed: `36ea08c`, `c3f7b88`, `f824276`). Independent reviewer: NONE.
+- **Done:** added `docs/operations/production-readiness-list.md`: ordered, owner-gated steps (production D1, migrations 0001 to 0009, vars, flags, daily sweep cron, separate admin Worker with its own Access, notices, release, post-deploy checks) and the rollback route. Documentation only; nothing applied to any Cloudflare account. Found while writing: `wrangler.toml` has no production D1 binding, cron or flags, and `wrangler.admin.toml` has no production environment. The production D1 state is UNKNOWN until read from the account. Check: prettier clean.
+- **Next:** task 5 (partner nudge notifications: ADR and threat model first, no build before owner approval). Owner tasks from 2026-11-26 are unchanged.
+- **Legal:** no sign-off recorded.
+
 ## End of day 2026-11-26 21:44:19 IST: group names, map pins, Contact us, Design B, one style sheet
 
 - **Who:** owner Krishna Murthy Raju G (`gkmraju`) asked for the changes below and to call it a day; implemented and recorded by Claude Code (agent). Independent reviewer: NONE. All commits pushed straight to `main` (owner direction 2026-11-14); staging redeployed by CI on each push.
