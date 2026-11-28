@@ -1,7 +1,9 @@
 import {
   decidePartner,
   partnerOverview,
+  pushTargets,
   purgeDuePartnerData,
+  recordPushResults,
   sendNudge,
   setUpdateHidden,
 } from '../db/adminPartners';
@@ -9,6 +11,7 @@ import { growth, groupStats, live, tableCounts } from '../db/adminStats';
 import { istPeriods } from '../http/istTime';
 import type { KeyLookup } from '../security/accessJwt';
 import { admit, type AdminAccessEnv } from './access';
+import { pushConfig, sendToTargets } from './push';
 import {
   ADMIN_CSS,
   growthBody,
@@ -35,6 +38,11 @@ export interface AdminEnv extends AdminAccessEnv {
   readonly ENVIRONMENT_NAME?: string;
   /** Partners (ADR 0019): the Partners tab can change data only when this is exactly `enabled`. */
   readonly FLAG_PARTNERS?: string;
+  /** Partner phone notifications (ADR 0020); also needs the three VAPID values (see push.ts). */
+  readonly FLAG_PARTNER_PUSH?: string;
+  readonly VAPID_PRIVATE_KEY?: string;
+  readonly VAPID_PUBLIC_KEY?: string;
+  readonly VAPID_SUBJECT?: string;
 }
 
 export interface AdminDeps {
@@ -66,6 +74,8 @@ function respond(body: string, status: number, type: string): Response {
 }
 
 const FORM_BODY_MAX = 2048;
+// Counts shown after a nudge: sent, failed, left to the inbox. Digits only, so nothing is reflected.
+const PUSH_PARAM = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
 const REF = /^[A-Za-z0-9_-]{8,128}$/;
 const ID = /^[a-f0-9]{32}$/;
 const GHAT = /^[a-z0-9][a-z0-9/-]{0,63}$/;
@@ -87,10 +97,13 @@ function sameText(a: string, b: string): boolean {
   return diff === 0;
 }
 
-function backToPartners(notice: string): Response {
+function backToPartners(notice: string, push?: string): Response {
   return new Response(null, {
     status: 303,
-    headers: { ...SECURITY_HEADERS, Location: `/?tab=partners&notice=${notice}` },
+    headers: {
+      ...SECURITY_HEADERS,
+      Location: `/?tab=partners&notice=${notice}${push === undefined ? '' : `&push=${push}`}`,
+    },
   });
 }
 
@@ -152,8 +165,23 @@ async function partnerWrite(
       ) {
         return backToPartners('invalid');
       }
-      const sent = await sendNudge(db, admin, kind, ghat === '' ? null : ghat, nowMs);
-      return backToPartners(sent ? 'nudged' : 'limit');
+      const ghatId = ghat === '' ? null : ghat;
+      const sent = await sendNudge(db, admin, kind, ghatId, nowMs);
+      if (!sent) return backToPartners('limit');
+      // Phone notifications are best effort: the nudge is already in every inbox (ADR 0020).
+      const config = pushConfig(env);
+      if (config === null) return backToPartners('nudged');
+      try {
+        const { targets, more } = await pushTargets(db, ghatId, nowMs);
+        const { results, run } = await sendToTargets(targets, config, Math.floor(nowMs / 1000));
+        await recordPushResults(db, results, nowMs);
+        return backToPartners(
+          'nudged',
+          [run.sent, run.failed + run.gone, more].map(String).join('.'),
+        );
+      } catch {
+        return backToPartners('nudged', '0.0.0');
+      }
     }
     const id = form.get('id') ?? '';
     const choice = form.get('do');
@@ -271,6 +299,7 @@ export async function handleAdmin(
             csrf: await csrfToken(request.headers.get('Cf-Access-Jwt-Assertion')),
             writable,
             notice: noticeParam !== null && noticeParam in PARTNER_NOTICES ? noticeParam : null,
+            push: PUSH_PARAM.exec(url.searchParams.get('push') ?? ''),
             nowMs,
           }),
         ),

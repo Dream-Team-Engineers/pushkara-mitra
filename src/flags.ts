@@ -14,7 +14,8 @@ export type KillSwitch =
   | 'donations'
   | 'missing-person-reports'
   | 'metrics'
-  | 'partners';
+  | 'partners'
+  | 'partner-push';
 
 export interface FlagProvider {
   isEnabled(flag: KillSwitch): boolean;
@@ -33,6 +34,7 @@ export const FLAG_VARIABLES: Readonly<Record<KillSwitch, string>> = {
   'missing-person-reports': 'FLAG_MISSING_PERSON_REPORTS',
   metrics: 'FLAG_METRICS',
   partners: 'FLAG_PARTNERS',
+  'partner-push': 'FLAG_PARTNER_PUSH',
 };
 
 /** Fails closed: every risky feature is off. */

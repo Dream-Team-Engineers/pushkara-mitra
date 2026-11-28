@@ -271,6 +271,8 @@ export interface PartnersView {
   /** False when FLAG_PARTNERS is not enabled: the page then only reads. */
   readonly writable: boolean;
   readonly notice: string | null;
+  /** Phone notification counts after a nudge: [all, sent, failed, rest]; null when none were attempted. */
+  readonly push?: RegExpExecArray | null;
   readonly nowMs: number;
 }
 
@@ -327,7 +329,13 @@ export function partnersBody(view: PartnersView): string {
   const flash =
     notice === null
       ? ''
-      : `<p class="flash" role="status">${escapeHtml(PARTNER_NOTICES[notice] ?? PARTNER_NOTICES['invalid'] ?? '')}</p>`;
+      : `<p class="flash" role="status">${escapeHtml(PARTNER_NOTICES[notice] ?? PARTNER_NOTICES['invalid'] ?? '')}${
+          notice === 'nudged' && view.push
+            ? escapeHtml(
+                ` Phone notifications: ${view.push[1] ?? '0'} sent, ${view.push[2] ?? '0'} failed, ${view.push[3] ?? '0'} left to the inbox only.`,
+              )
+            : ''
+        }</p>`;
   const off = writable
     ? ''
     : '<p class="note">Partners are switched off in this environment (FLAG_PARTNERS), so nothing can be changed here yet.</p>';

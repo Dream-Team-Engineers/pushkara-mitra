@@ -5,6 +5,7 @@ import type {
   PartnerStatus,
   Repository,
 } from '../db/repository';
+import { isPushEndpoint } from '../security/pushEndpoint';
 import { googleKeyFetcher, verifyGoogleIdToken, type KeyFetcher } from '../security/googleIdToken';
 import {
   clearedNonceCookie,
@@ -26,6 +27,8 @@ import {
  *   GET  /api/v1/partners/inbox         approved partner: open nudges
  *   POST /api/v1/partners/inbox/read    approved partner: mark nudges read
  *   POST /api/v1/partners/updates       approved, available partner: post a fixed-choice update
+ *   POST /api/v1/partners/push          approved partner: opt in to phone notifications (ADR 0020)
+ *   POST /api/v1/partners/push/off      approved partner: opt out (deletes the push address at once)
  */
 export const PARTNER_PATHS: readonly string[] = [
   '/partners/updates',
@@ -34,6 +37,8 @@ export const PARTNER_PATHS: readonly string[] = [
   '/partners/availability',
   '/partners/inbox',
   '/partners/inbox/read',
+  '/partners/push',
+  '/partners/push/off',
 ];
 
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -98,6 +103,17 @@ export interface PartnerContext {
   readonly readJson: () => Promise<Record<string, unknown> | Response>;
   readonly hasOnlyKeys: (body: Record<string, unknown>, keys: readonly string[]) => boolean;
   readonly sameOrigin: () => boolean;
+  /**
+   * The browser push public key, set only when FLAG_PARTNER_PUSH is enabled and the key exists
+   * (ADR 0020). Undefined means phone notifications are off and their routes answer 404.
+   */
+  readonly pushPublicKey: string | undefined;
+  /** Writes a consent record for phone notifications (purpose partner_push). */
+  readonly recordPushConsent: (
+    subjectRef: string,
+    locale: 'te' | 'en' | 'hi',
+    decision: 'granted' | 'withdrawn',
+  ) => Promise<void>;
   /** Writes a consent record (append-only ledger) for the signed-in person. */
   readonly recordConsent: (subjectRef: string, locale: 'te' | 'en' | 'hi') => Promise<void>;
 }
@@ -208,6 +224,32 @@ async function postUpdate(ctx: PartnerContext, subjectRef: string): Promise<Resp
   return ok({ recorded: true }, 201);
 }
 
+function isLocale(value: unknown): value is 'te' | 'en' | 'hi' {
+  return typeof value === 'string' && (LOCALES as readonly string[]).includes(value);
+}
+
+/** Opt in to phone notifications. Only an approved partner; only a real browser push address. */
+async function subscribePush(ctx: PartnerContext, subjectRef: string): Promise<Response> {
+  if (!ctx.sameOrigin()) return fail('FORBIDDEN', 403);
+  const partner = await ownPartner(ctx, subjectRef, 'approved');
+  if (partner instanceof Response) return partner;
+  const body = await ctx.readJson();
+  if (body instanceof Response) return body;
+  if (
+    !ctx.hasOnlyKeys(body, ['endpoint', 'locale', 'consent']) ||
+    body['consent'] !== true ||
+    !isLocale(body['locale']) ||
+    !isPushEndpoint(body['endpoint'])
+  ) {
+    return fail('INVALID_REQUEST', 400);
+  }
+  if (!(await ctx.repo.savePartnerPush(subjectRef, body['endpoint'], iso(ctx.now)))) {
+    return fail('NOT_PARTNER', 403);
+  }
+  await ctx.recordPushConsent(subjectRef, body['locale'], 'granted');
+  return ok({ on: true }, 201);
+}
+
 /** Handles every `/partners/...` path. `path` keeps its leading slash, e.g. `/partners/me`. */
 export async function handlePartners(ctx: PartnerContext, path: string): Promise<Response> {
   const method = ctx.request.method;
@@ -247,6 +289,10 @@ export async function handlePartners(ctx: PartnerContext, path: string): Promise
             ? partner.availableUntil
             : null,
         unread: nudges.filter((n) => !n.read).length,
+        push:
+          ctx.pushPublicKey === undefined || partner.status !== 'approved'
+            ? null
+            : { key: ctx.pushPublicKey, on: await ctx.repo.hasPartnerPush(subjectRef) },
       });
     }
     case '/partners/apply':
@@ -278,6 +324,24 @@ export async function handlePartners(ctx: PartnerContext, path: string): Promise
       const partner = await ownPartner(ctx, subjectRef, 'approved');
       if (partner instanceof Response) return partner;
       await ctx.repo.markNudgesRead(subjectRef, iso(ctx.now));
+      return new Response(null, { status: 204, headers: NO_STORE });
+    }
+    case '/partners/push': {
+      if (ctx.pushPublicKey === undefined) return fail('NOT_FOUND', 404);
+      if (method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'POST' });
+      return subscribePush(ctx, subjectRef);
+    }
+    case '/partners/push/off': {
+      if (ctx.pushPublicKey === undefined) return fail('NOT_FOUND', 404);
+      if (method !== 'POST') return fail('METHOD_NOT_ALLOWED', 405, { Allow: 'POST' });
+      if (!ctx.sameOrigin()) return fail('FORBIDDEN', 403);
+      const body = await ctx.readJson();
+      if (body instanceof Response) return body;
+      if (!ctx.hasOnlyKeys(body, ['locale']) || !isLocale(body['locale'])) {
+        return fail('INVALID_REQUEST', 400);
+      }
+      await ctx.repo.deletePartnerPush(subjectRef);
+      await ctx.recordPushConsent(subjectRef, body['locale'], 'withdrawn');
       return new Response(null, { status: 204, headers: NO_STORE });
     }
     case '/partners/updates':

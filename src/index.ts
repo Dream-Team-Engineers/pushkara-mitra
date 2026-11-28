@@ -38,6 +38,10 @@ export interface Env {
   FLAG_METRICS?: string;
   /** Partners: priests and volunteers (ADR 0019). */
   FLAG_PARTNERS?: string;
+  /** Partner phone notifications (ADR 0020): on only when exactly `enabled`, and needs the key below. */
+  FLAG_PARTNER_PUSH?: string;
+  /** Public browser push key (not a secret). The matching private key lives only on the admin Worker. */
+  VAPID_PUBLIC_KEY?: string;
   /** Worker secret: the bearer token that may report crowd levels. Without it the ingest route answers 503. */
   CROWD_INGEST_TOKEN?: string;
 }

@@ -4,6 +4,7 @@ import core from '../../migrations/0002_backend_core.sql?raw';
 import groupName from '../../migrations/0004_group_name.sql?raw';
 import groupBlock from '../../migrations/0005_group_block.sql?raw';
 import partners from '../../migrations/0007_partners.sql?raw';
+import pushMigration from '../../migrations/0010_partner_push.sql?raw';
 import { sha256Hex } from '../../src/db/ids';
 import { d1Repository } from '../../src/db/repository';
 import { handleV1, type V1Deps } from '../../src/routes/v1';
@@ -36,7 +37,7 @@ let privateKey: CryptoKey;
 let jwk: Jwk;
 
 beforeAll(async () => {
-  for (const migration of [core, groupName, groupBlock, partners]) {
+  for (const migration of [core, groupName, groupBlock, partners, pushMigration]) {
     for (const statement of migration.split(/;\s*\n\s*\n/)) {
       const sql = statement.trim();
       if (sql !== '') await DB.prepare(sql).run();

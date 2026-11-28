@@ -2,6 +2,8 @@
 
 **Review recorded:** owner statement 2026-11-21: "Telugu and Hindi reviewed by GKM Raju on 21.11.2026". Parts A and B both count as reviewed; no corrections were sent, so the text is unchanged. Strings added after this date need a new review.
 
+**Awaiting native review (added 2026-11-28, agent drafts):** `pv.push.title`, `pv.push.enable`, `pv.push.disable`, `pv.push.note`, `pv.push.denied`, `pv.push.unsupported` in te and hi (Partners screen, phone notifications, ADR 0020). The owner said English is enough for the notification itself, which is English only.
+
 **Part C review recorded:** owner statement 2026-11-23: "Native review done. Mark it as done" (reviewer GKM Raju, as for Parts A and B). No corrections were sent, so the text is unchanged.
 
 **Parts D, E and F review recorded:** owner statement 2026-11-24: "te/hi reviewed by GKM Raju on 24.11.2026" (reviewer GKM Raju, as above), given after the agent shared the Part F worksheet and the catalogue links. The statement did not name parts; the agent recorded it as covering every part of this list added up to that date (D, E and F, 58 strings in Part F). No corrections were sent, so the text is unchanged. The consent and privacy wording draft below is not in the app and is not covered.

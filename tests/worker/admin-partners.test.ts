@@ -2,6 +2,7 @@ import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
 import core from '../../migrations/0002_backend_core.sql?raw';
 import partnersMigration from '../../migrations/0007_partners.sql?raw';
+import pushMigration from '../../migrations/0010_partner_push.sql?raw';
 import { handleAdmin, type AdminEnv } from '../../src/admin/index';
 import { setUpdateHidden } from '../../src/db/adminPartners';
 import type { KeyLookup } from '../../src/security/accessJwt';
@@ -125,7 +126,7 @@ beforeAll(async () => {
   privateKey = pair.privateKey;
   const jwk = (await crypto.subtle.exportKey('jwk', pair.publicKey)) as JsonWebKey;
   lookupKey = (kid) => Promise.resolve(kid === 'k1' ? jwk : null);
-  for (const migration of [core, partnersMigration]) {
+  for (const migration of [core, partnersMigration, pushMigration]) {
     for (const statement of migration.split(/;\s*\n\s*\n/)) {
       const sql = statement.replaceAll(/^--.*$/gm, '').trim();
       if (sql !== '') await DB.prepare(sql).run();

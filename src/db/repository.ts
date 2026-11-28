@@ -8,7 +8,8 @@
  */
 import { randomId } from './ids';
 
-export type ConsentPurpose = 'sign-in' | 'group' | 'pass' | 'notifications' | 'partner';
+export type ConsentPurpose =
+  'sign-in' | 'group' | 'pass' | 'notifications' | 'partner' | 'partner_push';
 export type SosCategory = 'medical' | 'lost' | 'crowd' | 'other';
 
 export type CrowdLevel = 'low' | 'moderate' | 'high';
@@ -188,6 +189,10 @@ export interface Repository {
     nowIso: string,
   ): Promise<readonly PartnerNudge[]>;
   markNudgesRead(subjectRef: string, nowIso: string): Promise<void>;
+  /** Phone notifications (ADR 0020). Approved partners only; the address is never returned. */
+  savePartnerPush(subjectRef: string, endpoint: string, nowIso: string): Promise<boolean>;
+  deletePartnerPush(subjectRef: string): Promise<void>;
+  hasPartnerPush(subjectRef: string): Promise<boolean>;
   /** How many updates this partner posted since `sinceIso` (optionally for one kind and ghat). */
   countPartnerUpdates(
     subjectRef: string,
@@ -657,6 +662,31 @@ export function d1Repository(db: D1Database): Repository {
       }));
     },
 
+    async savePartnerPush(subjectRef, endpoint, nowIso) {
+      const result = await run(
+        `INSERT INTO partner_push (subject_ref, endpoint, created_at)
+         SELECT subject_ref, ?, ? FROM partner WHERE subject_ref = ? AND status = 'approved'
+         ON CONFLICT (subject_ref) DO UPDATE SET endpoint = excluded.endpoint,
+           created_at = excluded.created_at, failed_at = NULL`,
+        endpoint,
+        nowIso,
+        subjectRef,
+      );
+      return result.meta.changes === 1;
+    },
+
+    async deletePartnerPush(subjectRef) {
+      await run('DELETE FROM partner_push WHERE subject_ref = ?', subjectRef);
+    },
+
+    async hasPartnerPush(subjectRef) {
+      const rows = await all<{ n: number }>(
+        'SELECT COUNT(*) AS n FROM partner_push WHERE subject_ref = ?',
+        subjectRef,
+      );
+      return (rows[0]?.n ?? 0) > 0;
+    },
+
     async markNudgesRead(subjectRef, nowIso) {
       await run(
         `INSERT OR IGNORE INTO partner_nudge_read (nudge_id, subject_ref)
@@ -741,9 +771,10 @@ export function d1Repository(db: D1Database): Repository {
         db.prepare(
           'DELETE FROM partner_update WHERE subject_ref IN (SELECT subject_ref FROM partner)',
         ),
+        db.prepare('DELETE FROM partner_push'),
         db.prepare('DELETE FROM partner'),
       ]);
-      return results[3]?.meta.changes ?? 0;
+      return results[4]?.meta.changes ?? 0;
     },
 
     async purgeEndedGroups(nowIso) {
@@ -774,6 +805,7 @@ export function d1Repository(db: D1Database): Repository {
         // the admin's decision but loses the person.
         db.prepare('DELETE FROM partner WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM partner_nudge_read WHERE subject_ref = ?').bind(subjectRef),
+        db.prepare('DELETE FROM partner_push WHERE subject_ref = ?').bind(subjectRef),
         db.prepare('DELETE FROM partner_update WHERE subject_ref = ?').bind(subjectRef),
         db.prepare("UPDATE partner_audit SET target = 'removed' WHERE target = ?").bind(subjectRef),
       ]);

@@ -76,6 +76,13 @@ To switch a feature off, remove the variable (or set it to anything other than `
 
 Contact us emails are kept at least one year (owner decision 2026-11-27). Do not keep them longer than needed; when and how they are finally deleted, and who may read them, is a counsel question (OQ-047, OQ-024).
 
+## Partner phone notifications (ADR 0020)
+
+- **Off switch:** set `FLAG_PARTNER_PUSH` to anything but `enabled` on the app and admin Workers and redeploy. Nudges still reach every partner's inbox; only the phone messages stop.
+- **First setup (staging):** `node scripts/generate-vapid.mjs`; put the public key in `VAPID_PUBLIC_KEY` on both Workers; set the private key only on the admin Worker with `npx wrangler secret put VAPID_PRIVATE_KEY --config wrangler.admin.toml --env staging`; set `VAPID_SUBJECT` (a `mailto:` or `https:` contact chosen by the owner) on the admin Worker; then set `FLAG_PARTNER_PUSH = "enabled"` on both. Never paste the private key into a chat, log or commit.
+- **Rotate the key:** generate a new pair, replace the secret and both public values, redeploy both Workers, and tell partners to turn phone notifications off and on again (subscriptions made under the old key are rejected by the push services and are removed when a service answers 404 or 410).
+- **Symptom: a nudge is sent but the admin line says 0 sent:** check `VAPID_SUBJECT` is set and well formed, the private and public key belong together, and partners have opted in and are available.
+
 ## Secrets
 
 - `SESSION_SECRET` is set per environment with `npx wrangler secret put SESSION_SECRET --env <name>`. The production value must be different from staging. Never put it in the repo, a log or a ticket.

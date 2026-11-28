@@ -85,6 +85,11 @@ export function cleanGroupName(raw: unknown): string | null | undefined {
   if (codePoints(name) > GROUP_NAME_MAX || !GROUP_NAME.test(name)) return undefined;
   return name;
 }
+/** The browser push public key, only while phone notifications are switched on (ADR 0020). */
+function pushKey(env: object, on: boolean): string | undefined {
+  const key = (env as { VAPID_PUBLIC_KEY?: unknown }).VAPID_PUBLIC_KEY;
+  return on && typeof key === 'string' && key !== '' ? key : undefined;
+}
 const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const JOIN_CODE = /^[A-HJKMNP-Z2-9]{8}$/;
 const PURPOSES: readonly ConsentPurpose[] = [
@@ -625,6 +630,15 @@ export async function handleV1(request: Request, deps: V1Deps): Promise<Response
           readJson: () => readJsonObject(request),
           hasOnlyKeys,
           sameOrigin: () => sameOrigin(request),
+          pushPublicKey: pushKey(deps.env, flags.isEnabled('partner-push')),
+          recordPushConsent: (subjectRef, locale, decision) =>
+            repo.recordConsent(subjectRef, {
+              purposeId: 'partner_push',
+              noticeVersion: 'partner-push-1',
+              locale,
+              decision,
+              at: iso(now),
+            }),
           recordConsent: (subjectRef, locale) =>
             repo.recordConsent(subjectRef, {
               purposeId: 'partner',

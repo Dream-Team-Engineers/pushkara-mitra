@@ -63,6 +63,7 @@ describe('Access token verifier stays in the admin Worker', () => {
       'partner',
       'partner_nudge',
       'partner_nudge_read',
+      'partner_push',
       'partner_update',
       'partner_audit',
     ];

@@ -83,6 +83,16 @@ Entries that say "time not recorded" fall on these days. No commits on 11-08, 11
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partner phone notifications built (staging, flag off) — 2026-11-28 IST
+
+- **Who:** owner approved ADR 0020 (answers recorded in it); Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Done:** migration `0010_partner_push.sql` (table `partner_push`; `consent_ledger` rebuilt with purpose `partner_push`) **applied to the staging D1**; app routes `POST /api/v1/partners/push` and `/push/off`; `/partners/me` carries `push` only while the flag and public key exist; admin Worker sends empty Web Push after a nudge (`src/admin/push.ts`, VAPID signing with WebCrypto, no new package), per-nudge cap 40, per-partner 3 an hour and 10 a day, push address allow-list (Google, Mozilla, Apple, Microsoft hosts), redirects not followed; address deleted on opt-out, suspend, reject, erase, 404/410, 30 days of failures and the 14 July 2028 sweep; service worker `push` and `notificationclick` handlers (fixed English text, opens `#/partners`); Partners screen card "Phone notifications"; `scripts/generate-vapid.mjs`; runbook section; guard `tests/guards/partner-push.test.ts` and `tests/worker/partner-push.test.ts` (19 tests).
+- **Check (PowerShell):** `npm run check`: 79 test files passed, 1 skipped; 1188 tests passed, 24 skipped; lint, typecheck and format clean. `npm run gate`: build and budgets within (CSS 22.7 of 25 KB gzip), 175 routing cases passed.
+- **Not verified:** no real push was sent to any phone or push service (no keys exist yet); iPhone (Home Screen only) and Android delivery; the new Telugu and Hindi settings strings (`pv.push.*`) are agent drafts awaiting native review. The deployed staging build has not been looked at.
+- **Switched off:** `FLAG_PARTNER_PUSH`, `VAPID_*` are not set anywhere, so nothing is visible or sent.
+- **Owner needs to supply:** the `VAPID_SUBJECT` contact address (not chosen yet); then run `node scripts/generate-vapid.mjs` and set the keys per the runbook (the private key never goes into chat). The production D1 still needs migration 0010 with the others.
+- **Next:** with the owner's address and keys, switch on for staging and try on an Android phone and an iPhone.
+
 ## Partner nudge notifications: ADR and threat model — 2026-11-28 IST
 
 - **Who:** owner asked to start with the ADR and threat model (owner could not log in to Cloudflare, so production domain and Google client wait); Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.

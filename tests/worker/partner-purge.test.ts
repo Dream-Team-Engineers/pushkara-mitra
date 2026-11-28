@@ -2,6 +2,7 @@ import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
 import core from '../../migrations/0002_backend_core.sql?raw';
 import partners from '../../migrations/0007_partners.sql?raw';
+import pushMigration from '../../migrations/0010_partner_push.sql?raw';
 import roles from '../../migrations/0008_partner_roles.sql?raw';
 import { d1Repository } from '../../src/db/repository';
 import { EVENT_END_WITH_BUFFER, PARTNER_RETENTION_ENDS_AT } from '../../src/retention';
@@ -11,7 +12,7 @@ const DB = (env as unknown as { DB: D1Database }).DB;
 const repo = d1Repository(DB);
 
 beforeAll(async () => {
-  for (const migration of [core, partners, roles]) {
+  for (const migration of [core, partners, roles, pushMigration]) {
     for (const statement of migration.split(/;\s*\n\s*\n/)) {
       const sql = statement.trim();
       if (sql !== '') await DB.prepare(sql).run();

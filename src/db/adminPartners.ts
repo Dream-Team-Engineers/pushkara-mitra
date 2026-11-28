@@ -3,7 +3,7 @@ import type { PartnerRole } from './repository';
 /**
  * Partner administration for the staff dashboard (ADR 0019, amending ADR 0018 section 3). This is the
  * only admin module that writes, and it touches only the partner tables: partner, partner_nudge,
- * partner_update and partner_audit. It never reads sessions, memberships, groups, consent records,
+ * partner_push (ADR 0020), partner_update and partner_audit. It never reads sessions, memberships, groups, consent records,
  * positions or any pilgrim data. Every write records the admin's Access subject (never an email).
  * Applicant names and emails are returned here for admins only.
  */
@@ -46,6 +46,12 @@ const HOUR = 3600;
 const DAY = 24 * HOUR;
 /** Most nudges one admin may send in an hour. */
 export const NUDGES_PER_ADMIN_PER_HOUR = 10;
+/** Phone notifications (ADR 0020): most pushes one nudge may send on the free Workers plan (OQ-028). */
+export const PUSH_PER_NUDGE_CAP = 40;
+export const PUSH_PER_PARTNER_PER_HOUR = 3;
+export const PUSH_PER_PARTNER_PER_DAY = 10;
+/** A push address that keeps failing is deleted after this long without a success. */
+const PUSH_FAILING_SECONDS = 30 * 24 * 60 * 60;
 /** A nudge stays open this long. */
 export const NUDGE_OPEN_SECONDS = 6 * HOUR;
 /** Hidden updates after this many hide actions suspend the partner until an admin reviews. */
@@ -94,6 +100,9 @@ export async function purgeDuePartnerData(db: D1Database, nowMs: number): Promis
       )
       .bind(iso(nowMs - REJECTED_DETAILS_SECONDS * 1000)),
     // Nudges are deleted 24 hours after they open; their read marks follow.
+    db
+      .prepare('DELETE FROM partner_push WHERE failed_at IS NOT NULL AND failed_at < ?')
+      .bind(iso(nowMs - PUSH_FAILING_SECONDS * 1000)),
     db.prepare('DELETE FROM partner_nudge WHERE created_at < ?').bind(day),
     db.prepare(
       'DELETE FROM partner_nudge_read WHERE nudge_id NOT IN (SELECT id FROM partner_nudge)',
@@ -209,6 +218,9 @@ export async function decidePartner(
     .bind(to, nowIso, admin, ref)
     .run();
   if (result.meta.changes !== 1) return false;
+  if (action !== 'approve') {
+    await db.prepare('DELETE FROM partner_push WHERE subject_ref = ?').bind(ref).run();
+  }
   await audit(db, admin, action, ref, nowIso).run();
   return true;
 }
@@ -279,10 +291,104 @@ export async function setUpdateHidden(
           .bind(nowIso, owner.subject_ref)
           .run();
         if (suspended.meta.changes === 1) {
+          await db
+            .prepare('DELETE FROM partner_push WHERE subject_ref = ?')
+            .bind(owner.subject_ref)
+            .run();
           await audit(db, 'system', 'suspend', owner.subject_ref, nowIso).run();
         }
       }
     }
   }
   return true;
+}
+
+export interface PushTarget {
+  readonly ref: string;
+  readonly endpoint: string;
+}
+
+/**
+ * Who gets a phone notification for a nudge (ADR 0020): approved partners who are available now,
+ * whose home ghat matches (or all, when the nudge names no ghat), who opted in, and who are under
+ * their hourly and daily limits. At most `PUSH_PER_NUDGE_CAP` are returned; `more` counts the rest.
+ * Push addresses leave this function only to be used for sending.
+ */
+export async function pushTargets(
+  db: D1Database,
+  ghatId: string | null,
+  nowMs: number,
+): Promise<{ targets: PushTarget[]; more: number }> {
+  const nowIso = iso(nowMs);
+  const { results } = await db
+    .prepare(
+      `SELECT p.subject_ref AS ref, x.endpoint, x.hour_start, x.hour_count, x.day_start, x.day_count
+       FROM partner p JOIN partner_push x ON x.subject_ref = p.subject_ref
+       WHERE p.status = 'approved' AND p.available_until > ? AND (? IS NULL OR p.ghat_id = ?)
+       ORDER BY x.created_at, p.subject_ref`,
+    )
+    .bind(nowIso, ghatId, ghatId)
+    .all<{
+      ref: string;
+      endpoint: string;
+      hour_start: string | null;
+      hour_count: number;
+      day_start: string | null;
+      day_count: number;
+    }>();
+  const hourAgo = iso(nowMs - HOUR * 1000);
+  const dayAgo = iso(nowMs - DAY);
+  const within = results.filter(
+    (r) =>
+      (r.hour_start === null ||
+        r.hour_start < hourAgo ||
+        r.hour_count < PUSH_PER_PARTNER_PER_HOUR) &&
+      (r.day_start === null || r.day_start < dayAgo || r.day_count < PUSH_PER_PARTNER_PER_DAY),
+  );
+  return {
+    targets: within.slice(0, PUSH_PER_NUDGE_CAP).map((r) => ({ ref: r.ref, endpoint: r.endpoint })),
+    more: Math.max(0, within.length - PUSH_PER_NUDGE_CAP),
+  };
+}
+
+/** Records each attempt against the partner's limits; deletes addresses a push service says are gone. */
+export async function recordPushResults(
+  db: D1Database,
+  results: readonly { ref: string; outcome: 'ok' | 'gone' | 'failed' }[],
+  nowMs: number,
+): Promise<void> {
+  if (results.length === 0) return;
+  const nowIso = iso(nowMs);
+  const hourAgo = iso(nowMs - HOUR * 1000);
+  const dayAgo = iso(nowMs - DAY);
+  await db.batch(
+    results.map((r) =>
+      r.outcome === 'gone'
+        ? db.prepare('DELETE FROM partner_push WHERE subject_ref = ?').bind(r.ref)
+        : db
+            .prepare(
+              `UPDATE partner_push SET
+                 last_ok_at = CASE WHEN ? = 1 THEN ? ELSE last_ok_at END,
+                 failed_at = CASE WHEN ? = 1 THEN NULL ELSE COALESCE(failed_at, ?) END,
+                 hour_count = CASE WHEN hour_start IS NULL OR hour_start < ? THEN 1 ELSE hour_count + 1 END,
+                 hour_start = CASE WHEN hour_start IS NULL OR hour_start < ? THEN ? ELSE hour_start END,
+                 day_count = CASE WHEN day_start IS NULL OR day_start < ? THEN 1 ELSE day_count + 1 END,
+                 day_start = CASE WHEN day_start IS NULL OR day_start < ? THEN ? ELSE day_start END
+               WHERE subject_ref = ?`,
+            )
+            .bind(
+              r.outcome === 'ok' ? 1 : 0,
+              nowIso,
+              r.outcome === 'ok' ? 1 : 0,
+              nowIso,
+              hourAgo,
+              hourAgo,
+              nowIso,
+              dayAgo,
+              dayAgo,
+              nowIso,
+              r.ref,
+            ),
+    ),
+  );
 }

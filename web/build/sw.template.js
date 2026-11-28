@@ -119,6 +119,34 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(respond(url.pathname, request));
 });
 
+// Partner phone notifications (ADR 0020). The push is empty: the notification text is fixed here and
+// names no ghat, kind, person or place. These handlers make no network request and cache nothing.
+self.addEventListener('push', (event) => {
+  event.waitUntil(
+    self.registration.showNotification('Pushkara Mitra', {
+      body: 'A new request is waiting.',
+      icon: '/icon-192.png',
+      tag: 'partner-nudge',
+      renotify: true,
+    }),
+  );
+});
+
+// A tap always opens the app's own Partners screen; nothing from the push can choose the address.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if ('focus' in client && 'navigate' in client) {
+          return client.focus().then(() => client.navigate('/#/partners'));
+        }
+      }
+      return self.clients.openWindow('/#/partners');
+    }),
+  );
+});
+
 const rangeBlobs = new Map();
 
 // Saved map files are used first (online or not). The tile archive is read in slices, and the

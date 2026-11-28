@@ -7,11 +7,14 @@ import { useResource } from '../../shared/data/useResource';
 import { locale, t, type MessageKey } from '../../shared/i18n/i18n';
 import {
   applyAsPartner,
+  disablePush,
+  enablePush,
   loadInbox,
   loadMe,
   markInboxRead,
   PARTNER_KINDS,
   postVolunteerUpdate,
+  pushSupported,
   setAvailable,
   UPDATE_VALUES,
   type Nudge,
@@ -19,6 +22,7 @@ import {
   type PartnerMe,
   type PartnerResult,
   type PartnerRole,
+  type PushResult,
 } from '../../shared/partners/partnersClient';
 import { Bi } from '../../shared/ui/Bi';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
@@ -372,6 +376,61 @@ function PostUpdate() {
   );
 }
 
+/** Phone notifications (ADR 0020): off until the partner taps; the message is always the same fixed line. */
+function PushCard({
+  push,
+  reload,
+}: {
+  readonly push: { readonly key: string; readonly on: boolean };
+  readonly reload: () => void;
+}) {
+  const busy = useSignal(false);
+  const problem = useSignal<MessageKey | null>(null);
+  const run = (job: Promise<PushResult>) => {
+    busy.value = true;
+    job
+      .then((result) => {
+        busy.value = false;
+        problem.value =
+          result === 'ok'
+            ? null
+            : result === 'denied'
+              ? 'pv.push.denied'
+              : result === 'unsupported'
+                ? 'pv.push.unsupported'
+                : RESULT_TEXT[result];
+        reload();
+      })
+      .catch(() => {
+        busy.value = false;
+        problem.value = 'pv.error';
+      });
+  };
+  return (
+    <section class="b-card" aria-labelledby="pv-push-title">
+      <h2 id="pv-push-title" class="section__title">
+        <Bi k="pv.push.title" />
+      </h2>
+      <p class="note">{t('pv.push.note')}</p>
+      {!pushSupported() ? <p class="notice">{t('pv.push.unsupported')}</p> : null}
+      <div class="actions">
+        <button
+          type="button"
+          class="button"
+          disabled={busy.value || (!push.on && !pushSupported())}
+          onClick={() => {
+            if (busy.value) return;
+            run(push.on ? disablePush(locale.value) : enablePush(push.key, locale.value));
+          }}
+        >
+          {t(push.on ? 'pv.push.disable' : 'pv.push.enable')}
+        </button>
+      </div>
+      {problem.value === null ? null : <p class="notice">{t(problem.value)}</p>}
+    </section>
+  );
+}
+
 function ApprovedView({
   me,
   reload,
@@ -411,6 +470,7 @@ function ApprovedView({
         {problem.value === null ? null : <p class="notice">{t(problem.value)}</p>}
       </section>
       <Inbox unread={me.unread} onRead={reload} />
+      {me.push === null ? null : <PushCard push={me.push} reload={reload} />}
       {me.available ? <PostUpdate /> : <p class="note">{t('pv.post.needAvailable')}</p>}
       <ChangeRole onApplied={reload} />
     </>

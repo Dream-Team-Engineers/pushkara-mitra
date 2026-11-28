@@ -40,6 +40,8 @@ export type PartnerMe =
       readonly available: boolean;
       readonly availableUntil: string | null;
       readonly unread: number;
+      /** Phone notifications (ADR 0020): null when the server has them switched off. */
+      readonly push: { readonly key: string; readonly on: boolean } | null;
     };
 
 export interface Nudge {
@@ -151,18 +153,34 @@ export async function loadMe(request: Fetch = defaultFetch): Promise<PartnerMe> 
   ) {
     return { status };
   }
-  const { role, ghatId, available, availableUntil, unread } = body;
+  const { role, ghatId, available, availableUntil, unread, push } = body;
+  const pushOk =
+    push === null ||
+    push === undefined ||
+    (isRecord(push) && typeof push['key'] === 'string' && typeof push['on'] === 'boolean');
   if (
     status !== 'approved' ||
     (role !== 'priest' && role !== 'volunteer' && role !== 'vendor' && role !== 'moderator') ||
     (ghatId !== null && typeof ghatId !== 'string') ||
     typeof available !== 'boolean' ||
     (availableUntil !== null && typeof availableUntil !== 'string') ||
-    typeof unread !== 'number'
+    typeof unread !== 'number' ||
+    !pushOk
   ) {
     throw new Error('Partner status does not match its contract');
   }
-  return { status, role, ghatId, available, availableUntil, unread };
+  return {
+    status,
+    role,
+    ghatId,
+    available,
+    availableUntil,
+    unread,
+    push:
+      isRecord(push) && typeof push['key'] === 'string' && typeof push['on'] === 'boolean'
+        ? { key: push['key'], on: push['on'] }
+        : null,
+  };
 }
 
 /** Sends the application. `credential` is a fresh Google token; the server takes name and email from it. */
@@ -225,4 +243,67 @@ export async function postVolunteerUpdate(
 /** Whole minutes since `iso`, never negative. */
 export function ageMinutes(iso: string, nowMs: number = Date.now()): number {
   return Math.max(0, Math.floor((nowMs - Date.parse(iso)) / MINUTE));
+}
+
+export type PushResult = PartnerResult | 'unsupported' | 'denied';
+
+/** True when this browser can receive Web Push at all. */
+export function pushSupported(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    typeof PushManager !== 'undefined' &&
+    typeof Notification !== 'undefined'
+  );
+}
+
+function keyBytes(key: string): Uint8Array<ArrayBuffer> {
+  const padded = key
+    .replaceAll('-', '+')
+    .replaceAll('_', '/')
+    .padEnd(Math.ceil(key.length / 4) * 4, '=');
+  return Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
+}
+
+/**
+ * Opt in to phone notifications (ADR 0020). Call it from a tap: the browser asks for permission
+ * only here, never on page load. The browser's push address goes to the server and nowhere else.
+ */
+export async function enablePush(
+  key: string,
+  language: 'te' | 'en' | 'hi',
+  request: Fetch = defaultFetch,
+): Promise<PushResult> {
+  if (!pushSupported()) return 'unsupported';
+  if ((await Notification.requestPermission()) !== 'granted') return 'denied';
+  const registration = await navigator.serviceWorker.ready;
+  const existing = await registration.pushManager.getSubscription();
+  const subscription =
+    existing ??
+    (await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: keyBytes(key),
+    }));
+  const response = await send(request, '/push', 'POST', {
+    endpoint: subscription.endpoint,
+    locale: language,
+    consent: true,
+  });
+  if (response.status === 201) return 'ok';
+  await subscription.unsubscribe();
+  return resultFor(response.status);
+}
+
+/** Opt out: the server deletes the push address first, then the browser drops the subscription. */
+export async function disablePush(
+  language: 'te' | 'en' | 'hi',
+  request: Fetch = defaultFetch,
+): Promise<PushResult> {
+  const response = await send(request, '/push/off', 'POST', { locale: language });
+  if (response.status !== 204) return resultFor(response.status);
+  if (pushSupported()) {
+    const registration = await navigator.serviceWorker.ready;
+    await (await registration.pushManager.getSubscription())?.unsubscribe();
+  }
+  return 'ok';
 }
