@@ -4493,3 +4493,65 @@ a.qcard:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Partners: one-line rows (switch, request, report) */
+.pv-row,
+.pv-line,
+.pv-request {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pv-row + .pv-row {
+  margin-block-start: var(--space-2);
+}
+
+.pv-row__label,
+.pv-line__name {
+  flex: 1;
+  font-weight: 700;
+}
+
+.pv-row__state {
+  font-size: 0.8125rem;
+}
+
+.pv-row .switch {
+  flex: none;
+  margin: 0;
+}
+
+.pv-line {
+  margin-block-start: var(--space-2);
+}
+
+.pv-line__name {
+  flex: 0 0 5.5rem;
+  font-size: 0.8125rem;
+}
+
+.pv-line__picks {
+  display: flex;
+  flex: 1;
+  gap: 0.25rem;
+}
+
+.pv-line__picks .choice {
+  flex: 1;
+  min-height: 2.25rem;
+  padding: 0 var(--space-1);
+  font-size: 0.75rem;
+}
+
+.pv-request {
+  justify-content: space-between;
+}
+
+.pv-request__go {
+  flex: none;
+}
+
+.pv-foot {
+  margin: var(--space-4) var(--space-4) var(--space-6);
+}

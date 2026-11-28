@@ -27,7 +27,7 @@ import {
 import { Bi } from '../../shared/ui/Bi';
 import { ChipGroup, type ChipOption } from '../../shared/ui/Chips';
 import { ScreenHeader } from '../../shared/ui/Layout';
-import { KIND_LABELS, valueLabel } from './VolunteerStrip';
+import { KIND_LABELS } from './VolunteerStrip';
 
 /**
  * Partners, real version (flag `partners`, staging build only; ADR 0019). Fixed choices only: no free
@@ -51,12 +51,6 @@ const ROLE_NAME: Readonly<Record<PartnerRole, MessageKey>> = {
   vendor: 'pv.roleName.vendor',
   moderator: 'pv.roleName.moderator',
 };
-type Availability = 'on' | 'off';
-const AVAILABILITY: readonly ChipOption<Availability>[] = [
-  { value: 'on', label: 'pv.available.on' },
-  { value: 'off', label: 'pv.available.off' },
-];
-
 const RESULT_TEXT: Readonly<Record<Exclude<PartnerResult, 'ok'>, MessageKey>> = {
   unavailable: 'pv.unavailable',
   signin: 'pv.signin',
@@ -71,18 +65,20 @@ function GhatSelect({
   value,
   emptyLabel,
   onChange,
+  hideLabel = false,
 }: {
   readonly id: string;
   readonly label: MessageKey;
   readonly value: string;
   readonly emptyLabel: MessageKey;
   readonly onChange: (value: string) => void;
+  readonly hideLabel?: boolean;
 }) {
   const state = useResource(ghatsResource);
   const ghats = state.status === 'ready' ? state.data : [];
   return (
     <div class="field">
-      <label for={id}>
+      <label for={id} class={hideLabel ? 'visually-hidden' : undefined}>
         <Bi k={label} />
       </label>
       <select
@@ -223,7 +219,15 @@ function ApplyForm({
   );
 }
 
-function Inbox({ unread, onRead }: { readonly unread: number; readonly onRead: () => void }) {
+function Inbox({
+  unread,
+  onRead,
+  onReport,
+}: {
+  readonly unread: number;
+  readonly onRead: () => void;
+  readonly onReport: () => void;
+}) {
   const nudges = useSignal<readonly Nudge[] | null>(null);
   const failed = useSignal(false);
   const ghats = useResource(ghatsResource);
@@ -262,22 +266,34 @@ function Inbox({ unread, onRead }: { readonly unread: number; readonly onRead: (
       ) : null}
       <ul class="card-list">
         {(nudges.value ?? []).map((nudge) => (
-          <li key={nudge.id} class="card">
-            <p class="card__title">
-              {nudge.read ? '' : '● '}
-              {t(`pv.nudge.${nudge.kind}`)}
-            </p>
-            <p class="card__meta">
-              {nudge.ghatId === null
-                ? t('pv.nudge.anyGhat')
-                : (names.get(nudge.ghatId) ?? nudge.ghatId)}
-            </p>
+          <li key={nudge.id} class="card pv-request">
+            <div>
+              <p class="card__title">
+                {nudge.read ? '' : '● '}
+                {t(`pv.nudge.${nudge.kind}`)}
+              </p>
+              <p class="card__meta">
+                {nudge.ghatId === null
+                  ? t('pv.nudge.anyGhat')
+                  : (names.get(nudge.ghatId) ?? nudge.ghatId)}
+              </p>
+            </div>
+            <button type="button" class="button pv-request__go" onClick={onReport}>
+              {t('pv.inbox.report')}
+            </button>
           </li>
         ))}
       </ul>
     </section>
   );
 }
+
+/** One short word per choice, so each report fits on a single line. */
+const SHORT_LABEL: Readonly<Record<PartnerKind, Readonly<Record<string, MessageKey>>>> = {
+  crowd: { low: 'pv.crowd.low', moderate: 'pv.crowd.moderate', high: 'pv.crowd.high' },
+  river: { normal: 'pv.river.normal', rising: 'pv.river.rising', high: 'pv.river.high' },
+  food: { available: 'pv.yes', finished: 'pv.no' },
+};
 
 function PostUpdate() {
   const ghat = useSignal('');
@@ -331,35 +347,39 @@ function PostUpdate() {
         label="pv.post.ghat"
         value={ghat.value}
         emptyLabel="pv.post.pick"
+        hideLabel
         onChange={(next) => {
           ghat.value = next;
           message.value = null;
         }}
       />
-      {PARTNER_KINDS.map((kind) => {
-        const options: readonly ChipOption<string>[] = UPDATE_VALUES[kind].flatMap((choice) => {
-          const label = valueLabel(kind, choice);
-          return label === null ? [] : [{ value: choice, label }];
-        });
-        return (
-          <div key={kind} class="pv-kind">
-            <h3 class="card__title">
-              <Bi k={KIND_LABELS[kind]} />
-            </h3>
-            <ChipGroup
-              legend={KIND_LABELS[kind]}
-              options={options}
-              selected={picks.value[kind] ?? ''}
-              onSelect={(next) => {
-                // Tapping the chosen option again clears it, so a tab can be left out.
-                picks.value = { ...picks.value, [kind]: picks.value[kind] === next ? '' : next };
-                message.value = null;
-              }}
-            />
+      {PARTNER_KINDS.map((kind) => (
+        <div key={kind} class="pv-line">
+          <span class="pv-line__name" id={`pv-kind-${kind}`}>
+            {t(kind === 'food' ? 'pv.kind.foodShort' : KIND_LABELS[kind])}
+          </span>
+          <div class="pv-line__picks" role="group" aria-labelledby={`pv-kind-${kind}`}>
+            {UPDATE_VALUES[kind].map((choice) => (
+              <button
+                key={choice}
+                type="button"
+                class="choice"
+                aria-pressed={picks.value[kind] === choice}
+                onClick={() => {
+                  // Tapping the chosen option again clears it, so a tab can be left out.
+                  picks.value = {
+                    ...picks.value,
+                    [kind]: picks.value[kind] === choice ? '' : choice,
+                  };
+                  message.value = null;
+                }}
+              >
+                {t(SHORT_LABEL[kind][choice] ?? 'pv.error')}
+              </button>
+            ))}
           </div>
-        );
-      })}
-      <p class="note">{t('pv.post.pickOne')}</p>
+        </div>
+      ))}
       <div class="actions">
         <button type="button" class="button" disabled={!ready} onClick={send}>
           {t('pv.post.send')}
@@ -370,14 +390,49 @@ function PostUpdate() {
           {t(message.value)}
         </p>
       )}
-      <p class="note">{t('pv.post.note')}</p>
-      {(picks.value.river ?? '') !== '' ? <p class="note">{t('pv.strip.river')}</p> : null}
     </section>
   );
 }
 
+/** One line: a label, Yes/No and a small switch. */
+function ToggleRow({
+  id,
+  label,
+  on,
+  disabled,
+  onToggle,
+}: {
+  readonly id: string;
+  readonly label: MessageKey;
+  readonly on: boolean;
+  readonly disabled: boolean;
+  readonly onToggle: () => void;
+}) {
+  return (
+    <div class="pv-row">
+      <span id={id} class="pv-row__label">
+        {t(label)}
+      </span>
+      <span class="pv-row__state" aria-hidden="true">
+        {t(on ? 'pv.yes' : 'pv.no')}
+      </span>
+      <button
+        type="button"
+        class="switch"
+        role="switch"
+        aria-checked={on}
+        aria-labelledby={id}
+        disabled={disabled}
+        onClick={onToggle}
+      >
+        <span class="switch__knob" aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
 /** Phone notifications (ADR 0020): off until the partner taps; the message is always the same fixed line. */
-function PushCard({
+function PushRow({
   push,
   reload,
 }: {
@@ -406,28 +461,22 @@ function PushCard({
         problem.value = 'pv.error';
       });
   };
+  const supported = pushSupported();
   return (
-    <section class="b-card" aria-labelledby="pv-push-title">
-      <h2 id="pv-push-title" class="section__title">
-        <Bi k="pv.push.title" />
-      </h2>
-      <p class="note">{t('pv.push.note')}</p>
-      {!pushSupported() ? <p class="notice">{t('pv.push.unsupported')}</p> : null}
-      <div class="actions">
-        <button
-          type="button"
-          class="button"
-          disabled={busy.value || (!push.on && !pushSupported())}
-          onClick={() => {
-            if (busy.value) return;
-            run(push.on ? disablePush(locale.value) : enablePush(push.key, locale.value));
-          }}
-        >
-          {t(push.on ? 'pv.push.disable' : 'pv.push.enable')}
-        </button>
-      </div>
+    <>
+      <ToggleRow
+        id="pv-push-title"
+        label="pv.push.title"
+        on={push.on}
+        disabled={busy.value || (!push.on && !supported)}
+        onToggle={() => {
+          if (busy.value) return;
+          run(push.on ? disablePush(locale.value) : enablePush(push.key, locale.value));
+        }}
+      />
+      {!supported ? <p class="notice">{t('pv.push.unsupported')}</p> : null}
       {problem.value === null ? null : <p class="notice">{t(problem.value)}</p>}
-    </section>
+    </>
   );
 }
 
@@ -440,21 +489,42 @@ function ApprovedView({
 }) {
   const busy = useSignal(false);
   const problem = useSignal<MessageKey | null>(null);
+  const goToReport = (): void => {
+    const scroll = (): void => {
+      window.setTimeout(() => {
+        document.getElementById('pv-post-title')?.scrollIntoView({ block: 'start' });
+      }, 400);
+    };
+    if (me.available || busy.value) {
+      scroll();
+      return;
+    }
+    // Reporting needs the partner to be available, so the button switches that on first.
+    busy.value = true;
+    setAvailable(true)
+      .then((result) => {
+        busy.value = false;
+        problem.value = result === 'ok' ? null : RESULT_TEXT[result];
+        reload();
+        if (result === 'ok') scroll();
+      })
+      .catch(() => {
+        busy.value = false;
+        problem.value = 'pv.error';
+      });
+  };
   return (
     <>
-      <p class="note">{t('pv.status.approvedAs', { role: t(ROLE_NAME[me.role]) })}</p>
-      <section class="b-card" aria-labelledby="pv-avail-title">
-        <h2 id="pv-avail-title" class="section__title">
-          <Bi k="pv.available.title" />
-        </h2>
-        <ChipGroup
-          legend="pv.available.title"
-          options={AVAILABILITY}
-          selected={me.available ? 'on' : 'off'}
-          onSelect={(next) => {
+      <section class="b-card pv-quick" aria-label={t('pv.available.title')}>
+        <ToggleRow
+          id="pv-avail-title"
+          label="pv.available.title"
+          on={me.available}
+          disabled={busy.value}
+          onToggle={() => {
             if (busy.value) return;
             busy.value = true;
-            setAvailable(next === 'on')
+            setAvailable(!me.available)
               .then((result) => {
                 busy.value = false;
                 problem.value = result === 'ok' ? null : RESULT_TEXT[result];
@@ -466,13 +536,20 @@ function ApprovedView({
               });
           }}
         />
-        <p class="note">{t('pv.available.note')}</p>
+        {me.push === null ? null : <PushRow push={me.push} reload={reload} />}
         {problem.value === null ? null : <p class="notice">{t(problem.value)}</p>}
       </section>
-      <Inbox unread={me.unread} onRead={reload} />
-      {me.push === null ? null : <PushCard push={me.push} reload={reload} />}
+      <Inbox unread={me.unread} onRead={reload} onReport={goToReport} />
       {me.available ? <PostUpdate /> : <p class="note">{t('pv.post.needAvailable')}</p>}
       <ChangeRole onApplied={reload} />
+      <div class="pv-foot">
+        <p class="note">{t('pv.status.approvedAs', { role: t(ROLE_NAME[me.role]) })}</p>
+        <p class="note">{t('pv.available.note')}</p>
+        {me.push === null ? null : <p class="note">{t('pv.push.note')}</p>}
+        <p class="note">{t('pv.post.pickOne')}</p>
+        <p class="note">{t('pv.post.note')}</p>
+        <p class="note">{t('pv.strip.river')}</p>
+      </div>
     </>
   );
 }
