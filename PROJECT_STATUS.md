@@ -22,6 +22,15 @@
 
 **Where the full old text is:** [docs/archive/PROJECT_STATUS_FULL_2026-11-27.md](docs/archive/PROJECT_STATUS_FULL_2026-11-27.md). Older entries below are shortened (long lines cut, long tables trimmed); the newest entries (2026-11-25 to 2026-11-27) are unchanged.
 
+## Production release 3: groups on, uniform sizes, countdown and map tidy — 2026-11-28 IST
+
+- **Who:** owner said "deploy" in chat; Claude Code (agent) deployed. Independent reviewer: NONE. **Legal sign-off: none**; counsel review (OQ-024) and the group notice are still open. Engineering readiness only.
+- **Source and environment:** commit `ab01103` on `main`, production. App Worker `pushkara-mitra-production` version `09e18272-7630-401e-b87c-3915a745e2b8`. The admin Worker was not redeployed.
+- **What changed:** real groups (create, join, members) on in production via `FLAG_GROUPS` and the release build; live position sharing, metrics and device location stay off. Uniform control sizes on all screens (40px controls, 36px chips, small switches; the 48px minimum was dropped by the owner), countdown rings at 75% with bolder numbers, Map tab without the prototype banner and with its notes at the bottom. The sponsor strip stays hidden in production (sample content only, OQ-044).
+- **Checks (actual output):** `npm run ship:production` gate passed (1190 passed, 24 skipped; CSS 23.0 of 25 KB; 175 routing cases). After deploy, see the owner's phone check; curl checks are in the session reply.
+- **Rollback:** `npx wrangler rollback --env production`; to switch groups off alone, remove `FLAG_GROUPS` and redeploy.
+- **Not verified:** the new look has not been viewed on a device by the agent.
+
 ## Production release 2: sign-in, partners and phone notifications on — 2026-11-28 IST
 
 - **Who:** owner asked for sign-in and VAPID on production in chat; Claude Code (agent) built, set secrets and deployed. Independent reviewer: NONE. **Legal sign-off: none.** Counsel review (OQ-024) and the other legal gates are still open; this entry is engineering readiness only and certifies no compliance.
