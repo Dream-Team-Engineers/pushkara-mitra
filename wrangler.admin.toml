@@ -7,16 +7,18 @@ main = "src/admin/index.ts"
 compatibility_date = "2026-08-22"
 workers_dev = false
 
-# Production: not deployed. ACCESS_TEAM_DOMAIN and ACCESS_AUD are left out until the owner creates a
-# separate Access application for it, so every request answers 503. FLAG_PARTNERS stays unset.
+# Production: not deployed yet. Its own Access application (admin.pushkaramitra.app) was created on
+# 2026-11-28; the two values below are public identifiers, not secrets. FLAG_PARTNERS stays unset.
 [env.production]
 name = "pushkara-mitra-admin-production"
 workers_dev = false
-# Staff address. Create its own Access application before the first deploy.
+# Staff address, behind its own Access application.
 routes = [{ pattern = "admin.pushkaramitra.app", custom_domain = true }]
 
 [env.production.vars]
 ENVIRONMENT_NAME = "production"
+ACCESS_TEAM_DOMAIN = "https://sparkling-star-84a3.cloudflareaccess.com"
+ACCESS_AUD = "8a02a3f9fcc957d2f5125ec019ece5fbc72da8872464863b5a66afc784141c79"
 
 [[env.production.d1_databases]]
 binding = "DB"
