@@ -630,21 +630,12 @@ export default function MapScreen() {
               }}
             />
           ) : null}
-          <p class="note">{t('map.live.area')}</p>
           {group.state === 'in' ? (
             <p class={sharing.value ? 'state-line is-on' : 'state-line'} role="status">
               <span class="state-line__dot" aria-hidden="true" />
               {t(sharing.value ? 'group.live.sharingOn' : 'map.sharing.off')}
             </p>
-          ) : (
-            <>
-              <PrototypeBanner />
-              <p class="state-line" role="status">
-                <span class="state-line__dot" aria-hidden="true" />
-                {t('map.sharing.off')}
-              </p>
-            </>
-          )}
+          ) : null}
         </>
       )}
       {FLAGS.geolocation ? <LocateControl outside={outside.value} /> : null}
@@ -698,12 +689,16 @@ export default function MapScreen() {
           </div>
         </>
       ) : null}
-      <p class="note">{t('map.noHistory')}</p>
-      <p class="note">{t('map.attribution')}</p>
       <div class="actions">
         <a class="button button--secondary" href={hrefFor('group')}>
           <Bi k="map.manage" />
         </a>
+      </div>
+      {/* Every note sits together at the bottom, not between the map and its controls. */}
+      <div class="page-foot">
+        {LiveMap === null ? null : <p class="note">{t('map.live.area')}</p>}
+        <p class="note">{t('map.noHistory')}</p>
+        <p class="note">{t('map.attribution')}</p>
       </div>
     </>
   );

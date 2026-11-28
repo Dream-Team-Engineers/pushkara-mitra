@@ -4670,3 +4670,33 @@ a.qcard:hover {
 .switch[aria-checked='true'] .switch__knob {
   inset-inline-end: 0.2rem;
 }
+
+/* Countdown: rings at 75% of their old size; the numbers keep their size and get bolder. */
+.ring__face {
+  max-width: 3.375rem;
+}
+
+.ring__value {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* Notes and disclaimers sit together at the bottom of a screen, never between controls. */
+.pv-foot,
+.page-foot {
+  margin: var(--space-4) var(--space-4) var(--space-6);
+}
+
+.page-foot .note {
+  margin-inline: 0;
+}
+
+/* Map: icon cards line up in the middle, the offline and location panels use the same compact card. */
+.link-card {
+  align-items: center;
+}
+
+.locate {
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--card-pad);
+}
