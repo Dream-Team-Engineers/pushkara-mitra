@@ -30,7 +30,7 @@ function buildId(): string {
 
 export default defineConfig(({ mode }) => {
   const staging = mode === 'staging';
-  // Live release: only sign-in and partners (with phone notifications) are compiled in.
+  // Live release: sign-in, partners (with phone notifications) and groups are compiled in.
   const release = mode === 'release';
   return {
     root: 'web',
@@ -43,8 +43,9 @@ export default defineConfig(({ mode }) => {
       ),
       // Device position on the map: staging build only (flags.ts, OQ-041).
       'import.meta.env.VITE_DEVICE_LOCATION': JSON.stringify(staging ? 'enabled' : ''),
-      // Real groups and live sharing with the group: staging build only (flags.ts, ADR 0017).
-      'import.meta.env.VITE_GROUPS': JSON.stringify(mode === 'staging' ? 'enabled' : ''),
+      // Real groups (create, join, members): staging and release builds (flags.ts, ADR 0017).
+      // Live position sharing is a separate flag and stays staging only.
+      'import.meta.env.VITE_GROUPS': JSON.stringify(staging || release ? 'enabled' : ''),
       // Partners (priests and volunteers): staging and release builds (flags.ts, ADR 0019, ADR 0020).
       'import.meta.env.VITE_PARTNERS': JSON.stringify(staging || release ? 'enabled' : ''),
       // App-open and install counters for the staff dashboard: staging build only (ADR 0018).

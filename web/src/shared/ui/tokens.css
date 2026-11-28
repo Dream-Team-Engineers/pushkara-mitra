@@ -217,7 +217,7 @@
 }
 
 :root {
-  /* Type: 16px minimum body text; captions never below 14px. Sizes in rem so 200% text works. */
+  /* Type: sizes stay in rem so the phone's own text size still scales them. Body text 16px; the compact controls use 13 to 15px. */
   --font-latin: 'Mitra Roboto', system-ui, sans-serif;
   --font-telugu: 'Mitra Telugu', 'Mitra Devanagari', system-ui, sans-serif;
   --font-body: var(--font-latin), var(--font-telugu);
@@ -239,8 +239,8 @@
   --radius-card: 16px;
   --radius-feature: 20px;
 
-  /* Interaction: 48px minimum touch target; visible focus ring */
-  --target-min: 48px;
+  /* Interaction: 40px control height (owner request 2026-11-28, was 48px; WCAG 2.2 AA asks for 24px); visible focus ring */
+  --target-min: 2.5rem;
   --focus-ring: 3px solid var(--focus);
   --focus-offset: 2px;
 }

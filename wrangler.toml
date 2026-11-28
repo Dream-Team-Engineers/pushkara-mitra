@@ -88,10 +88,12 @@ routes = [{ pattern = "pushkaramitra.app", custom_domain = true }]
 # Production has no vars block on purpose: every FLAG_*, DEVICE_LOCATION and sign-in stay off until
 # the owner turns each one on. SESSION_SECRET is set with `wrangler secret put`, never here.
 # Daily sweep (03:30 UTC) for ended groups and the partner retention date. No location involved.
-# Live release (owner decision 2026-11-28): Google sign-in and partners on. The client ID is public. Groups,
-# metrics and device location stay off. SESSION_SECRET and the VAPID keys are Worker secrets, never here.
+# Live release (owner decision 2026-11-28): Google sign-in, partners and groups on. The client ID is public.
+# Live location sharing, metrics and device location stay off. SESSION_SECRET and the VAPID keys are Worker secrets, never here.
 [env.production.vars]
 GOOGLE_CLIENT_ID = "433695131529-igclhmojpijekd1nq65m2jnue5rno8tr.apps.googleusercontent.com"
+# Groups: create, join and member list only. Live position sharing has its own flag and stays off.
+FLAG_GROUPS = "enabled"
 FLAG_PARTNERS = "enabled"
 [env.production.triggers]
 crons = ["30 3 * * *"]

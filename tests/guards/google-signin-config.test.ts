@@ -29,15 +29,17 @@ describe('Google sign-in configuration', () => {
     expect(read('vite.config.ts')).toMatch(/staging \|\| release\s*\? GOOGLE_CLIENT_ID_PUBLIC/);
   });
 
-  it('keeps groups, metrics, device location and sample rows out of the release build', () => {
+  it('keeps metrics, device location and sample rows out of the release build', () => {
     const vite = read('vite.config.ts');
-    expect(vite).toMatch(/VITE_GROUPS'[^\n]*staging/);
+    expect(vite).toMatch(/VITE_GROUPS'[^\n]*staging \|\| release/);
     expect(vite).toMatch(/VITE_METRICS'[^\n]*staging/);
     expect(vite).toMatch(/VITE_DEVICE_LOCATION'[^\n]*staging/);
-    expect(vite).not.toMatch(/VITE_(GROUPS|METRICS|DEVICE_LOCATION)'[^\n]*release/);
+    expect(vite).not.toMatch(/VITE_(METRICS|DEVICE_LOCATION)'[^\n]*release/);
     expect(vite).toMatch(/VITE_SHOW_SAMPLES'[^;]*\|\| release/);
     const production = /\[env\.production\.vars\][^[]*/.exec(read('wrangler.toml'))?.[0] ?? '';
-    expect(production).not.toMatch(/FLAG_GROUPS|FLAG_GROUP_LOCATION|FLAG_METRICS|DEVICE_LOCATION/);
+    // Groups are on in production, but live position sharing is not.
+    expect(production).toMatch(/FLAG_GROUPS\s*=\s*"enabled"/);
+    expect(production).not.toMatch(/FLAG_GROUP_LOCATION|FLAG_METRICS|DEVICE_LOCATION/);
   });
 
   it('builds staging with the staging mode in CI, so a push cannot remove the client ID', () => {

@@ -137,8 +137,8 @@ describe.each(THEMES.flatMap((theme) => ACCENTS.map((accent) => [theme, accent] 
 );
 
 describe('size tokens', () => {
-  it('keeps the 48px touch target and 16px body text', () => {
-    expect(CSS).toMatch(/--target-min:\s*48px;/);
+  it('keeps a 40px control height (owner relaxed it from 48px on 2026-11-28; WCAG 2.2 AA needs 24px) and 16px body text', () => {
+    expect(CSS).toMatch(/--target-min:\s*2\.5rem;/);
     expect(CSS).toMatch(/--text-body:\s*1rem;/);
     expect(CSS).toMatch(/--text-caption:\s*0\.875rem;/);
   });
