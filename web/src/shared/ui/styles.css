@@ -4494,32 +4494,53 @@ a.qcard:hover {
   }
 }
 
-/* Partners: one-line rows (switch, request, report) */
+/* Partners: small one-line rows. Rows are 2.5rem tall with the switch drawn small; WCAG 2.2 needs 24px. */
 .pv-row,
 .pv-line,
 .pv-request {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: var(--space-2);
 }
 
-.pv-row + .pv-row {
-  margin-block-start: var(--space-2);
+.pv-row {
+  min-height: 2.5rem;
 }
 
 .pv-row__label,
 .pv-line__name {
   flex: 1;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .pv-row__state {
+  color: var(--text-muted);
   font-size: 0.8125rem;
 }
 
 .pv-row .switch {
   flex: none;
+  width: 2.5rem;
+  min-height: 0;
+  height: 1.5rem;
   margin: 0;
+  border-width: 1px;
+}
+
+.pv-row .switch__knob {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  inset-inline-start: 0.2rem;
+}
+
+.pv-row .switch[aria-checked='true'] .switch__knob {
+  inset-inline-end: 0.2rem;
+}
+
+.pv-quick {
+  padding-block: var(--space-2);
 }
 
 .pv-line {
@@ -4527,7 +4548,7 @@ a.qcard:hover {
 }
 
 .pv-line__name {
-  flex: 0 0 5.5rem;
+  flex: 0 0 5rem;
   font-size: 0.8125rem;
 }
 
@@ -4539,17 +4560,31 @@ a.qcard:hover {
 
 .pv-line__picks .choice {
   flex: 1;
-  min-height: 2.25rem;
+  min-height: 2rem;
   padding: 0 var(--space-1);
+  border-radius: 999px;
   font-size: 0.75rem;
 }
 
-.pv-request {
+.b-card .pv-request {
   justify-content: space-between;
+  padding: var(--space-1) 0;
+  background: none;
+  border: 0;
+  border-block-start: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pv-request .card__title {
+  font-size: 0.9375rem;
 }
 
 .pv-request__go {
   flex: none;
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  font-size: 0.8125rem;
 }
 
 .pv-foot {
