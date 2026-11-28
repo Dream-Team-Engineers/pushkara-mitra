@@ -12,6 +12,8 @@ workers_dev = false
 [env.production]
 name = "pushkara-mitra-admin-production"
 workers_dev = false
+# Staff address. Create its own Access application before the first deploy.
+routes = [{ pattern = "admin.pushkaramitra.app", custom_domain = true }]
 
 [env.production.vars]
 ENVIRONMENT_NAME = "production"
