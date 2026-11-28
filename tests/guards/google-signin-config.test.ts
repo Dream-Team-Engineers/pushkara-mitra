@@ -6,7 +6,7 @@ const ROOT = join(import.meta.dirname, '..', '..');
 const read = (file: string): string => readFileSync(join(ROOT, file), 'utf8');
 
 describe('Google sign-in configuration', () => {
-  const fromVite = /STAGING_GOOGLE_CLIENT_ID =\s*'([^']+)'/.exec(read('vite.config.ts'))?.[1];
+  const fromVite = /GOOGLE_CLIENT_ID_PUBLIC =\s*'([^']+)'/.exec(read('vite.config.ts'))?.[1];
   const stagingBlock = /\[env\.staging\.vars\][^[]*/.exec(read('wrangler.toml'))?.[0] ?? '';
   const fromWrangler = /GOOGLE_CLIENT_ID\s*=\s*"([^"]+)"/.exec(stagingBlock)?.[1];
 
@@ -15,13 +15,29 @@ describe('Google sign-in configuration', () => {
     expect(fromWrangler).toBe(fromVite);
   });
 
-  it('sets no client ID for preview or production, so sign-in stays off there', () => {
+  it('sets the client ID for staging and production only, never for preview or top level', () => {
     const wrangler = read('wrangler.toml');
-    expect(wrangler.match(/GOOGLE_CLIENT_ID/g)).toHaveLength(1);
-    expect(wrangler).not.toMatch(/\[env\.production\.vars\]/);
+    const production = /\[env\.production\.vars\][^[]*/.exec(wrangler)?.[0] ?? '';
+    expect(/GOOGLE_CLIENT_ID\s*=\s*"([^"]+)"/.exec(production)?.[1]).toBe(fromVite);
+    expect(wrangler.match(/GOOGLE_CLIENT_ID/g)).toHaveLength(2);
+    expect(wrangler).not.toMatch(/\[env\.preview\.vars\]/);
     const pkg = read('package.json');
     expect(pkg).toMatch(/"ship:staging":[^\n]*build:web:staging/);
-    expect(pkg).toMatch(/"ship:production":[^\n]*build:web &&/);
+    // The live release uses its own mode; a plain build (CI, preview) carries no client ID.
+    expect(pkg).toMatch(/"ship:production":[^\n]*build:web:production/);
+    expect(pkg).toMatch(/"build:web:production":\s*"vite build --mode release"/);
+    expect(read('vite.config.ts')).toMatch(/staging \|\| release\s*\? GOOGLE_CLIENT_ID_PUBLIC/);
+  });
+
+  it('keeps groups, metrics, device location and sample rows out of the release build', () => {
+    const vite = read('vite.config.ts');
+    expect(vite).toMatch(/VITE_GROUPS'[^\n]*staging/);
+    expect(vite).toMatch(/VITE_METRICS'[^\n]*staging/);
+    expect(vite).toMatch(/VITE_DEVICE_LOCATION'[^\n]*staging/);
+    expect(vite).not.toMatch(/VITE_(GROUPS|METRICS|DEVICE_LOCATION)'[^\n]*release/);
+    expect(vite).toMatch(/VITE_SHOW_SAMPLES'[^;]*\|\| release/);
+    const production = /\[env\.production\.vars\][^[]*/.exec(read('wrangler.toml'))?.[0] ?? '';
+    expect(production).not.toMatch(/FLAG_GROUPS|FLAG_GROUP_LOCATION|FLAG_METRICS|DEVICE_LOCATION/);
   });
 
   it('builds staging with the staging mode in CI, so a push cannot remove the client ID', () => {
