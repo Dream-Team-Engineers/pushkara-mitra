@@ -16,11 +16,22 @@
 
 **Critical path:** buy the paid plan; book the security test, accessibility audit and counsel session now (longest waits); owner creates the production Google client and gives the domain; agent then prepares production config (A12) and runs the staging rehearsal (B9); then release approval (B16). See [production readiness list](docs/operations/production-readiness-list.md).
 
-**Production:** not deployed. **Staging:** redeployed by CI on every push; CI, Supply chain, Scorecard and Deploy staging passed on `76989d1`; runs for the later push `a71ea2d` were not checked.
+**Production:** deployed 2026-11-28 (see the first entry below): app at pushkaramitra.app, admin at admin.pushkaramitra.app, every feature flag off. **Staging:** redeployed by CI on every push; CI, Supply chain, Scorecard and Deploy staging passed on `76989d1`; runs for the later push `a71ea2d` were not checked.
 
 **Owner open items:** staging check of the 18+ tick; native review of te/hi `pv.adult`; OQ-028; counsel list on launch day; yearly deletion of Contact us emails (runbook).
 
 **Where the full old text is:** [docs/archive/PROJECT_STATUS_FULL_2026-11-27.md](docs/archive/PROJECT_STATUS_FULL_2026-11-27.md). Older entries below are shortened (long lines cut, long tables trimmed); the newest entries (2026-11-25 to 2026-11-27) are unchanged.
+
+## Production deployed, first release (flags off) — 2026-11-28 IST
+
+- **Who:** owner approved migrations and deploy in chat on 2026-11-28; Claude Code (agent) ran them. Independent reviewer: NONE. Legal sign-off: none; counsel review is still pending (OQ-024) and this is not a compliance claim.
+- **Source and environment:** commit `5c2b3e8` on `main`, production. App Worker `pushkara-mitra-production` (version `a9b229e9-fa3d-4061-86f2-23ed61fd59cc`) at `https://pushkaramitra.app`; admin Worker `pushkara-mitra-admin-production` (version `56f43619-dd1e-4d92-8cc0-db3d117d82ff`) at `https://admin.pushkaramitra.app`, behind its own Cloudflare Access application.
+- **Database:** migrations 0007 to 0010 applied to production D1 (`pushkara-mitra-production`); `0010` listed as applied and `partner_push` present.
+- **Decision:** ADR 0004 Amendment 3 (owner option A): production uses an unused SQLite Durable Object namespace because Workers Free refuses `new_classes` (error 10097). No location is stored; the guard `tests/guards/wrangler-config.test.ts` was updated.
+- **Checks (actual output):** `npm run ship:production` gate passed (1189 tests, 24 skipped; budgets within; 175 routing cases). `/healthz` returned 200 `{"status":"ok"}`; home page 200 with HSTS and the strict CSP; admin address redirected to Access login with the correct AUD; the owner then logged in and saw the Growth dashboard (all zeros, as expected).
+- **Off in this build:** Google sign-in, groups, partners, push, metrics and device location are compiled out of the production build and no `FLAG_*` is set. Samples are hidden. The Google client ID is not in production config; turning sign-in on is a separate release with its own legal gates.
+- **Rollback:** `npx wrangler rollback --env production` (app) and the same with `-c wrangler.admin.toml` (admin); removing a custom domain in the dashboard takes that address offline.
+- **Open:** production VAPID keys (not generated), production `SESSION_SECRET` (needed once sign-in is on), counsel and the other legal gates, paid plan (OQ-028).
 
 ## Secrets-scan false positives cleared — 2026-11-28 02:55:27 IST
 
@@ -38,12 +49,6 @@
 ## WHO DID WHAT — three people, from git history (429 commits, 20 active days, 2026-11-02 to 2026-11-27)
 
 Times are IST (commit times). The work is grouped under the three people: **GKM Raju** (GitHub `gkmraju`, git name `Twisted_Arrow`; includes the Codex and Claude agent sessions), **Aditya** (includes Siddhu, same person) and **Amrutha** (`amruthamudunuru39`; the entries credit them as LEAD). Claude and Codex commits are counted under the person whose session they belong to. Git does not record whose session each agent commit came from, so all Claude and Codex commits are placed under GKM Raju (owner-directed work: ADR 0011 decisions, the 2026-11-14 direct-deploy rule); correct this if a session belonged to someone else. No independent reviewer is recorded unless an entry says so.
-
-| Person                           | Commits | Active days                                     | Work (from commit messages; not independently reviewed)                                                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------------------------- | ------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **GKM Raju** (+ Codex, + Claude) | 322     | 11-02 to 11-27                                  | Governance, content, map, Google sign-in, Group, Partners, admin dashboard, Design B, retention; all entries from 11-14. With Claude (39 commits): frontend phase 0, design tokens; screens for Ghats, Stay, Travel, Culture and Conditions, backend first slice, ADR 0011, Access verifier, staging Durable Object fix (11-03, 11-10 to 11-12, 11-14). With Codex (4 commits, 11-06): local integration review snapshot, ghat review draft recovery                |
-| **Aditya** (+ Siddhu)            | 62      | 11-03, 11-05, 11-07, 11-14, 11-21, 11-25, 11-26 | Standards v3 docs, vitest 5 upgrade, backend contracts merge; merged pull requests (standards docs, security: worker-first routing, locked scan evidence, paused PR preview credentials, delivery plan); 11-21 UI work (18 commits); 11-25 admin restyle, splash, home countdown (CSS only; reviewed 11-27 in `docs/operations/review-aditya-motion-text-2026-11-27.md`); 11-26 00:08 "apply flow design to admin growth and pilgrim app" (not separately reviewed) |
-| **Amrutha**                      | 18      | 11-02, 11-03, 11-05, 11-10, 11-15               | Repository scaffold and CI/CD, V1 status report and roadmap, licence-check and SCA fixes, staging smoke test                                                                                                                                                                                                                                                                                                                                                        |
 
 Not a person: 27 commits by dependabot and github-actions (dependency updates, release pull requests) are listed as "automation" in the timeline below.
 
