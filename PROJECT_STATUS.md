@@ -16,11 +16,21 @@
 
 **Critical path:** buy the paid plan; book the security test, accessibility audit and counsel session now (longest waits); owner creates the production Google client and gives the domain; agent then prepares production config (A12) and runs the staging rehearsal (B9); then release approval (B16). See [production readiness list](docs/operations/production-readiness-list.md).
 
-**Production:** deployed 2026-11-28 (see the first entry below): app at pushkaramitra.app, admin at admin.pushkaramitra.app, every feature flag off. **Staging:** redeployed by CI on every push; CI, Supply chain, Scorecard and Deploy staging passed on `76989d1`; runs for the later push `a71ea2d` were not checked.
+**Production:** live since 2026-11-28 (see the first two entries below): app at pushkaramitra.app, admin at admin.pushkaramitra.app; Google sign-in, partners and partner phone notifications on; groups, metrics and device location off. **Staging:** redeployed by CI on every push; CI, Supply chain, Scorecard and Deploy staging passed on `76989d1`; runs for the later push `a71ea2d` were not checked.
 
 **Owner open items:** staging check of the 18+ tick; native review of te/hi `pv.adult`; OQ-028; counsel list on launch day; yearly deletion of Contact us emails (runbook).
 
 **Where the full old text is:** [docs/archive/PROJECT_STATUS_FULL_2026-11-27.md](docs/archive/PROJECT_STATUS_FULL_2026-11-27.md). Older entries below are shortened (long lines cut, long tables trimmed); the newest entries (2026-11-25 to 2026-11-27) are unchanged.
+
+## Production release 2: sign-in, partners and phone notifications on — 2026-11-28 IST
+
+- **Who:** owner asked for sign-in and VAPID on production in chat; Claude Code (agent) built, set secrets and deployed. Independent reviewer: NONE. **Legal sign-off: none.** Counsel review (OQ-024) and the other legal gates are still open; this entry is engineering readiness only and certifies no compliance.
+- **Source and environment:** commit `bde3ce4` on `main`, production. App Worker `pushkara-mitra-production` version `2d0bbf03-c3c4-4cfe-9e61-87f53a2d6356`; admin Worker `pushkara-mitra-admin-production` version `b3fb40c3-11cb-4c20-94e2-614e5db17d9d`.
+- **What changed:** new build mode `release` (`npm run build:web:production`, used by `ship:production`) compiles in Google sign-in and partners; groups, metrics, device location and sample rows stay off (guard: `tests/guards/google-signin-config.test.ts`). Production vars: public `GOOGLE_CLIENT_ID`, `FLAG_PARTNERS` on both Workers. Secrets set on production (values never shown): app `SESSION_SECRET`, `VAPID_PUBLIC_KEY`, `FLAG_PARTNER_PUSH`; admin `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_SUBJECT`, `FLAG_PARTNER_PUSH`. The VAPID pair is new, not the staging pair.
+- **Checks (actual output):** `npm run check` 1190 passed, 24 skipped; `npm run gate` budgets within, 175 routing cases passed. After deploy: `/healthz` 200 `{"status":"ok"}`; home page 200 with the Google sign-in CSP and COOP `same-origin-allow-popups`; `/api/v1/partners/me` without a session 401; admin address 302 to Access.
+- **Not verified:** no real Google sign-in, partner approval or phone notification has been run on production yet. The Google console origin `https://pushkaramitra.app` was shown saved by the owner; propagation can take a while.
+- **Rollback:** `npx wrangler rollback --env production` (app) and the same with `-c wrangler.admin.toml` (admin). To switch partners off alone, remove `FLAG_PARTNERS` on both Workers and redeploy; to stop only phone messages, delete `FLAG_PARTNER_PUSH`.
+- **Open:** native review of te/hi strings, counsel and legal gates, paid plan (OQ-028), groups/metrics/location decisions.
 
 ## Production deployed, first release (flags off) — 2026-11-28 IST
 
