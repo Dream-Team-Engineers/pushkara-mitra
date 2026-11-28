@@ -83,6 +83,14 @@ Entries that say "time not recorded" fall on these days. No commits on 11-08, 11
 
 **Accountability required in every entry:** task and outcome; actual implementer/agent; accountable human owner; independent reviewer and actual review state; evidence (commit/PR/issue and exact checks); blockers; next action and its owner. Distinguish GitHub commit author, agent execution, verification, human review, merge and deployment. Never infer approval from a merge or tick another person's review. Unknown actor/time/reviewer stays `UNKNOWN`; a requested review is not a completed review.
 
+## Partner nudge notifications: ADR and threat model — 2026-11-28 IST
+
+- **Who:** owner asked to start with the ADR and threat model (owner could not log in to Cloudflare, so production domain and Google client wait); Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.
+- **Done:** `docs/decisions/0020-partner-nudge-push.md` (status Proposed): opt-in Web Push on top of approval, empty pushes with fixed text, admin Worker sends with a Worker-only VAPID key, per-partner caps, 40-per-nudge cap on the free plan, deletion rules, kill switch `FLAG_PARTNER_PUSH`, threat table. Added DI-26, CON-08, OQ-048 and a pointer in `docs/security/threat-model.md`. Documentation only: no code, migration or secret; prettier run on the edited files.
+- **Unverified:** iPhone and Android delivery behaviour (needs real phones in staging); push-service terms and cross-border wording (counsel, OQ-048).
+- **Owner decisions needed before any build:** approve the design; `VAPID_SUBJECT` contact address; native review of the notification wording; the 40 cap until OQ-028.
+- **Still waiting on owner:** production domain and production Google client (Cloudflare login).
+
 ## Records refreshed for default-on sharing and contact emails — 2026-11-27 21:18 IST (`76989d1`; runbook 21:42 `a71ea2d`)
 
 - **Who:** owner said go ahead; Claude Code (agent). Independent reviewer: NONE. Legal sign-off: none.

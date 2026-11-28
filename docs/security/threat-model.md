@@ -61,3 +61,7 @@ This unmerged candidate adds only original public static pages and a six-resourc
 Readiness requires the current controlling worker to acknowledge the expected cache revision and complete static set. Failed new installation with an older active worker must never report the new revision ready. Old in-flight workers can finish public requests; perpetual disappearance of every legacy public cache is not a security guarantee. Cache/protocol/helper versions must change together when static content changes.
 
 Same-origin script or service-worker compromise remains a trust risk; CSP, safe text rendering, exact static source review and deployment credential isolation are required defenses, not proof against all attacks. No identity, D1, consent, location or private processing is activated here. Future authenticated routes must reassess static paths, logout/session boundaries and cache behavior before release. Hosting connection-data handling remains unverified and requires privacy review. Native-language, accessibility, legal/IP and independent human approval remain pending.
+
+## Partner phone notifications (2026-11-28, design only)
+
+ADR 0020 adds a trust boundary: the admin Worker sends empty Web Push messages through the browser vendors' push services (Google, Apple, Mozilla) to approved partners who opted in. New assets are the VAPID private key (admin Worker secret) and stored push endpoints (credentials). The ADR's threat table is the record; nothing is built and the ratings and sign-off stay pending.
