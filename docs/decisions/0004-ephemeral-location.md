@@ -1,6 +1,6 @@
 # 0004. Ephemeral location
 
-Status: Proposed (base ADR; Amendment 1 approved for staging only on 2026-11-03)
+Status: Proposed (base ADR; Amendment 1 approved for staging only on 2026-11-03; Amendment 3 approved for production on 2026-11-28)
 Date: 2026-11-02
 
 ## Context
@@ -74,3 +74,21 @@ Workers Free requires SQLite-backed Durable Objects, as documented in Amendment 
 ### Verification and rollback boundaries
 
 The configuration guard checks preview/staging SQLite declarations, unchanged production/top-level declarations, only `GroupLocation`, and the original `v1` tags. Privacy guards remain mandatory and unchanged. Local tests do not provision Cloudflare resources or prove live preview availability. A rollback before first deployment can revert this preview-only candidate; after provisioning, do not assume a backend switch is reversible or remove a namespace without a separately approved migration/retention plan.
+
+## Amendment 3: Initial production namespace on Workers Free (2026-11-28)
+
+Status: **Approved by the owner (gkmraju) on 2026-11-28, production only.** The owner chose this option over upgrading to the paid plan (OQ-028 stays deferred). It does not approve the base ADR's other pending criteria, any location feature or any paid setting.
+
+### Evidence
+
+The first production deploy (`npm run ship:production`, source commit `4182b5e`) failed with Cloudflare error 10097: "In order to use Durable Objects with a free plan, you must create a namespace using a `new_sqlite_classes` migration." Before it, `wrangler secret list --env production` answered that the Worker `pushkara-mitra-production` did not exist, so no production namespace exists to convert or reset. The account is on Workers Free, as for Amendment 1.
+
+### Decision
+
+1. Only production changes, from `new_classes` to `new_sqlite_classes = ["GroupLocation"]`, keeping the initial tag `v1`. Top-level stays `new_classes`; preview and staging are unchanged.
+2. The SQLite store may be provisioned but must never be used. Everything in Amendment 1 item 2 applies unchanged: no `ctx.storage` of any kind, no SQL, KV or alarms, no attachment serialisation, no coordinates in logs, no location history. The class stays a stub and the persistence allow-list stays empty.
+3. This is an initial namespace, not a conversion. If a production namespace is ever found to exist already, stop and investigate; do not delete, recreate or reset it to push a migration through.
+
+### Guards and consequences
+
+`tests/guards/wrangler-config.test.ts` now expects `new_sqlite_classes` for production and still rejects any other class, tag or backend change. The privacy guards are unchanged. Cloudflare keeps a small empty database per production object. The backend cannot be switched back without deleting the namespace; a later move to the paid plan would keep SQLite and needs no further change. At M10 the class is removed with a `deleted_classes` migration. This is not legal advice or a compliance claim.

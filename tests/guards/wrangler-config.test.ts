@@ -3,10 +3,11 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Config guard for ADR 0004 Amendment 1 and proposed Amendment 2.
- * GroupLocation remains the only class. Preview and staging use unused SQLite provisioning
- * for Workers Free; top-level and production stay unchanged. Amendment 2 is a proposal,
- * not owner approval or deployment authorization. Further changes require reviewed decisions.
+ * Config guard for ADR 0004 Amendments 1 to 3.
+ * GroupLocation remains the only class. Preview, staging and production use unused SQLite
+ * provisioning for Workers Free; only the top-level migration keeps new_classes. Amendment 2
+ * (preview) is a proposal; Amendment 3 (production) was approved by the owner on 2026-11-28.
+ * Further changes require reviewed decisions.
  */
 const TOML = readFileSync(join(import.meta.dirname, '..', '..', 'wrangler.toml'), 'utf8');
 
@@ -14,7 +15,7 @@ const EXPECTED: Record<string, 'new_classes' | 'new_sqlite_classes'> = {
   top: 'new_classes',
   preview: 'new_sqlite_classes',
   staging: 'new_sqlite_classes',
-  production: 'new_classes',
+  production: 'new_sqlite_classes',
 };
 
 const DECLARATION = /^\s*(new_classes|new_sqlite_classes)\s*=\s*\[([^\]]*)\]/gm;
@@ -68,10 +69,10 @@ describe('wrangler.toml Durable Object migrations', () => {
     }).toThrow();
   });
 
-  it('rejects production migration changes or namespace-reset tags', () => {
+  it('rejects production fallback to new_classes or namespace-reset tags', () => {
     const changed = TOML.replace(
-      '[[env.production.migrations]]\ntag = "v1"\nnew_classes',
       '[[env.production.migrations]]\ntag = "v1"\nnew_sqlite_classes',
+      '[[env.production.migrations]]\ntag = "v1"\nnew_classes',
     );
     expect(changed).not.toBe(TOML);
     expect(() => {
@@ -79,7 +80,7 @@ describe('wrangler.toml Durable Object migrations', () => {
     }).toThrow();
     const reset = TOML.replaceAll('tag = "v1"', 'tag = "v2"');
     expect(() => {
-      assertEnvironmentMigration(reset, 'preview');
+      assertEnvironmentMigration(reset, 'production');
     }).toThrow();
   });
 
