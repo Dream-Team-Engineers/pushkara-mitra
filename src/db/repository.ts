@@ -103,6 +103,10 @@ export interface Repository {
     inviteExpiresIso: string,
     uses: number,
   ): Promise<string>;
+  /** True when an active group already uses this name (case-insensitive), other than `exceptId`. */
+  groupNameTaken(name: string, exceptId?: string): Promise<boolean>;
+  /** Changes an active group's name. The route has already checked the caller owns it. */
+  renameGroup(groupId: string, name: string): Promise<boolean>;
   /** Makes sure the group's permanent code is accepted (older groups had random codes). */
   ensureInvitation(
     groupId: string,
@@ -323,6 +327,24 @@ export function d1Repository(db: D1Database): Repository {
           .bind(codeHash, id, inviteExpiresIso, uses),
       ]);
       return id;
+    },
+
+    async groupNameTaken(name, exceptId) {
+      const rows = await all(
+        "SELECT 1 AS ok FROM group_ WHERE state = 'active' AND lower(name) = lower(?) AND id <> ? LIMIT 1",
+        name,
+        exceptId ?? '',
+      );
+      return rows.length > 0;
+    },
+
+    async renameGroup(groupId, name) {
+      const result = await run(
+        "UPDATE group_ SET name = ? WHERE id = ? AND state = 'active'",
+        name,
+        groupId,
+      );
+      return result.meta.changes === 1;
     },
 
     async ensureInvitation(groupId, codeHash, expiresIso, uses) {

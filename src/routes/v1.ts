@@ -25,6 +25,7 @@ import {
  *   POST   /api/v1/groups/{id}/invite  owner gets the group's (permanent) code [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/leave   leave a group                          [flag FLAG_GROUPS]
  *   POST   /api/v1/groups/{id}/remove  owner removes a member by handle       [flag FLAG_GROUPS]
+ *   POST   /api/v1/groups/{id}/rename  owner changes the (required, unique) name [flag FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/members everyone in the group: handle, role, first name [FLAG_GROUPS]
  *   GET    /api/v1/groups/{id}/live    WebSocket to the in-memory live room   [+ FLAG_GROUP_LOCATION]
  *   POST   /api/v1/ping                count one app open or install         [flag FLAG_METRICS]
@@ -47,7 +48,7 @@ const GROUP_LIFETIME_SECONDS = 14 * 24 * 60 * 60; // PROPOSAL: should match the 
 /** One code per group for its whole life (owner decision 2026-11-23); the 10-member limit caps joins. */
 const INVITE_USES = 10_000;
 const GROUP_ID = /^[a-z2-7]{26}$/;
-const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove|members)$/;
+const GROUP_ACTION = /^\/groups\/[a-z2-7]{26}\/(invite|leave|live|remove|members|rename)$/;
 /** Longest first name kept for a member (ADR 0017, migration 0009). */
 const MEMBER_NAME_MAX = 20;
 
@@ -121,6 +122,8 @@ const MESSAGES = {
   ALREADY_MEMBER: 'Already a member.',
   GROUP_FULL: 'The group is full.',
   INVALID_NAME: 'Use up to 16 letters or digits.',
+  NAME_REQUIRED: 'Enter a group name.',
+  NAME_TAKEN: 'That group name is already taken.',
 } as const;
 type ErrorCode = keyof typeof MESSAGES;
 
@@ -516,19 +519,28 @@ async function groups(
     }
     const name = cleanGroupName(body['name']);
     if (name === undefined) return fail('INVALID_NAME', 400);
+    // A group needs a name (owner decision 2026-11-28), and no two active groups share one.
+    if (name === null) return fail('NAME_REQUIRED', 400);
+    if (await repo.groupNameTaken(name)) return fail('NAME_TAKEN', 409);
     const id = randomId();
     const code = await groupJoinCode(secret, id);
     const expires = iso(now + GROUP_LIFETIME_SECONDS);
-    await repo.createGroup(
-      id,
-      signed.subjectRef,
-      name,
-      iso(now),
-      expires,
-      await sha256Hex(`join.v1|${code}`),
-      expires,
-      INVITE_USES,
-    );
+    try {
+      await repo.createGroup(
+        id,
+        signed.subjectRef,
+        name,
+        iso(now),
+        expires,
+        await sha256Hex(`join.v1|${code}`),
+        expires,
+        INVITE_USES,
+      );
+    } catch (error) {
+      // Two people choosing the same name at the same moment: the unique index refuses the second.
+      if (await repo.groupNameTaken(name)) return fail('NAME_TAKEN', 409);
+      throw error;
+    }
     await repo.setMemberName(id, signed.subjectRef, firstName);
     return ok({ id, joinCode: code }, 201);
   }
@@ -557,7 +569,7 @@ async function groups(
     return fail('INVALID_CODE', 400);
   }
 
-  const match = /^\/([a-z2-7]{26})\/(invite|leave|live|remove|members)$/.exec(rest);
+  const match = /^\/([a-z2-7]{26})\/(invite|leave|live|remove|members|rename)$/.exec(rest);
   if (match !== null) {
     const id = match[1] ?? '';
     if (!GROUP_ID.test(id)) return fail('NOT_FOUND', 404);
@@ -571,6 +583,27 @@ async function groups(
       return new Response(null, { status: 204, headers: NO_STORE });
     }
     if (match[2] === 'remove') return removeMember(request, deps, repo, now, signed, id);
+    if (match[2] === 'rename') {
+      // Only the owner of an active group may rename it; anyone else gets the same answer as a wrong id.
+      const body = await readJsonObject(request);
+      if (body instanceof Response) return body;
+      if (!hasOnlyKeys(body, ['name'])) return fail('INVALID_REQUEST', 400);
+      const name = cleanGroupName(body['name']);
+      if (name === undefined) return fail('INVALID_NAME', 400);
+      if (name === null) return fail('NAME_REQUIRED', 400);
+      const owned = await repo.listGroups(signed.subjectRef, iso(now));
+      if (!owned.some((g) => g.id === id && g.role === 'owner' && g.state === 'active')) {
+        return fail('NOT_FOUND', 404);
+      }
+      if (await repo.groupNameTaken(name, id)) return fail('NAME_TAKEN', 409);
+      try {
+        if (!(await repo.renameGroup(id, name))) return fail('NOT_FOUND', 404);
+      } catch (error) {
+        if (await repo.groupNameTaken(name, id)) return fail('NAME_TAKEN', 409);
+        throw error;
+      }
+      return new Response(null, { status: 204, headers: NO_STORE });
+    }
     // The group keeps one code; the owner just gets it again. Not the owner, or the group is closed
     // or gone: the same answer, so ids cannot be probed.
     const groups = await repo.listGroups(signed.subjectRef, iso(now));

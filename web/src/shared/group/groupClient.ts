@@ -135,14 +135,18 @@ export function cleanGroupName(raw: string): string | null {
   return codePoints(name) <= GROUP_NAME_MAX && GROUP_NAME.test(name) ? name : null;
 }
 
-/** Creates a group. The join code is shown once; the server keeps only its hash. */
+/**
+ * Creates a group. A name is required (owner decision 2026-11-28) and must not be used by another
+ * active group: 'taken' says so. The join code is shown once; the server keeps only its hash.
+ */
 export async function createGroup(
   name = '',
   request: Fetch = defaultFetch,
-): Promise<{ id: string; joinCode: string } | null> {
+): Promise<{ id: string; joinCode: string } | 'taken' | null> {
   const clean = cleanGroupName(name);
-  if (clean === null) return null;
-  const response = await send(request, BASE, 'POST', clean === '' ? {} : { name: clean });
+  if (clean === null || clean === '') return null;
+  const response = await send(request, BASE, 'POST', { name: clean });
+  if (response.status === 409) return (await errorCode(response)) === 'NAME_TAKEN' ? 'taken' : null;
   if (response.status !== 201) return null;
   const body: unknown = await response.json();
   if (!isRecord(body)) return null;
@@ -150,6 +154,23 @@ export async function createGroup(
   return typeof id === 'string' && typeof joinCode === 'string' && CODE.test(joinCode)
     ? { id, joinCode }
     : null;
+}
+
+export type RenameOutcome = 'ok' | 'taken' | 'invalid' | 'error';
+
+/** The owner changes the group's name. The name stays unique among active groups. */
+export async function renameGroup(
+  groupId: string,
+  name: string,
+  request: Fetch = defaultFetch,
+): Promise<RenameOutcome> {
+  const clean = cleanGroupName(name);
+  if (clean === null || clean === '') return 'invalid';
+  const response = await send(request, `${BASE}/${groupId}/rename`, 'POST', { name: clean });
+  if (response.status === 204) return 'ok';
+  if (response.status === 409) return 'taken';
+  if (response.status === 400) return 'invalid';
+  return 'error';
 }
 
 export type JoinOutcome = 'joined' | 'invalid' | 'already' | 'full' | 'error';

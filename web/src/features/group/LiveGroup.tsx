@@ -9,6 +9,7 @@ import {
   cleanGroupName,
   connectLive,
   createGroup,
+  renameGroup,
   disconnectLive,
   GROUP_NAME_MAX,
   joinGroup,
@@ -81,6 +82,10 @@ export default function LiveGroup() {
   const code = useSignal('');
   const groupName = useSignal('');
   const nameInvalid = useSignal(false);
+  const nameTaken = useSignal(false);
+  const editing = useSignal(false);
+  const newName = useSignal('');
+  const renameProblem = useSignal<'invalid' | 'taken' | null>(null);
   const copied = useSignal<'code' | 'invite' | 'failed' | null>(null);
   const joinResult = useSignal<JoinOutcome | null>(null);
   const busy = useSignal(false);
@@ -215,23 +220,34 @@ export default function LiveGroup() {
                 onInput={(event) => {
                   groupName.value = event.currentTarget.value;
                   nameInvalid.value = cleanGroupName(groupName.value) === null;
+                  nameTaken.value = false;
                 }}
               />
             </label>
             <p
               id="group-name-hint"
               class="group-panel__hint"
-              role={nameInvalid.value ? 'alert' : undefined}
+              role={nameInvalid.value || nameTaken.value ? 'alert' : undefined}
             >
-              {t(nameInvalid.value ? 'group.live.badName' : 'group.live.nameHint')}
+              {t(
+                nameTaken.value
+                  ? 'group.live.nameTaken'
+                  : nameInvalid.value
+                    ? 'group.live.badName'
+                    : 'group.live.nameHint',
+              )}
             </p>
             <button
               type="button"
               class="button button--compact"
-              disabled={busy.value || nameInvalid.value}
+              disabled={busy.value || nameInvalid.value || cleanGroupName(groupName.value) === ''}
               onClick={() =>
                 void run(async () => {
                   const created = await createGroup(groupName.value);
+                  if (created === 'taken') {
+                    nameTaken.value = true;
+                    return true;
+                  }
                   if (created === null) return false;
                   groupName.value = '';
                   await refresh();
@@ -330,6 +346,73 @@ export default function LiveGroup() {
               {t(isLeader ? 'group.live.roleLeader' : 'group.live.roleMember')}
             </span>
           </div>
+          {isLeader ? (
+            editing.value ? (
+              <div class="group-rename">
+                <label class="visually-hidden" for="group-rename">
+                  {t('group.live.nameLabel')}
+                </label>
+                <input
+                  id="group-rename"
+                  type="text"
+                  autocomplete="off"
+                  maxLength={GROUP_NAME_MAX}
+                  value={newName.value}
+                  aria-invalid={renameProblem.value !== null}
+                  onInput={(event) => {
+                    newName.value = event.currentTarget.value;
+                    renameProblem.value = null;
+                  }}
+                />
+                <button
+                  type="button"
+                  class="button button--compact"
+                  disabled={busy.value || cleanGroupName(newName.value) === ''}
+                  onClick={() =>
+                    void run(async () => {
+                      const result = await renameGroup(group.id, newName.value);
+                      if (result === 'ok') {
+                        editing.value = false;
+                        await refresh();
+                        return true;
+                      }
+                      renameProblem.value = result === 'taken' ? 'taken' : 'invalid';
+                      return result !== 'error';
+                    })
+                  }
+                >
+                  {t('group.live.nameSave')}
+                </button>
+                <button
+                  type="button"
+                  class="button button--secondary button--compact"
+                  onClick={() => {
+                    editing.value = false;
+                    renameProblem.value = null;
+                  }}
+                >
+                  {t('group.live.nameCancel')}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                class="pill-button"
+                onClick={() => {
+                  newName.value = group.name ?? '';
+                  renameProblem.value = null;
+                  editing.value = true;
+                }}
+              >
+                {t('group.live.nameEdit')}
+              </button>
+            )
+          ) : null}
+          {renameProblem.value === null ? null : (
+            <p class="group-panel__hint group-panel__hint--alert" role="alert">
+              {t(renameProblem.value === 'taken' ? 'group.live.nameTaken' : 'group.live.badName')}
+            </p>
+          )}
           <p class="group-panel__meta">
             {t('group.live.count', {
               count: formatNumber(group.memberCount),

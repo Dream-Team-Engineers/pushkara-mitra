@@ -153,8 +153,8 @@ describe('group client: groups API', () => {
 
   it('sends cookies only to its own origin and never puts a position in a request', async () => {
     const { request, calls } = fake(201, { id: GROUP_ID, joinCode: 'ABCD2345' });
-    expect(await createGroup('', request)).toEqual({ id: GROUP_ID, joinCode: 'ABCD2345' });
-    expect(calls[0]?.init?.body).toBe('{}');
+    expect(await createGroup('Family', request)).toEqual({ id: GROUP_ID, joinCode: 'ABCD2345' });
+    expect(calls[0]?.init?.body).toBe('{"name":"Family"}');
     expect(calls[0]?.init?.credentials).toBe('same-origin');
     expect(calls[0]?.init?.body as string).not.toMatch(/lat|lng/);
   });
@@ -202,6 +202,12 @@ describe('group client: live room', () => {
     const bad = fake(201, { id: GROUP_ID, joinCode: 'ABCD2345' });
     expect(await createGroup('Raju-Family!', bad.request)).toBeNull();
     expect(bad.calls).toHaveLength(0);
+    // A name is required: an empty one is refused without a request.
+    expect(await createGroup('   ', bad.request)).toBeNull();
+    expect(bad.calls).toHaveLength(0);
+    // A name another active group uses comes back as 'taken'.
+    const taken = fake(409, { error: { code: 'NAME_TAKEN', message: 'x' } });
+    expect(await createGroup('Family', taken.request)).toBe('taken');
     expect(cleanGroupName('a'.repeat(17))).toBeNull();
     expect(cleanGroupName('రాజు కుటుంబం')).toBe('రాజు కుటుంబం');
   });

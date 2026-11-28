@@ -85,6 +85,13 @@ beforeAll(async () => {
   }
 });
 
+/** Group names are required and unique, so each test group gets its own. */
+let nameCounter = 0;
+function freshName(): string {
+  nameCounter += 1;
+  return `Team${String(nameCounter)}`;
+}
+
 describe('flags fail closed', () => {
   it('answers 404 for SOS and groups when the flag is not exactly "enabled"', async () => {
     for (const value of [undefined, '', 'true', 'ENABLED', '1']) {
@@ -258,7 +265,7 @@ describe('signed-in routes', () => {
       decision: 'granted',
     };
     await post('/api/v1/me/consents', consent, who.cookie);
-    const madeRes = await post('/api/v1/groups', {}, who.cookie);
+    const madeRes = await post('/api/v1/groups', { name: freshName() }, who.cookie);
     const made = await madeRes.json<{ id: string }>();
     const res = await call('/api/v1/me', {
       method: 'DELETE',
@@ -280,7 +287,7 @@ describe('groups (metadata only)', () => {
   it('creates, joins by code, lists, and leaves; the last member removes the group', async () => {
     const owner = await signIn('group-owner');
     const guest = await signIn('group-guest');
-    const made = await post('/api/v1/groups', {}, owner.cookie);
+    const made = await post('/api/v1/groups', { name: freshName() }, owner.cookie);
     const created = await made.json<{ id: string; joinCode: string }>();
     expect(created.joinCode).toMatch(/^[A-HJKMNP-Z2-9]{8}$/);
 
@@ -316,7 +323,7 @@ describe('groups (metadata only)', () => {
   it('only the owner can invite, and a stranger learns nothing about the id', async () => {
     const owner = await signIn('invite-owner');
     const guest = await signIn('invite-guest');
-    const made = await post('/api/v1/groups', {}, owner.cookie);
+    const made = await post('/api/v1/groups', { name: freshName() }, owner.cookie);
     const created = await made.json<{ id: string; joinCode: string }>();
     await post('/api/v1/groups/join', { code: created.joinCode }, guest.cookie);
     expect((await post(`/api/v1/groups/${created.id}/invite`, {}, guest.cookie)).status).toBe(404);
@@ -328,7 +335,7 @@ describe('groups (metadata only)', () => {
 
   it('rejects bad codes and spends each use once', async () => {
     const owner = await signIn('uses-owner');
-    const made = await post('/api/v1/groups', {}, owner.cookie);
+    const made = await post('/api/v1/groups', { name: freshName() }, owner.cookie);
     const created = await made.json<{ joinCode: string }>();
     const stranger = await signIn('uses-stranger');
     expect((await post('/api/v1/groups/join', { code: 'nope' }, stranger.cookie)).status).toBe(400);
@@ -352,7 +359,7 @@ describe('groups (metadata only)', () => {
     const guest = await signIn('roster-guest', '  Ravi   Kumar ');
     const stranger = await signIn('roster-stranger', 'Mallory');
     const created = await (
-      await post('/api/v1/groups', {}, owner.cookie)
+      await post('/api/v1/groups', { name: freshName() }, owner.cookie)
     ).json<{ id: string; joinCode: string }>();
     await post('/api/v1/groups/join', { code: created.joinCode }, guest.cookie);
 
@@ -395,7 +402,9 @@ describe('groups (metadata only)', () => {
 
   it('keeps at most a 20-character first name', async () => {
     const owner = await signIn('long-name-owner', `${'X'.repeat(30)} Surname`);
-    const created = await (await post('/api/v1/groups', {}, owner.cookie)).json<{ id: string }>();
+    const created = await (
+      await post('/api/v1/groups', { name: freshName() }, owner.cookie)
+    ).json<{ id: string }>();
     const row = await DB.prepare('SELECT display_name FROM membership WHERE group_id = ?')
       .bind(created.id)
       .first<{ display_name: string }>();

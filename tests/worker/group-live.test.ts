@@ -123,7 +123,7 @@ async function connect(groupId: string, cookie: string) {
 }
 
 async function createGroup(cookie: string): Promise<{ id: string; joinCode: string }> {
-  const response = await post('/api/v1/groups', {}, cookie);
+  const response = await post('/api/v1/groups', { name: freshName() }, cookie);
   expect(response.status).toBe(201);
   return response.json();
 }
@@ -148,6 +148,13 @@ beforeAll(async () => {
     }
   }
 });
+
+/** Group names are required and unique, so each test group gets its own. */
+let nameCounter = 0;
+function freshName(): string {
+  nameCounter += 1;
+  return `Team${String(nameCounter)}`;
+}
 
 describe('live room access', () => {
   it('is off unless FLAG_GROUP_LOCATION is exactly "enabled"', async () => {
@@ -337,6 +344,66 @@ describe('group name', () => {
     for (const bad of ['a'.repeat(17), 'Raju-Family', '<b>x</b>', 'Raju!', 'x\u0000y', 42, ['x']]) {
       expect(cleanGroupName(bad)).toBeUndefined();
     }
+  });
+
+  it('requires a name, keeps names unique, and lets only the owner rename', async () => {
+    const ownerCookie = await signIn('owner-unique', 'Asha Rao');
+    const otherCookie = await signIn('other-unique', 'Meena Rao');
+    const memberCookie = await signIn('member-unique', 'Ravi Kumar');
+    // A name is required.
+    expect((await post('/api/v1/groups', {}, ownerCookie)).status).toBe(400);
+    expect((await post('/api/v1/groups', { name: '   ' }, ownerCookie)).status).toBe(400);
+    const made = await post('/api/v1/groups', { name: 'Godavari Yatra' }, ownerCookie);
+    expect(made.status).toBe(201);
+    const group: { id: string; joinCode: string } = await made.json();
+    // The same name is refused for another group, whatever the letter case.
+    const clash = await post('/api/v1/groups', { name: 'godavari yatra' }, otherCookie);
+    expect(clash.status).toBe(409);
+    expect(await clash.json()).toMatchObject({ error: { code: 'NAME_TAKEN' } });
+    const second = await post('/api/v1/groups', { name: 'Second Group' }, otherCookie);
+    expect(second.status).toBe(201);
+    const secondGroup: { id: string } = await second.json();
+    await post('/api/v1/groups/join', { code: group.joinCode }, memberCookie);
+    // A member cannot rename; the answer matches a wrong id.
+    const byMember = await post(
+      `/api/v1/groups/${group.id}/rename`,
+      { name: 'Mine Now' },
+      memberCookie,
+    );
+    expect(byMember.status).toBe(404);
+    // The owner cannot take another group's name, but may change case of their own.
+    const taken = await post(
+      `/api/v1/groups/${group.id}/rename`,
+      { name: 'second group' },
+      ownerCookie,
+    );
+    expect(taken.status).toBe(409);
+    expect(
+      (await post(`/api/v1/groups/${group.id}/rename`, { name: 'GODAVARI YATRA' }, ownerCookie))
+        .status,
+    ).toBe(204);
+    expect(
+      (await post(`/api/v1/groups/${group.id}/rename`, { name: 'Pushkara Trip' }, ownerCookie))
+        .status,
+    ).toBe(204);
+    expect((await post(`/api/v1/groups/${group.id}/rename`, {}, ownerCookie)).status).toBe(400);
+    expect(
+      (await post(`/api/v1/groups/${group.id}/rename`, { name: 'Bad-Name!' }, ownerCookie)).status,
+    ).toBe(400);
+    // The new name is visible to members, and the old one is free again.
+    const listed = await call('/api/v1/groups', { headers: { Cookie: memberCookie } });
+    const body: { groups: { id: string; name: string | null }[] } = await listed.json();
+    expect(body.groups.find((g) => g.id === group.id)?.name).toBe('Pushkara Trip');
+    expect(secondGroup.id).not.toBe(group.id);
+    expect(
+      (
+        await post(
+          '/api/v1/groups',
+          { name: 'Godavari Yatra' },
+          await signIn('third-unique', 'Sita Devi'),
+        )
+      ).status,
+    ).toBe(201);
   });
 
   it('stores the name, shows it to members, refuses a bad one and clears it on erasure', async () => {
