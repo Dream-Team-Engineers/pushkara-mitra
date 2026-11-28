@@ -7,6 +7,7 @@ import {
   sendNudge,
   setUpdateHidden,
 } from '../db/adminPartners';
+import { PUBLISHED_CONTENT } from '../content/publishedContent';
 import { growth, groupStats, live, tableCounts } from '../db/adminStats';
 import { istPeriods } from '../http/istTime';
 import type { KeyLookup } from '../security/accessJwt';
@@ -95,6 +96,16 @@ function sameText(a: string, b: string): boolean {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+/** The published ghats (the same ids partners choose in the app), for the nudge dropdown. */
+function ghatChoices(): { id: string; name: string }[] {
+  return PUBLISHED_CONTENT.ghats.dataset.items.flatMap((item) => {
+    const { id, name } = item;
+    return typeof id === 'string' && typeof name === 'string' && GHAT.test(id)
+      ? [{ id, name }]
+      : [];
+  });
 }
 
 function backToPartners(notice: string, push?: string): Response {
@@ -300,6 +311,7 @@ export async function handleAdmin(
             writable,
             notice: noticeParam !== null && noticeParam in PARTNER_NOTICES ? noticeParam : null,
             push: PUSH_PARAM.exec(url.searchParams.get('push') ?? ''),
+            ghats: ghatChoices(),
             nowMs,
           }),
         ),

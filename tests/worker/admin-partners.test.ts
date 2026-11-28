@@ -146,6 +146,13 @@ describe('the Partners tab', () => {
     expect(html).toContain('Waiting for approval');
   });
 
+  it('offers every published ghat in the nudge dropdown, with all ghats as the default', async () => {
+    const html = await (await view(await token())).text();
+    expect(html).toContain('<select name="ghat"><option value="">All ghats</option>');
+    expect(html).toContain('<option value="pushkar-ghat">Pushkar Ghat</option>');
+    expect(html).not.toContain('<input name="ghat"');
+  });
+
   it('is read-only and says so while FLAG_PARTNERS is off', async () => {
     const jwt = await token();
     await addPartner('pending');

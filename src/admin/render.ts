@@ -274,6 +274,8 @@ export interface PartnersView {
   /** Phone notification counts after a nudge: [all, sent, failed, rest]; null when none were attempted. */
   readonly push?: RegExpExecArray | null;
   readonly nowMs: number;
+  /** Every ghat partners can pick, so staff choose from a list instead of typing an id. */
+  readonly ghats?: readonly { readonly id: string; readonly name: string }[];
 }
 
 const csrfField = (csrf: string): string =>
@@ -351,7 +353,9 @@ export function partnersBody(view: PartnersView): string {
     ? `<form class="card nudge" method="post" action="/partners/nudge">${csrfField(csrf)}
   <h2>Ask partners for an update</h2>
   <label>What<select name="kind"><option value="crowd">Crowd level</option><option value="river">River level</option><option value="food">Free food</option></select></label>
-  <label>Ghat (optional)<input name="ghat" maxlength="64" pattern="[a-z0-9][a-z0-9/\\-]{0,63}" placeholder="all ghats" autocomplete="off"></label>
+  <label>Ghat<select name="ghat"><option value="">All ghats</option>${(view.ghats ?? [])
+    .map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`)
+    .join('')}</select></label>
   <button class="btn btn--go" type="submit">Send nudge</button>
   <p class="note">Fixed wording only. Goes to approved partners (all, or those with that home ghat) and closes after 6 hours. 10 per hour.</p>
 </form>`
